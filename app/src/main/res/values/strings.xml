@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">ProjectXClient</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+
+    <string name="action_settings">action stringgggg</string>
+
+    <!-- Menu Strings -->
+    <string name="add_friend_title">Add New Friend</string>
+    <string name="new_event_title">Create New Event</string>
+    <string name="event_list_title">My Events</string>
+    <string name="event_settings_title">Events Settings</string>
+    <string name="account_settings_title">Account Settings</string>
+    <string name="friends_list_title">My Friends</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+</resources>
