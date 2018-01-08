@@ -3,7 +3,6 @@ package com.example.malicteam.projectxclient;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -28,6 +27,8 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private LinkedList<Event> data;
+
+    EventDetailsFragment fragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,29 +74,43 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Event event = data.get(position);
-                Intent intent=new Intent(getApplicationContext(), EventDetails.class);
-                intent.putExtra("sendevent", event);
-                startActivity(intent);
-
-
-
-
+                //Intent intent=new Intent(getApplicationContext(), EventDetails.class);
+                //intent.putExtra("sendevent", event);
+                //startActivity(intent);
 
                 //Log.d("tag",event.get_nameEvent());
+                addNewFragment();
             }
         });
         //END of Eden
 
 
-        //Fragment
-        /*
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        //Fragment - Blank
+//        fragment = (EventDetailsFragment) getSupportFragmentManager().findFragmentById(R.id.details_fragment);
+//        fragment.setDate("SOME VALUE FROM ACTIVITY");
+//        fragment.setListener(new EventDetailsFragment.OnFragmentInteractionListener() {
+//            @Override
+//            public void onButtonClick() {
+//                addNewFragment();
+//            }
+//        });
+    }
 
-        BlankFragment fragment = new BlankFragment();
-        fragmentTransaction.add(R.id.example_fragment, fragment);
-        fragmentTransaction.commit();
-        */
+    //Fragment Sample
+    private void addNewFragment(){
+        fragment = new EventDetailsFragment();
+        fragment.setDate("SOME VALUE FROM ACTIVITY");
+        fragment.setListener(new EventDetailsFragment.OnFragmentInteractionListener() {
+            @Override
+            public void onButtonClick() {
+                addNewFragment();
+            }
+        });
+
+        android.support.v4.app.FragmentTransaction tran = getSupportFragmentManager().beginTransaction();
+        tran.add(R.id.details_frame_container,fragment);
+
+        tran.commit();
     }
 
     //Eden Method

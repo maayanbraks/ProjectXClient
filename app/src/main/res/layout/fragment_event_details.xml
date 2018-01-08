@@ -1,17 +1,12 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    tools:context="com.example.malicteam.projectxclient.EventDetails">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.malicteam.projectxclient.EventDetailsFragment">
 
     <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
 
         <TextView
             android:id="@+id/event_title"
@@ -28,9 +23,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/event_title"
-            android:text="TextView"
+            android:text="details_date"
             tools:layout_editor_absoluteX="16dp"
             tools:layout_editor_absoluteY="52dp" />
+
+        <TextView
+            android:id="@+id/details_date_content"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Unknown"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/event_title"/>
 
         <TextView
             android:id="@+id/details_descp"
@@ -52,15 +55,15 @@
             android:text="Participats:" />
 
         <Button
-            android:layout_below="@+id/details_partici"
-            android:id="@+id/details_open"
+            android:id="@+id/button_event_details"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="40dp"
+            android:layout_marginBottom="80dp"
             android:text="open  conversetion" />
 
 
     </RelativeLayout>
 
-</android.support.constraint.ConstraintLayout>
+</FrameLayout>
