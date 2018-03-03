@@ -22,7 +22,7 @@ import android.widget.TextView;
 import java.util.Date;
 import java.util.LinkedList;
 
-import Model.Event;
+import Event.Model.Event;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -36,8 +36,8 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton recordFab = (FloatingActionButton) findViewById(R.id.record_fab);
+        recordFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(),NewEventActivity.class);

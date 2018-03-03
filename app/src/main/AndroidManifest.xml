@@ -56,7 +56,8 @@
             android:name="android.arch.lifecycle.VERSION"
             android:value="27.0.0-SNAPSHOT" />
 
-        <activity android:name=".EventDetails"></activity>
+        <activity android:name=".EventDetails" />
+        <activity android:name=".RecordingActivity"></activity>
     </application>
 
 </manifest>

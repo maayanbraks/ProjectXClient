@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import Model.Event;
+import Event.Model.Event;
 
 public class EventDetails extends Activity {
     @Override
