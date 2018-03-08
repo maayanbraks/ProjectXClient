@@ -3,7 +3,6 @@ package com.example.malicteam.projectxclient;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,25 +18,31 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
 import java.util.Date;
 import java.util.LinkedList;
 
 import Event.Model.Event;
 
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private LinkedList<Event> data;
+    private FirebaseAuth _auth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton recordFab = (FloatingActionButton) findViewById(R.id.record_fab);
-        recordFab.setOnClickListener(new View.OnClickListener() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.record_fab);
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(),NewEventActivity.class);
@@ -54,8 +59,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        //List From Eden
 
         final ListView list = (ListView) findViewById(R.id._listOfEvents);
         data = new LinkedList<Event>();
@@ -77,40 +80,41 @@ public class MainActivity extends AppCompatActivity
                 intent.putExtra("sendevent", event);
                 startActivity(intent);
 
-
-
-
-
                 //Log.d("tag",event.get_nameEvent());
             }
         });
-        //END of Eden
 
 
-        //Fragment
-        /*
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-        BlankFragment fragment = new BlankFragment();
-        fragmentTransaction.add(R.id.example_fragment, fragment);
-        fragmentTransaction.commit();
-        */
+        //userLoggedIn();
     }
 
-    //Eden Method
+
     @Override
     protected void onResume() { //after creating new event.
         super.onResume();
-        String nameEvent = getIntent().getStringExtra("title");
-        String desc = getIntent().getStringExtra("desc");
-        String part = getIntent().getStringExtra("part");
-        if (desc != null && part != null && nameEvent != null) {
-            Event event = new Event(1, nameEvent, "04/04/2018", "m", part, desc);
-            data.add(event);
+
+
+//        else {//TODO class from
+//            String nameEvent = getIntent().getStringExtra("title");
+//            String desc = getIntent().getStringExtra("desc");
+//            String part = getIntent().getStringExtra("part");
+//            if (desc != null && part != null && nameEvent != null) {
+//                Event event = new Event(1, nameEvent, "04/04/2018", "m", part, desc);
+//                data.add(event);
+//            }
+//        }
+    }
+
+    private void userLoggedIn(){
+        _auth = FirebaseAuth.getInstance();
+
+        if (_auth != null && _auth.getCurrentUser() != null) {
+            TextView userEmail = (TextView)findViewById(R.id.userMail);
+            TextView userName = (TextView)findViewById(R.id.userName);
+            userEmail.setText(_auth.getCurrentUser().getEmail());
+            userName.setText(_auth.getCurrentUser().getEmail().split("@")[0]);
         }
     }
-    //End of Eden Method
 
     //Eden Class
     class MyAdapter extends BaseAdapter {
@@ -135,7 +139,6 @@ public class MainActivity extends AppCompatActivity
             if (view == null) {
                 view = getLayoutInflater().inflate(R.layout.records_list_row, null);
             }
-
 
             Event event= data.get(i);
 
@@ -211,6 +214,13 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_settings_event:
                 intent = new Intent(this,EventSettingsActivity.class);
                 break;
+            case R.id.nav_signup:
+                intent = new Intent(this, SignupActivity.class);
+                break;
+            case R.id.nav_login:
+                intent = new Intent(this, LoginActivity.class);
+                break;
+
             default:
                 intent = new Intent(this,MainActivity.class);
                 finish();
