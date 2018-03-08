@@ -3,6 +3,7 @@ package com.example.malicteam.projectxclient;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -17,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,6 +32,7 @@ import Event.Model.Event;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private NavigationView _navigationView;
     private LinkedList<Event> data;
     private FirebaseAuth _auth;
 
@@ -38,6 +41,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        _auth = FirebaseAuth.getInstance();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -45,7 +50,7 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(),NewEventActivity.class);
+                Intent intent = new Intent(getApplicationContext(), NewEventActivity.class);
                 startActivity(intent);
                 //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
             }
@@ -57,35 +62,32 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        _navigationView = (NavigationView) findViewById(R.id.nav_view);
+        _navigationView.setNavigationItemSelectedListener(this);
 
-        final ListView list = (ListView) findViewById(R.id._listOfEvents);
+        final ListView eventList = (ListView) findViewById(R.id._listOfEvents);
         data = new LinkedList<Event>();
-        for (int i = 0; i < 20; i++) {
-            Date date=new Date();
+        for (int i = 0; i < 10; i++) {
+            Date date = new Date();
 
-            Event event=new Event(i,"name"+i,"04/01/2018","blabla","maayan,eden","bussnies talk about moneyy$$$$$$");
+            Event event = new Event(i, "name" + i, "04/01/2018", "blabla", "maayan,eden", "bussnies talk about moneyy$$$$$$");
 
             data.add(event);
 
         }
         MyAdapter myadapter = new MyAdapter();
-        list.setAdapter(myadapter);
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        eventList.setAdapter(myadapter);
+        eventList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Event event = data.get(position);
-                Intent intent=new Intent(getApplicationContext(), EventDetails.class);
+                Intent intent = new Intent(getApplicationContext(), EventDetails.class);
                 intent.putExtra("sendevent", event);
                 startActivity(intent);
 
                 //Log.d("tag",event.get_nameEvent());
             }
         });
-
-
-        //userLoggedIn();
     }
 
 
@@ -93,68 +95,14 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() { //after creating new event.
         super.onResume();
 
+        FirebaseUser user = _auth.getCurrentUser();
+        if (user != null) {
+            userLoggedIn(user);
+        } else {
+            noCurrentUser();
+        }
 
-//        else {//TODO class from
-//            String nameEvent = getIntent().getStringExtra("title");
-//            String desc = getIntent().getStringExtra("desc");
-//            String part = getIntent().getStringExtra("part");
-//            if (desc != null && part != null && nameEvent != null) {
-//                Event event = new Event(1, nameEvent, "04/04/2018", "m", part, desc);
-//                data.add(event);
-//            }
-//        }
     }
-
-    private void userLoggedIn(){
-        _auth = FirebaseAuth.getInstance();
-
-        if (_auth != null && _auth.getCurrentUser() != null) {
-            TextView userEmail = (TextView)findViewById(R.id.userMail);
-            TextView userName = (TextView)findViewById(R.id.userName);
-            userEmail.setText(_auth.getCurrentUser().getEmail());
-            userName.setText(_auth.getCurrentUser().getEmail().split("@")[0]);
-        }
-    }
-
-    //Eden Class
-    class MyAdapter extends BaseAdapter {
-
-        @Override
-        public int getCount() {
-            return data.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            if (view == null) {
-                view = getLayoutInflater().inflate(R.layout.records_list_row, null);
-            }
-
-            Event event= data.get(i);
-
-            TextView _nameEvent = view.findViewById(R.id._nameEvent);
-            TextView _date = view.findViewById(R.id._date);
-            TextView _participates = view.findViewById(R.id._participates);
-
-            _nameEvent.setText(event._nameEvent);
-            _date.setText(event._date);
-            _participates.setText(event._participates);
-
-            return view;
-        }
-    }
-    //End of Eden Class
-
 
     @Override
     public void onBackPressed() {
@@ -197,22 +145,22 @@ public class MainActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.nav_events_list:
-                intent = new Intent(this,EventListActivity.class);
+                intent = new Intent(this, EventListActivity.class);
                 break;
             case R.id.nav_events_new:
-                intent = new Intent(getApplicationContext(),NewEventActivity.class);
+                intent = new Intent(getApplicationContext(), NewEventActivity.class);
                 break;
             case R.id.nav_friends_add:
-                intent = new Intent(this,AddFriendActivity.class);
+                intent = new Intent(this, AddFriendActivity.class);
                 break;
             case R.id.nav_friends_list:
-                intent = new Intent(this,FriendsListActivity.class);
+                intent = new Intent(this, FriendsListActivity.class);
                 break;
             case R.id.nav_settings_account:
-                intent = new Intent(this,AccountSettingsActivity.class);
+                intent = new Intent(this, AccountSettingsActivity.class);
                 break;
             case R.id.nav_settings_event:
-                intent = new Intent(this,EventSettingsActivity.class);
+                intent = new Intent(this, EventSettingsActivity.class);
                 break;
             case R.id.nav_signup:
                 intent = new Intent(this, SignupActivity.class);
@@ -222,7 +170,7 @@ public class MainActivity extends AppCompatActivity
                 break;
 
             default:
-                intent = new Intent(this,MainActivity.class);
+                intent = new Intent(this, MainActivity.class);
                 finish();
                 break;
         }
@@ -232,4 +180,73 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    //Handle User Instance
+    private void userLoggedIn(FirebaseUser user) {
+        //Navigation Header
+        View headerLayout = _navigationView.getHeaderView(0);
+        TextView userEmail = (TextView) headerLayout.findViewById(R.id.userMail);
+        TextView userName = (TextView) headerLayout.findViewById(R.id.userName);
+        try {
+            userEmail.setText(user.getEmail());
+            userName.setText(user.getEmail().split("@")[0]);
+        }
+        catch (Exception e){
+        }
+
+    }
+    private  void noCurrentUser(){
+        //Navigation Header
+        View headerLayout = _navigationView.getHeaderView(0);
+        TextView userEmail = (TextView) headerLayout.findViewById(R.id.userMail);
+        TextView userName = (TextView) headerLayout.findViewById(R.id.userName);
+        try {
+            userName.setText("Hello Guest.");
+            userEmail.setText("Please Log In if you want full service");
+        }
+        catch (Exception e){
+        }
+
+        //Navigation User Options
+    }
+    //End - Handle User Instance
+
+    //Eden Class
+    class MyAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            return data.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            if (view == null) {
+                view = getLayoutInflater().inflate(R.layout.records_list_row, null);
+            }
+
+            Event event = data.get(i);
+
+            TextView _nameEvent = view.findViewById(R.id._nameEvent);
+            TextView _date = view.findViewById(R.id._date);
+            TextView _participates = view.findViewById(R.id._participates);
+
+            _nameEvent.setText(event._nameEvent);
+            _date.setText(event._date);
+            _participates.setText(event._participates);
+
+            return view;
+        }
+    }
+    //End of Eden Class
 }
