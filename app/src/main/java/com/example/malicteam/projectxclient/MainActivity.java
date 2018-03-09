@@ -1,8 +1,13 @@
 package com.example.malicteam.projectxclient;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.renderscript.Allocation;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -16,10 +21,11 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.example.malicteam.projectxclient.Dialogs.LogoutDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -84,8 +90,6 @@ public class MainActivity extends AppCompatActivity
                 Intent intent = new Intent(getApplicationContext(), EventDetails.class);
                 intent.putExtra("sendevent", event);
                 startActivity(intent);
-
-                //Log.d("tag",event.get_nameEvent());
             }
         });
     }
@@ -146,35 +150,64 @@ public class MainActivity extends AppCompatActivity
         switch (id) {
             case R.id.nav_events_list:
                 intent = new Intent(this, EventListActivity.class);
+                startActivity(intent);
                 break;
             case R.id.nav_events_new:
                 intent = new Intent(getApplicationContext(), NewEventActivity.class);
+                startActivity(intent);
                 break;
             case R.id.nav_friends_add:
                 intent = new Intent(this, AddFriendActivity.class);
+                startActivity(intent);
                 break;
             case R.id.nav_friends_list:
                 intent = new Intent(this, FriendsListActivity.class);
+                startActivity(intent);
                 break;
             case R.id.nav_settings_account:
                 intent = new Intent(this, AccountSettingsActivity.class);
+                startActivity(intent);
                 break;
             case R.id.nav_settings_event:
                 intent = new Intent(this, EventSettingsActivity.class);
+                startActivity(intent);
                 break;
             case R.id.nav_signup:
                 intent = new Intent(this, SignupActivity.class);
+                startActivity(intent);
                 break;
             case R.id.nav_login:
-                intent = new Intent(this, LoginActivity.class);
-                break;
+                if(_auth.getCurrentUser() == null) {
+                    intent = new Intent(this, LoginActivity.class);
+                    startActivity(intent);
+                    break;
+                }
+                else
+                {
+                    logout();
+//                  TODO alert logout  AlertDialog.Builder builder = new AlertDialog();
+//                    builder.setMessage(R.string.dialog_fire_missiles)
+//                            .setPositiveButton(R.string.fire, new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int id) {
+//                                    // FIRE ZE MISSILES!
+//                                }
+//                            })
+//                            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+//                                public void onClick(DialogInterface dialog, int id) {
+//                                    // User cancelled the dialog
+//                                }
+//                            });
+                    break;
+                }
+
 
             default:
                 intent = new Intent(this, MainActivity.class);
+                startActivity(intent);
                 finish();
                 break;
         }
-        startActivity(intent);
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -193,9 +226,15 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e){
         }
+        //ToDo Profile Picture
+        ImageView pic = (ImageView)headerLayout.findViewById(R.id.userPic);
+        pic.setImageResource(R.mipmap.ic_launcher_round);//@mipmap/ic_launcher_round);//TODO Profile Picture
 
+        MenuItem item = _navigationView.getMenu().findItem(R.id.nav_login);
+        item.setTitle(R.string.nav_logout);
     }
-    private  void noCurrentUser(){
+
+    public void noCurrentUser(){
         //Navigation Header
         View headerLayout = _navigationView.getHeaderView(0);
         TextView userEmail = (TextView) headerLayout.findViewById(R.id.userMail);
@@ -206,8 +245,38 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e){
         }
+        ImageView pic = (ImageView)headerLayout.findViewById(R.id.userPic);
+        pic.setImageResource(R.drawable.outalk_logo);//TODO Profile Picture
 
         //Navigation User Options
+        MenuItem item = _navigationView.getMenu().findItem(R.id.nav_login);
+        item.setTitle(R.string.nav_login);
+    }
+
+    private void logout(){
+        //Dialog
+        //_auth.signOut();
+        LogoutDialogFragment logoutDialog = new LogoutDialogFragment();
+        logoutDialog.setActivity(this);
+        logoutDialog.show(getSupportFragmentManager(),
+                "LogoutDialog");
+
+        if(_auth.getCurrentUser() == null) {
+            noCurrentUser();
+            // this listener will be called when there is change in firebase user session
+            FirebaseAuth.AuthStateListener authListener = new FirebaseAuth.AuthStateListener() {
+                @Override
+                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                    FirebaseUser user = firebaseAuth.getCurrentUser();
+                    if (user == null) {
+                        // user auth state is changed - user is null
+                        // launch login activity
+                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                        finish();
+                    }
+                }
+            };
+        }
     }
     //End - Handle User Instance
 
