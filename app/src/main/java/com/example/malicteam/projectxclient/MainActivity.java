@@ -1,14 +1,9 @@
 package com.example.malicteam.projectxclient;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.renderscript.Allocation;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -29,10 +24,12 @@ import com.example.malicteam.projectxclient.Dialogs.LogoutDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 
-import Event.Model.Event;
+import Model.Event;
 
 
 public class MainActivity extends AppCompatActivity
@@ -74,10 +71,15 @@ public class MainActivity extends AppCompatActivity
         final ListView eventList = (ListView) findViewById(R.id._listOfEvents);
         data = new LinkedList<Event>();
         for (int i = 0; i < 10; i++) {
+            ArrayList<Integer> users = new ArrayList<>();
+            for (int j = 0; j < 10; j++) {
+                users.add(j);
+            }
+            int admin = 0;
+            if(_auth.getCurrentUser()!=null)
+                admin = _auth.getCurrentUser().getEmail().hashCode();
             Date date = new Date();
-
-            Event event = new Event(i, "name" + i, "04/01/2018", "blabla", "maayan,eden", "bussnies talk about moneyy$$$$$$");
-
+            Event event = new Event("Content no." + i, "Title - " + i, users, "Its just Descripton no." + i, admin);
             data.add(event);
 
         }
@@ -177,13 +179,11 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
                 break;
             case R.id.nav_login:
-                if(_auth.getCurrentUser() == null) {
+                if (_auth.getCurrentUser() == null) {
                     intent = new Intent(this, LoginActivity.class);
                     startActivity(intent);
                     break;
-                }
-                else
-                {
+                } else {
                     logout();
                     break;
                 }
@@ -211,18 +211,17 @@ public class MainActivity extends AppCompatActivity
         try {
             userEmail.setText(user.getEmail());
             userName.setText(user.getEmail().split("@")[0]);
-        }
-        catch (Exception e){
+        } catch (Exception e) {
         }
         //ToDo Profile Picture
-        ImageView pic = (ImageView)headerLayout.findViewById(R.id.userPic);
+        ImageView pic = (ImageView) headerLayout.findViewById(R.id.userPic);
         pic.setImageResource(R.mipmap.ic_launcher_round);//@mipmap/ic_launcher_round);//TODO Profile Picture
 
         MenuItem item = _navigationView.getMenu().findItem(R.id.nav_login);
         item.setTitle(R.string.nav_logout);
     }
 
-    public void noCurrentUser(){
+    public void noCurrentUser() {
         //Navigation Header
         View headerLayout = _navigationView.getHeaderView(0);
         TextView userEmail = (TextView) headerLayout.findViewById(R.id.userMail);
@@ -230,10 +229,9 @@ public class MainActivity extends AppCompatActivity
         try {
             userName.setText("Hello Guest.");
             userEmail.setText("Please Log In if you want full service");
+        } catch (Exception e) {
         }
-        catch (Exception e){
-        }
-        ImageView pic = (ImageView)headerLayout.findViewById(R.id.userPic);
+        ImageView pic = (ImageView) headerLayout.findViewById(R.id.userPic);
         pic.setImageResource(R.drawable.outalk_logo);//TODO Profile Picture
 
         //Navigation User Options
@@ -241,7 +239,7 @@ public class MainActivity extends AppCompatActivity
         item.setTitle(R.string.nav_login);
     }
 
-    private void logout(){
+    private void logout() {
         //Dialog
         //_auth.signOut();
         LogoutDialogFragment logoutDialog = new LogoutDialogFragment();
@@ -249,7 +247,7 @@ public class MainActivity extends AppCompatActivity
         logoutDialog.show(getSupportFragmentManager(),
                 "LogoutDialog");
 
-        if(_auth.getCurrentUser() == null) {
+        if (_auth.getCurrentUser() == null) {
             noCurrentUser();
             // this listener will be called when there is change in firebase user session
             FirebaseAuth.AuthStateListener authListener = new FirebaseAuth.AuthStateListener() {
@@ -296,11 +294,9 @@ public class MainActivity extends AppCompatActivity
 
             TextView _nameEvent = view.findViewById(R.id._nameEvent);
             TextView _date = view.findViewById(R.id._date);
-            TextView _participates = view.findViewById(R.id._participates);
 
-            _nameEvent.setText(event._nameEvent);
-            _date.setText(event._date);
-            _participates.setText(event._participates);
+            _nameEvent.setText(event.getTitle());
+            _date.setText(event.getDate());
 
             return view;
         }

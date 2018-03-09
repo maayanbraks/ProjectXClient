@@ -1,11 +1,10 @@
 package com.example.malicteam.projectxclient;
 
 import android.app.Activity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
-import Event.Model.Event;
+import Model.Event;
 
 public class EventDetails extends Activity {
     @Override
@@ -20,10 +19,14 @@ public class EventDetails extends Activity {
         TextView desc = findViewById(R.id.details_descp);
 
 
-        title.setText(event._nameEvent);
-        _date.setText(event._date);
-        _participates.setText("Participats:" + event._participates);
-        desc.setText("Description:" + event._descp);
+        title.setText(event.getTitle());
+        _date.setText(event.getDate());
+        String part = "Participats: ";
+        for (int num : event.getUsersIds()) {
+            part.concat(Integer.toString(num));
+        }
+        _participates.setText("part");
+        desc.setText("Description:" + event.getDescription());
 
 
     }

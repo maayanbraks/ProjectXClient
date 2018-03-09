@@ -3,7 +3,7 @@ package User;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 
-import User.Model.User;
+import Model.User;
 
 /**
  * Created by Maayan on 10-Jan-18.
