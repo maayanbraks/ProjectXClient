@@ -185,18 +185,6 @@ public class MainActivity extends AppCompatActivity
                 else
                 {
                     logout();
-//                  TODO alert logout  AlertDialog.Builder builder = new AlertDialog();
-//                    builder.setMessage(R.string.dialog_fire_missiles)
-//                            .setPositiveButton(R.string.fire, new DialogInterface.OnClickListener() {
-//                                public void onClick(DialogInterface dialog, int id) {
-//                                    // FIRE ZE MISSILES!
-//                                }
-//                            })
-//                            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-//                                public void onClick(DialogInterface dialog, int id) {
-//                                    // User cancelled the dialog
-//                                }
-//                            });
                     break;
                 }
 
@@ -257,7 +245,7 @@ public class MainActivity extends AppCompatActivity
         //Dialog
         //_auth.signOut();
         LogoutDialogFragment logoutDialog = new LogoutDialogFragment();
-        logoutDialog.setActivity(this);
+        logoutDialog.setContainsActivity(this);
         logoutDialog.show(getSupportFragmentManager(),
                 "LogoutDialog");
 
