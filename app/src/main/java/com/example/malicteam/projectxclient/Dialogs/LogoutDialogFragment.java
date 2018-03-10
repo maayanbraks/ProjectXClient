@@ -15,9 +15,9 @@ import com.example.malicteam.projectxclient.R;
 import com.google.firebase.auth.FirebaseAuth;
 
 
-public class LogoutDialogFragment extends DialogFragment implements IResultsDialog{
+public class LogoutDialogFragment extends DialogFragment implements IResultsDialog {
 
-    private MainActivity _activity;
+    private Activity _activity;
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -25,12 +25,11 @@ public class LogoutDialogFragment extends DialogFragment implements IResultsDial
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("Are you sure?\n" +
-        "If you logout, you cant enjoy from full service.")
+                "If you logout, you cant enjoy from full service.")
                 .setPositiveButton("Yes, Log me out", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         FirebaseAuth.getInstance().signOut();
                         Toast.makeText(_activity, getString(R.string.massage_logout), Toast.LENGTH_LONG).show();
-                        _activity.noCurrentUser();
                     }
                 })
                 .setNegativeButton("Cancel. Stay login", new DialogInterface.OnClickListener() {
@@ -44,7 +43,7 @@ public class LogoutDialogFragment extends DialogFragment implements IResultsDial
         return builder.create();
     }
 
-    public void setContainsActivity(Activity activity){
-        _activity = (MainActivity) activity;
+    public void setContainsActivity(Activity activity) {
+        _activity = activity;
     }
 }

@@ -27,9 +27,10 @@ import com.google.firebase.auth.FirebaseUser;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
-import java.util.List;
 
 import Model.Event;
+import Model.FirebaseModel;
+import Model.User;
 
 
 public class MainActivity extends AppCompatActivity
@@ -37,14 +38,13 @@ public class MainActivity extends AppCompatActivity
 
     private NavigationView _navigationView;
     private LinkedList<Event> data;
-    private FirebaseAuth _auth;
+    private FirebaseModel _fm;
+    private User _currentUser = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        _auth = FirebaseAuth.getInstance();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -70,18 +70,21 @@ public class MainActivity extends AppCompatActivity
 
         final ListView eventList = (ListView) findViewById(R.id._listOfEvents);
         data = new LinkedList<Event>();
+
+        //Generate list of Event - just test
         for (int i = 0; i < 10; i++) {
             ArrayList<Integer> users = new ArrayList<>();
             for (int j = 0; j < 10; j++) {
                 users.add(j);
             }
-            int admin = 0;
-            if(_auth.getCurrentUser()!=null)
-                admin = _auth.getCurrentUser().getEmail().hashCode();
-            Date date = new Date();
-            Event event = new Event("Content no." + i, "Title - " + i, users, "Its just Descripton no." + i, admin);
-            data.add(event);
+            int adminEventId = 0;
 
+            if(_currentUser != null)
+                adminEventId = _currentUser.getEmail().hashCode();
+            Date date = new Date();
+            Event event = new Event("Content no." + i, "Title - " + i, users, "Its just Descripton no." + i, adminEventId);
+            data.add(event);
+            //End just Test
         }
         MyAdapter myadapter = new MyAdapter();
         eventList.setAdapter(myadapter);
@@ -94,6 +97,9 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
             }
         });
+
+        _fm = new FirebaseModel(MainActivity.this);
+        _fm.updateCurrentUser();
     }
 
 
@@ -101,9 +107,14 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() { //after creating new event.
         super.onResume();
 
-        FirebaseUser user = _auth.getCurrentUser();
-        if (user != null) {
-            userLoggedIn(user);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (_currentUser != null) {
+            userLoggedIn();
         } else {
             noCurrentUser();
         }
@@ -145,7 +156,7 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
+        FirebaseModel.updateCurrentUser();
         int id = item.getItemId();
         Intent intent;
 
@@ -168,6 +179,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case R.id.nav_settings_account:
                 intent = new Intent(this, AccountSettingsActivity.class);
+                intent.putExtra("user",_currentUser);
                 startActivity(intent);
                 break;
             case R.id.nav_settings_event:
@@ -179,7 +191,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
                 break;
             case R.id.nav_login:
-                if (_auth.getCurrentUser() == null) {
+                if (_currentUser == null) {
                     intent = new Intent(this, LoginActivity.class);
                     startActivity(intent);
                     break;
@@ -196,21 +208,20 @@ public class MainActivity extends AppCompatActivity
                 break;
         }
 
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
     //Handle User Instance
-    private void userLoggedIn(FirebaseUser user) {
+    private void userLoggedIn() {
         //Navigation Header
         View headerLayout = _navigationView.getHeaderView(0);
         TextView userEmail = (TextView) headerLayout.findViewById(R.id.userMail);
         TextView userName = (TextView) headerLayout.findViewById(R.id.userName);
         try {
-            userEmail.setText(user.getEmail());
-            userName.setText(user.getEmail().split("@")[0]);
+            userEmail.setText(_currentUser.getEmail());
+            userName.setText(_currentUser.getEmail().split("@")[0]);
         } catch (Exception e) {
         }
         //ToDo Profile Picture
@@ -247,7 +258,8 @@ public class MainActivity extends AppCompatActivity
         logoutDialog.show(getSupportFragmentManager(),
                 "LogoutDialog");
 
-        if (_auth.getCurrentUser() == null) {
+        FirebaseModel.updateCurrentUser();
+        if (_currentUser == null) {
             noCurrentUser();
             // this listener will be called when there is change in firebase user session
             FirebaseAuth.AuthStateListener authListener = new FirebaseAuth.AuthStateListener() {
@@ -302,4 +314,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
     //End of Eden Class
+
+
+    public void setCurrentUser(User user){
+        _currentUser = user;
+        if(user == null)
+            noCurrentUser();
+        else
+            userLoggedIn();
+    }
 }

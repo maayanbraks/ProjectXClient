@@ -131,8 +131,8 @@ public class SignupActivity extends AppCompatActivity {
 
     public void addNewUser() {
         //String firstName, String lastName, String phoneNumber, String email
-        FirebaseModel model = new FirebaseModel();
-        model.addUser(new User(firstName.getText().toString(), lastName.getText().toString(), phone.getText().toString(), inputEmail.getText().toString()));
+        //FirebaseModel model = new FirebaseModel(SignupActivity.this);
+        FirebaseModel.addUser(new User(firstName.getText().toString(), lastName.getText().toString(), phone.getText().toString(), inputEmail.getText().toString()));
     }
 
     public final static boolean isValidEmail(CharSequence target) {
