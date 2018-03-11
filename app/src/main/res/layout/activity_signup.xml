@@ -17,6 +17,7 @@
 
 
         <ImageView
+            android:id="@+id/profilePicture_signUp"
             android:layout_width="@dimen/logo_w_h"
             android:layout_height="@dimen/logo_w_h"
             android:layout_gravity="center_horizontal"

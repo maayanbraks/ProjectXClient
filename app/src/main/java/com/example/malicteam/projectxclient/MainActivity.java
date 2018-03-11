@@ -1,9 +1,11 @@
 package com.example.malicteam.projectxclient;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -14,11 +16,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.webkit.URLUtil;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Dialogs.LogoutDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,6 +34,7 @@ import java.util.LinkedList;
 
 import Model.Event;
 import Model.FirebaseModel;
+import Model.Model;
 import Model.User;
 
 
@@ -226,10 +231,30 @@ public class MainActivity extends AppCompatActivity
         }
         //ToDo Profile Picture
         ImageView pic = (ImageView) headerLayout.findViewById(R.id.userPic);
-        pic.setImageResource(R.mipmap.ic_launcher_round);//@mipmap/ic_launcher_round);//TODO Profile Picture
+        FirebaseModel.getProfilePicture(new Model.GetImageListener() {
+            @Override
+            public void onSuccess(Bitmap image) {
+                //TODO locally file
+                String fileName = URLUtil.guessFileName(_currentUser.getPictureUrl(), null, null);
+                saveImageToFile(image,fileName);
+                pic.setImageBitmap(image);
+            }
+
+            @Override
+            public void onFail() {
+                Toast.makeText(getApplicationContext(), "Fail to load your profile picture", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         MenuItem item = _navigationView.getMenu().findItem(R.id.nav_login);
         item.setTitle(R.string.nav_logout);
+
+        //ToDO default picture
+    }
+
+    private void saveImageToFile(Bitmap image,String fileName){
+        //TODO move to model
+        //TODO save locally
     }
 
     public void noCurrentUser() {
@@ -242,6 +267,7 @@ public class MainActivity extends AppCompatActivity
             userEmail.setText("Please Log In if you want full service");
         } catch (Exception e) {
         }
+        //Default picture (Logo)
         ImageView pic = (ImageView) headerLayout.findViewById(R.id.userPic);
         pic.setImageResource(R.drawable.outalk_logo);//TODO Profile Picture
 

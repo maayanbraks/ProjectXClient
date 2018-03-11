@@ -1,15 +1,21 @@
 package Model;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.View;
+import android.webkit.URLUtil;
 import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.LoginActivity;
 import com.example.malicteam.projectxclient.MainActivity;
 import com.example.malicteam.projectxclient.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -19,17 +25,26 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 
 public class FirebaseModel {
 
-    private static FirebaseDatabase _database = FirebaseDatabase.getInstance();;
-    private static FirebaseAuth _auth = FirebaseAuth.getInstance();;
+    private static FirebaseDatabase _database = FirebaseDatabase.getInstance();
+    ;
+    private static FirebaseAuth _auth = FirebaseAuth.getInstance();
+    ;
     private static MainActivity _activity;
     private static User _currentUser = null;
+    private static FirebaseStorage _storage = FirebaseStorage.getInstance();
 
 
     public FirebaseModel(MainActivity activity) {
@@ -49,6 +64,7 @@ public class FirebaseModel {
         value.put("LastName", user.getLastName());
         value.put("Mail", user.getEmail());
         value.put("Phone", user.getPhoneNumber());
+        value.put("PictureUrl", user.getPictureUrl());
         value.put("admin", false);
 
         myRef.setValue(value);
@@ -88,12 +104,18 @@ public class FirebaseModel {
     }
 
     public static void removeAccount() {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();;
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         boolean success = false;
         if (user != null) {
             //Delete from DB
             DatabaseReference myRef = database.getReference("Users").child(Integer.toString(User.generateId(user.getEmail())));
+            //Delete picture from storage
+            if (_currentUser.getPictureUrl() != null) {
+                StorageReference httpsReference = FirebaseStorage.getInstance().getReferenceFromUrl(_currentUser.getPictureUrl());
+                httpsReference.delete();
+            }
             //delete from auth (first signout)
             user.delete()
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -109,26 +131,52 @@ public class FirebaseModel {
         updateCurrentUser();
     }
 
-    //Setters in DB
-    public static void setFirstName(String name){
+    //Setters + Getters in DB
+
+
+    public static void setFirstName(String name) {
         DatabaseReference myRef = _database.getReference("Users").child(Integer.toString(_currentUser.getId())).child("FirstName");
         myRef.setValue(name);
     }
 
-    public static void setLastName(String name){
+    public static void setLastName(String name) {
         DatabaseReference myRef = _database.getReference("Users").child(Integer.toString(_currentUser.getId())).child("LastName");
         myRef.setValue(name);
     }
 
-    public static void setEmail(String email){
+    public static void setEmail(String email) {
         DatabaseReference myRef = _database.getReference("Users").child(Integer.toString(_currentUser.getId())).child("Mail");
         myRef.setValue(email);
     }
 
-    public static void setPhone(String phone){
+    public static void setPhone(String phone) {
         DatabaseReference myRef = _database.getReference("Users").child(Integer.toString(_currentUser.getId())).child("Phone");
         myRef.setValue(phone);
     }
+
+    public static void getProfilePicture(final Model.GetImageListener listener) {
+        String url = _currentUser.getPictureUrl();
+        if (url != null) {
+            //TODO sizes of pictures & default picture
+            FirebaseStorage storage = FirebaseStorage.getInstance();
+            StorageReference httpsReference = storage.getReferenceFromUrl(url);
+            final long ONE_MEGABYTE = 1024 * 1024;
+            httpsReference.getBytes(3 * ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
+                @Override
+                public void onSuccess(byte[] bytes) {
+                    Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                    listener.onSuccess(image);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(Exception exception) {
+                    Log.d("TAG", exception.getMessage());
+                    listener.onFail();
+                }
+            });
+        }
+    }
+    // End DB
 
 
     public static void getUserById(final String id, final GetUserByIdListener listener) {
@@ -142,7 +190,14 @@ public class FirebaseModel {
                 String lastName = (String) value.get("LastName");
                 String phone = (String) value.get("Phone");
                 String email = (String) value.get("Mail");
-                listener.onComplete(new User(firstName, lastName, phone, email));
+                String pictureUrl = (String) value.get("PictureUrl");
+                List<Integer> friends = new LinkedList<Integer>();
+                friends = (LinkedList<Integer>) value.get("FriendsList");
+
+                if (pictureUrl != null)
+                    listener.onComplete(new User(firstName, lastName, phone, email, friends, pictureUrl));
+                else
+                    listener.onComplete(new User(firstName, lastName, phone, email, friends));
             }
 
             @Override
@@ -166,14 +221,12 @@ public class FirebaseModel {
         if (firebaseUser == null) {
             _currentUser = null;
             _activity.setCurrentUser(null);
-        }
-
-        else {
+        } else {
             getUserByEmail(firebaseUser.getEmail(), new FirebaseModel.GetUserByIdListener() {
                 @Override
                 public void onComplete(User user) {
                     //currentUser = new User(user.getFirstName(), user.getLastName(), user.getPhoneNumber(), user.getEmail());
-                    _currentUser = new User(user.getFirstName(), user.getLastName(), user.getPhoneNumber(), user.getEmail());
+                    _currentUser = new User(user.getFirstName(), user.getLastName(), user.getPhoneNumber(), user.getEmail(), user.getFriendsIds(), user.getPictureUrl());
                     _activity.setCurrentUser(_currentUser);
                 }
             });
@@ -184,9 +237,33 @@ public class FirebaseModel {
         void onComplete(User user);
     }
 
+    public static void saveImage(Bitmap imageBmp, int name, final Model.SaveImageListener listener) {
 
+        StorageReference imagesRef = _storage.getReference().child("Images").child("ProfilePictures").child(Integer.toString(name));
 
-    private void showToast(String msg) {
-        Toast.makeText(_activity, msg, Toast.LENGTH_LONG).show();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        imageBmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        UploadTask uploadTask = imagesRef.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception exception) {
+                listener.fail();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                @SuppressWarnings("VisibleForTests")
+                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                listener.complete(downloadUrl.toString());
+            }
+        });
     }
+
+    public interface GetUserListener {
+        void onComplete(List<User> UsersList);
+    }
+
+
 }
