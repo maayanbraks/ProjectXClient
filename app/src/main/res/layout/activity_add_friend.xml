@@ -6,9 +6,20 @@
     android:layout_height="match_parent"
     tools:context="com.example.malicteam.projectxclient.AddFriendActivity">
 
-    <include
-        layout="@layout/app_bar_main"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="64dp"
+        android:layout_height="47dp"
+        android:text="email"
+        tools:layout_editor_absoluteX="17dp"
+        tools:layout_editor_absoluteY="85dp" />
 
+    <EditText
+        android:id="@+id/addFreiendEmail_input"
+        android:layout_width="226dp"
+        android:layout_height="59dp"
+        android:ems="10"
+        android:text="Name"
+        tools:layout_editor_absoluteX="89dp"
+        tools:layout_editor_absoluteY="75dp" />
 </android.support.constraint.ConstraintLayout>

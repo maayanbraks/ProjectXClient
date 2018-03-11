@@ -1,119 +1,93 @@
 package Model;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import org.json.JSONArray;
+
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Maayan on 04-Jan-18.
  */
 
-public class Event implements IEvent,Serializable{
-    private static final long serialVersionUID=1L;
-    private int _id;
-    public String _nameEvent;
-    public String _date;
-    public String _participates;
-    public String _conversation;
-    public String _descp;
+public class Event implements Serializable{
 
-    public String get_descp() {
-        return _descp;
+    private static final long serialVersionUID = 1L;
+    private int id;
+    private String content;
+    private String title;
+    private String date;
+    private List<Integer> usersIds;
+    private String description;
+    private int adminId;
+
+    public Event(String content, String title, List<Integer> usersIds, String description, int adminId) {
+        this.content = content;
+        this.title = title;
+        this.usersIds = usersIds;
+        this.description = description;
+        this.adminId = adminId;
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:MM:SS");
+        Date d = new Date();
+        this.date = dateFormat.format(d);
+        this.id = Math.abs((this.adminId + this.date).hashCode());
+
     }
 
-    public void set_descp(String _descp) {
-        this._descp = _descp;
+    public int getAdminId() {
+        return adminId;
     }
 
-    public Event(int _id, String _nameEvent, String _date, String _conversation, String _participates, String descp) {
-        this._id = _id;
-        this._nameEvent = _nameEvent;
-        this._date = _date;
-        this._conversation = _conversation;
-        this._participates = _participates;
-
-        _descp=descp;
+    public int getId() {
+        return id;
     }
 
-    public String get_participates() {
-        return _participates;
+    public String getContent() {
+        return content;
     }
 
-    public void set_participates(String _participates) {
-        this._participates = _participates;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public String get_nameEvent() {
-
-        return _nameEvent;
+    public void addContent(String content) {
+        this.content.concat("\n" + content);
     }
 
-    public void set_id(int _id) {
-        this._id = _id;
+    public String getTitle() {
+        return title;
     }
 
-    public void set_nameEvent(String _nameEvent) {
-        this._nameEvent = _nameEvent;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public void set_date(String _date) {
-        this._date = _date;
+    public String getDate() {
+        return date;
     }
 
-    public void set_conversation(String _conversation) {
-        this._conversation = _conversation;
+    public void setDate(String date) {
+        this.date = date;
     }
 
-    public String get_date() {
-        return _date;
+    public List<Integer> getUsersIds() {
+        return usersIds;
     }
 
-    public String get_conversation() {
-        return _conversation;
+    public void setUsersIds(List<Integer> usersIds) {
+        this.usersIds = usersIds;
     }
 
-    public int get_id() {
-
-        return _id;
+    public String getDescription() {
+        return description;
     }
 
-    @Override
-    public int Open() {
-        return 0;
-    }
-
-    @Override
-    public int Close() {
-        return 0;
-    }
-
-    @Override
-    public int Share() {
-        return 0;
-    }
-
-    @Override
-    public String toString() {
-        return "Event{" +
-                "_id=" + _id +
-                ", _nameEvent='" + _nameEvent + '\'' +
-                ", _date='" + _date + '\'' +
-                ", _participates='" + _participates + '\'' +
-                ", _conversation='" + _conversation + '\'' +
-                ", _descp='" + _descp + '\'' +
-                '}';
-    }
-
-    @Override
-    public int Edit() {
-        return 0;
-    }
-
-    @Override
-    public int AddNewUser() {
-        return 0;
-    }
-
-    @Override
-    public int sync() {
-        return 0;
+    public void setDescription(String description) {
+        this.description = description;
     }
 }
