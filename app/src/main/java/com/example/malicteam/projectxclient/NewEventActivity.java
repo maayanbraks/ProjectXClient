@@ -37,12 +37,11 @@ public class NewEventActivity extends AppCompatActivity {
                 String description = _desc.getText().toString();
                 String title = _name.getText().toString();
                 String parti = _part.getText().toString();
-                Intent intent=new Intent(getApplicationContext(),MainActivity.class);
+                Intent intent = new Intent(getApplicationContext(), RecordingActivity.class);
                 intent.putExtra("title", title);
                 intent.putExtra("part", parti);
                 intent.putExtra("desc", description);
                 startActivity(intent);
-
             }
         });
     }
@@ -52,7 +51,7 @@ public class NewEventActivity extends AppCompatActivity {
         boolean checked = ((RadioButton) view).isChecked();
 
         // Check which radio button was clicked
-        switch(view.getId()) {
+        switch (view.getId()) {
             case R.id.radio_pdf:
                 if (checked)
                     // Pirates are the best

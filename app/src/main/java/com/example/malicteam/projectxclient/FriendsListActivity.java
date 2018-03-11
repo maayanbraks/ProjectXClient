@@ -47,10 +47,12 @@ public class FriendsListActivity extends AppCompatActivity {
         final ListView list = (ListView) findViewById(R.id.list_friendsList);
         // data.add("lala");
         //TODO load user final User user = new User("4ad2ee5b-f5d5-4fef-b52b-60beff53e31a", "asdsdsd", "eden@gmail.com", "1231231232", null);
-        User user = new User("Luka", "Modric", "0525556648", "Luka@modric.com", new LinkedList<Integer>() {{
+        User currentUser = new User("Luka", "Modric", "0525556648", "Luka@modric.com", new LinkedList<Integer>() {{
             add(1);
             add(1877972619);
         }});
+
+
         Button addButton = (Button) findViewById(R.id.addFriendButton_friendsList);
         Button deleteButton = (Button) findViewById(R.id.deleteFriendButton_friendList);
 
@@ -146,8 +148,8 @@ public class FriendsListActivity extends AppCompatActivity {
         list.setAdapter(myadapter);
 
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref = database.getReference("Users").child("4ad2ee5b-f5d5-4fef-b52b-60beff53e31a");
-        ;//instead of this gibrish here.child("4ad2ee5b-f5d5-4fef-b52b-60beff53e31a") ... put myId
+        DatabaseReference ref = database.getReference("Users").child(Integer.toString(currentUser.getId()));
+        //instead of this gibrish here.child("4ad2ee5b-f5d5-4fef-b52b-60beff53e31a") ... put myId
         ref.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -157,15 +159,10 @@ public class FriendsListActivity extends AppCompatActivity {
                     data = friends;
                     list.requestLayout();
                 }
-
-//                if (email.equals(Myemail))
-                //         System.out.println("you got a new invitation");
-
-
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getCode());
+                Toast.makeText(getApplication(), "The read failed:", Toast.LENGTH_SHORT).show();
             }
         });
     }
