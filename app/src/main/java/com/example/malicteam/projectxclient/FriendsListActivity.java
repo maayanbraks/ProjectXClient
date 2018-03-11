@@ -1,13 +1,10 @@
 package com.example.malicteam.projectxclient;
 
-import android.content.Context;
 import android.content.DialogInterface;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -32,10 +29,10 @@ import Model.User;
 
 public class FriendsListActivity extends AppCompatActivity {
     boolean isFriendalready = false;
-    private List<Integer> data;
-    private List<User> friends;
+    private List<Integer> data = null;
+    private List<Integer> friends;
 
-    private String m_Text = "";
+    private String emailString = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +49,8 @@ public class FriendsListActivity extends AppCompatActivity {
             add(1877972619);
         }});
 
+        //FirebaseModel.addUser(currentUser);
+
 
         Button addButton = (Button) findViewById(R.id.addFriendButton_friendsList);
         Button deleteButton = (Button) findViewById(R.id.deleteFriendButton_friendList);
@@ -62,20 +61,20 @@ public class FriendsListActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getApplicationContext());
-                builder.setTitle("Add new friend,Enter email.");
+                builder.setTitle("Add New Friend");
                 final EditText input = new EditText(getApplicationContext());
                 input.setInputType(InputType.TYPE_CLASS_TEXT);
                 builder.setView(input);
                 builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        m_Text = input.getText().toString();
-                        FirebaseModel.getUserByEmail(m_Text, new FirebaseModel.GetUserByIdListener() {
+                        emailString = input.getText().toString();
+                        FirebaseModel.getUserByEmail(emailString, new FirebaseModel.GetUserByIdListener() {
                             @Override
                             public void onComplete(User user) {
                                 isFriendalready = false;
                                 //Check if is friend already
-                                if (user.getFriendsIds().contains(User.generateId(m_Text))) {
+                                if (user.getFriendsIds().contains(User.generateId(emailString))) {
                                     isFriendalready = true;
                                     if (!isFriendalready) {
                                         //TODO check if exist
@@ -118,10 +117,10 @@ public class FriendsListActivity extends AppCompatActivity {
 //                builder.setPositiveButton("Remove", new DialogInterface.OnClickListener() {
 //                    @Override
 //                    public void onClick(DialogInterface dialog, int which) {
-//                        m_Text = input.getText().toString();
-//                        if(user.SearchFriendInFriendList(m_Text)) {       // if true there is a friend in that name
+//                        emailString = input.getText().toString();
+//                        if(user.SearchFriendInFriendList(emailString)) {       // if true there is a friend in that name
 //
-//                            user.removeFriendFromUser((m_Text));
+//                            user.removeFriendFromUser((emailString));
 //                            data=user.friends;
 //                            list.requestLayout();
 //                            model.addUser(user);
@@ -155,14 +154,15 @@ public class FriendsListActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Map<String, Object> value = (Map<String, Object>) dataSnapshot.getValue();
                 if (dataSnapshot.getValue() != null) {
-                    List<Integer> friends = ((LinkedList<Integer>) value.get("FriendsList"));
+                    List<Integer> friends = FirebaseModel.decodeFriends((String) value.get("FriendsList"));
                     data = friends;
                     list.requestLayout();
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getApplication(), "The read failed:", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplication(), "The read failed", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -198,8 +198,10 @@ public class FriendsListActivity extends AppCompatActivity {
             FirebaseModel.getUserById(id, new FirebaseModel.GetUserByIdListener() {
                 @Override
                 public void onComplete(User user) {
-                    friendName.setText(user.getFirstName() + " " + user.getLastName());
-                    friendId.setText(user.getId());
+                    if (friendName != null)
+                        friendName.setText(user.getFirstName() + " " + user.getLastName());
+                    if (friendId != null)
+                        friendId.setText(user.getId());
                 }
             });
 

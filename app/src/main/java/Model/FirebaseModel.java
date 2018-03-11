@@ -65,6 +65,7 @@ public class FirebaseModel {
         value.put("Mail", user.getEmail());
         value.put("Phone", user.getPhoneNumber());
         value.put("PictureUrl", user.getPictureUrl());
+        value.put("FriendsList", generateFriendsList(user.getFriendsIds()));
         value.put("admin", false);
 
         myRef.setValue(value);
@@ -192,7 +193,8 @@ public class FirebaseModel {
                 String email = (String) value.get("Mail");
                 String pictureUrl = (String) value.get("PictureUrl");
                 List<Integer> friends = new LinkedList<Integer>();
-                friends = (LinkedList<Integer>) value.get("FriendsList");
+                if (value.get("FriendsList") != null)
+                    friends = decodeFriends((String) value.get("FriendsList"));
 
                 if (pictureUrl != null)
                     listener.onComplete(new User(firstName, lastName, phone, email, friends, pictureUrl));
@@ -205,6 +207,25 @@ public class FirebaseModel {
                 listener.onComplete(null);
             }
         });
+    }
+
+    public static LinkedList<Integer> decodeFriends(String list) {
+        list = list.replace("{", "").replace("}", "").replace(" ", "");
+        String[] ids = list.split(",");
+        LinkedList<Integer> friendsList = new LinkedList<>();
+        for (String s : ids) {
+            friendsList.add(Integer.parseInt(s));
+        }
+        return friendsList;
+    }
+
+    private static String generateFriendsList(List<Integer> list) {
+        String str = "{ ";
+        for (int id : list) {
+            str += id + ", ";
+        }
+        str += "}";
+        return str;
     }
 
     //the same but id comes as string
