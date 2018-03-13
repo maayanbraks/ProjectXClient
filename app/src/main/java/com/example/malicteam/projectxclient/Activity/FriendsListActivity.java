@@ -44,7 +44,7 @@ public class FriendsListActivity extends FragmentActivity {
     //private FriendsViewModel friendsListData = null;
     private UserViewModel currentUser = null;
     private MyAdapter adapter = new MyAdapter();
-    ListView friendsListView = null;
+    private ListView friendsListView = null;
 
     private String emailString = "";
 
@@ -99,7 +99,7 @@ public class FriendsListActivity extends FragmentActivity {
                 {
                     if(i == position)
                     {
-                        parent.getChildAt(i).setBackgroundColor(10200754);
+                        parent.getChildAt(i).setBackgroundColor(Color.WHITE);
                     }
                 }
             }
@@ -207,6 +207,7 @@ public class FriendsListActivity extends FragmentActivity {
                     builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            try{
                             Repository.instance.deleteFromFriends(waitForAction.getId(), new FirebaseModel.Callback<List<User>>() {
                                 @Override
                                 public void onComplete(List<User> data) {
@@ -218,7 +219,10 @@ public class FriendsListActivity extends FragmentActivity {
                                     } else
                                         Toast.makeText(getApplicationContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
                                 }
-                            });
+                            });}
+                            catch (Exception e){
+                                Log.d("fgd", "ASDfadsf");
+                            }
                         }
                     })
                             .setNegativeButton("No, Cancel!", new DialogInterface.OnClickListener() {
@@ -229,7 +233,6 @@ public class FriendsListActivity extends FragmentActivity {
                             });
                     builder.show();
                 }
-                waitForAction = null;
             }
         });
     }
@@ -258,6 +261,7 @@ public class FriendsListActivity extends FragmentActivity {
             }
             User friend = friends.get(i);
 
+            view.setBackgroundColor(Color.WHITE);
 
             TextView firstName = (TextView) view.findViewById(R.id.firstName_friendsRow);
             TextView lastName = (TextView)view.findViewById(R.id.lastName_friendsRow);
@@ -265,7 +269,6 @@ public class FriendsListActivity extends FragmentActivity {
             firstName.setText(friend.getFirstName());
             lastName.setText(friend.getLastName());
             email.setText(friend.getEmail());
-
 
             return view;
         }

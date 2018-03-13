@@ -52,20 +52,24 @@ public class LoginActivity extends Activity {
             finish();
         }
 
+
+
+        Log.d("tagLogin", "login finish on create");
         btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(LoginActivity.this, SignupActivity.class));
+                finish();
             }
         });
-
+        Log.d("tagLogin", "login finish on create");
         btnReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
             }
         });
-
+        Log.d("tagLogin", "login finish on create");
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,8 +77,8 @@ public class LoginActivity extends Activity {
             }
         });
 
+        Log.d("tagLogin", "login finish on create");
     }
-
 
     private void tryLogin(){
         FirebaseAuth auth = FirebaseAuth.getInstance();

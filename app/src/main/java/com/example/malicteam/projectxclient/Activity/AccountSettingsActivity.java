@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Consts;
 import com.example.malicteam.projectxclient.Dialogs.ChangeDetailsFragment;
@@ -23,11 +24,14 @@ import com.example.malicteam.projectxclient.Dialogs.LogoutDialogFragment;
 import com.example.malicteam.projectxclient.Dialogs.PictureDialogFragment;
 import com.example.malicteam.projectxclient.Dialogs.RemoveAccountDialogFragment;
 import com.example.malicteam.projectxclient.Dialogs.ResetPasswordDialogFragment;
+import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.R;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
+
+import java.util.LinkedList;
 
 public class AccountSettingsActivity extends AppCompatActivity {
 
@@ -41,6 +45,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
     String newPhone = null;
     private ImageView profilePicture;
     private Bitmap bitmap = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,23 +87,6 @@ public class AccountSettingsActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.logout_actionMenu) {
-            Repository.instance.logout();
-            startActivity(new Intent(AccountSettingsActivity.this, LoginActivity.class));
-            finish();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -133,12 +121,13 @@ public class AccountSettingsActivity extends AppCompatActivity {
                     public void onSuccess(Bitmap image) {
                         profilePic.setImageBitmap(image);
                     }
+
                     @Override
                     public void onFail() {
                         profilePic.setImageResource(R.drawable.outalk_logo);
                     }
                 });
-            }else
+            } else
                 profilePic.setImageResource(R.drawable.outalk_logo);
 
             profilePic.setOnClickListener(new View.OnClickListener() {
@@ -157,21 +146,25 @@ public class AccountSettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if(!newFirstName.equals(viewModel.getUser().getValue().getFirstName()))
-                    newFirstName = ((EditText)findViewById(R.id.firstName_editAccount)).getText().toString();
-                if(!newLastName.equals(viewModel.getUser().getValue().getLastName()))
-                    newLastName = ((EditText)findViewById(R.id.lastName_editAccount)).getText().toString();
-                if(!newEmail.equals(viewModel.getUser().getValue().getEmail()))
-                    newEmail = ((EditText)findViewById(R.id.email_editAccount)).getText().toString();
-                if(!newPhone.equals(viewModel.getUser().getValue().getPhoneNumber()))
-                    newPhone = ((EditText)findViewById(R.id.phoneNumber_editAccount)).getText().toString();
+                if (!((EditText) findViewById(R.id.firstName_editAccount)).getText().toString()
+                        .equals(viewModel.getUser().getValue().getFirstName()))
+                    newFirstName = ((EditText) findViewById(R.id.firstName_editAccount)).getText().toString();
+
+                if (!((EditText) findViewById(R.id.lastName_editAccount)).getText().toString().equals(viewModel.getUser().getValue().getLastName()))
+                    newLastName = ((EditText) findViewById(R.id.lastName_editAccount)).getText().toString();
+
+                if (!((EditText) findViewById(R.id.email_editAccount)).getText().toString().equals(viewModel.getUser().getValue().getEmail()))
+                    newEmail = ((EditText) findViewById(R.id.email_editAccount)).getText().toString();
+
+                if (!((EditText) findViewById(R.id.phoneNumber_editAccount)).getText().toString().equals(viewModel.getUser().getValue().getPhoneNumber()))
+                    newPhone = ((EditText) findViewById(R.id.phoneNumber_editAccount)).getText().toString();
 
 
                 Bundle bundle = new Bundle();
-                bundle.putString(Consts.FIRST_NAME, newFirstName );
-                bundle.putString(Consts.FIRST_NAME, newFirstName );
-                bundle.putString(Consts.FIRST_NAME, newFirstName );
-                bundle.putString(Consts.FIRST_NAME, newFirstName );
+                bundle.putString(Consts.FIRST_NAME, newFirstName);
+                bundle.putString(Consts.LAST_NAME, newLastName);
+                bundle.putString(Consts.EMAIL, newEmail);
+                bundle.putString(Consts.PHONE_NUMBER, newPhone);
 
                 ChangeDetailsFragment changeDialog = new ChangeDetailsFragment();
                 changeDialog.setArguments(bundle);
@@ -208,7 +201,35 @@ public class AccountSettingsActivity extends AppCompatActivity {
                 dialog.show(getSupportFragmentManager(), "RemoveAccountDialog");
             }
         });
+
+
+        Button changePicture = (Button) findViewById(R.id.changePictureButton_editAccount);
+        changePicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (bitmap != null) {
+                    Repository.instance.saveProfilePicture(bitmap, viewModel.getUser().getValue().getEmail(), new FirebaseModel.Callback<String>() {
+                        @Override
+                        public void onComplete(String url) {
+                            if (url != null)
+                                Repository.instance.setPictureUrl(bitmap, new FirebaseModel.Callback<Boolean>(){
+                                    @Override
+                                    public void onComplete(Boolean data) {
+                                        if(data == true)
+                                        {
+                                            changePicture.setClickable(false);
+                                            Toast.makeText(AccountSettingsActivity.this, "Your picture uploaded", Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                            else
+                                Toast.makeText(AccountSettingsActivity.this, "There is problem with the picture", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(getApplicationContext(), "First you need take a picture.\nPress on the picture...", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
     }
-
-
 }

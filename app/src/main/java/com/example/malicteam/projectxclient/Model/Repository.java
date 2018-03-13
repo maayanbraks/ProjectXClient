@@ -137,7 +137,7 @@ public class Repository {
                             User u = data.get(i);
                             found = true;
                             data.remove(u);
-                            FirebaseModel.setFriends(data, new AddFriendsListener() {
+                            FirebaseModel.setFriends(userId, data, new AddFriendsListener() {
                                 @Override
                                 public void onSuccess() {
                                     callback.onComplete(data);
@@ -150,9 +150,9 @@ public class Repository {
                             });
 
                         }
-                        if (!found)
-                            callback.onComplete(null);
                     }
+                    if (!found)
+                        callback.onComplete(null);
                 } else {
                     callback.onComplete(null);
                 }
@@ -160,15 +160,37 @@ public class Repository {
         });
     }
 
-    public void changeUserDetails(String firstName, String lastName, String email, String phone, FirebaseModel.Callback<Integer> callback) {
-        if (firstName != null)
-            FirebaseModel.setFirstName(firstName);
-        if (lastName != null)
-            FirebaseModel.setLastName(lastName);
-        if (email != null)
-            FirebaseModel.setEmail(email);
-        if (phone != null)
-            FirebaseModel.setPhone(phone);
+    public void changeUserDetails(String firstName, String lastName, String email, String phone, FirebaseModel.Callback<String> callback) {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        int userId = User.generateId(auth.getCurrentUser().getEmail());
+
+        String str = "";
+
+        if (firstName != null) {
+            FirebaseModel.setFirstName(userId, firstName);
+            str += "First Name ";
+        }
+        if (lastName != null) {
+            FirebaseModel.setLastName(userId, lastName);
+            str += "Last Name ";
+        }
+        if (email != null) {
+            FirebaseModel.setEmail(userId, email);
+            str += "Email ";
+        }
+        if (phone != null) {
+            FirebaseModel.setPhone(userId, phone);
+            str += "Phone ";
+        }
+
+        callback.onComplete(str);
+    }
+
+    public void setPictureUrl(Bitmap bitmap, FirebaseModel.Callback<Boolean>callback)
+    {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        int id = User.generateId(auth.getCurrentUser().getEmail());
+        FirebaseModel.setPictureUrl(id,bitmap, callback);
     }
 
     public void removeAccount(FirebaseModel.Callback<Boolean> callback) {

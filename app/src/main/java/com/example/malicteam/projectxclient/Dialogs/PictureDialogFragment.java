@@ -30,11 +30,6 @@ public class PictureDialogFragment extends DialogFragment {
                             getActivity().startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
                         }
                     }
-                })
-                .setNeutralButton("Upload Picture", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        //TODO upload picture
-                    }
                 });
         builder.setCancelable(false);
         // Create the AlertDialog object and return it

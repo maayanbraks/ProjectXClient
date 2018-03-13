@@ -67,7 +67,9 @@ public class FirebaseModel {
                 List<Integer> events = new LinkedList<Integer>();
                 if (value.get("EventsList") != null)
                     friends = decodeListFromString((String) value.get("EventsList"));
-                callback.onComplete(new User(firstName, lastName, phone, email, friends, events, pictureUrl));
+
+                _currentUser = (new User(firstName, lastName, phone, email, friends, events, pictureUrl));
+                callback.onComplete(_currentUser);
             }
 
             @Override
@@ -129,34 +131,78 @@ public class FirebaseModel {
         }
     }
 
-    public static void setFirstName(String name) {
+    public static void setFirstName(int id, String name) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Users").child(Integer.toString(_currentUser.getId())).child("FirstName");
         myRef.setValue(name);
     }
 
-    public static void setLastName(String name) {
+    public static void setLastName(int id, String name) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Users").child(Integer.toString(_currentUser.getId())).child("LastName");
         myRef.setValue(name);
     }
 
-    public static void setEmail(String email) {
+    public static void setEmail(int id, String email) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Users").child(Integer.toString(_currentUser.getId())).child("Mail");
         myRef.setValue(email);
     }
 
-    public static void setPhone(String phone) {
+    public static void saveImage(Bitmap imageBmp, int userId, final Model.SaveImageListener listener) {
+
+        StorageReference imagesRef = _storage.getReference().child("Images").child("ProfilePictures").child(Integer.toString(userId));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        imageBmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        UploadTask uploadTask = imagesRef.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(Exception exception) {
+                listener.fail();
+            }
+        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                @SuppressWarnings("VisibleForTests")
+                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                listener.complete(downloadUrl.toString());
+                Log.d("profilePicture", "onSuccess: Profile picture saved on firebase");
+            }
+        });
+    }
+
+    public static void setPictureUrl(int id, Bitmap bitmap, Callback<Boolean> callback){
+        saveImage(bitmap, id, new Model.SaveImageListener() {
+            @Override
+            public void complete(String url) {
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    DatabaseReference myRef = database.getReference("Users").child(Integer.toString(id)).child("PictureUrl");
+                    myRef.setValue(url);
+                    callback.onComplete(true);
+            }
+
+            @Override
+            public void fail() {
+                callback.onComplete(false);
+            }
+        });
+
+
+    }
+
+
+    public static void setPhone(int id, String phone) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Users").child(Integer.toString(_currentUser.getId())).child("Phone");
         myRef.setValue(phone);
     }
 
-    public static void setFriends(List<User> friends, Repository.AddFriendsListener listener) {
+    public static void setFriends(int userId, List<User> friends, Repository.AddFriendsListener listener) {
         try {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference myRef = database.getReference("Users").child(Integer.toString(_currentUser.getId())).child("FriendsList");
+            DatabaseReference myRef = database.getReference("Users").child(Integer.toString(userId)).child("FriendsList");
             LinkedList<Integer> ids = new LinkedList<>();
             for (User u : friends) {
                 ids.add(u.getId());
@@ -372,35 +418,6 @@ public class FirebaseModel {
     }
 
 
-    //Setters + Getters in DB
-
-    // End DB
-
-
-    public static void saveImage(Bitmap imageBmp, int userId, final Model.SaveImageListener listener) {
-
-        StorageReference imagesRef = _storage.getReference().child("Images").child("ProfilePictures").child(Integer.toString(userId));
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        imageBmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data = baos.toByteArray();
-
-        UploadTask uploadTask = imagesRef.putBytes(data);
-        uploadTask.addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(Exception exception) {
-                listener.fail();
-            }
-        }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                @SuppressWarnings("VisibleForTests")
-                Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                listener.complete(downloadUrl.toString());
-                Log.d("profilePicture", "onSuccess: Profile picture saved on firebase");
-            }
-        });
-    }
 
 
     //Help Methods

@@ -41,7 +41,7 @@ public class SignupActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private ImageView profilePicture;
     private Bitmap bitmap = null;
-    private int action;
+
 
 
     @Override

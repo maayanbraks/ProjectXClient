@@ -12,7 +12,7 @@ import com.example.malicteam.projectxclient.Consts;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Repository;
 
-public class ChangeDetailsFragment extends DialogFragment{
+public class ChangeDetailsFragment extends DialogFragment {
     String _first = null;
     String _last = null;
     String _email = null;
@@ -21,27 +21,31 @@ public class ChangeDetailsFragment extends DialogFragment{
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
+        getArgumentsAndInit();
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         String str = "Are you sure you want to change your ";
-        if(getArguments().getString(Consts.FIRST_NAME)!=null)
-            str+=getArguments().getString(Consts.FIRST_NAME);
-        if(getArguments().getString(Consts.LAST_NAME)!=null)
-            str+=getArguments().getString(Consts.LAST_NAME);
-        if(getArguments().getString(Consts.EMAIL)!=null)
-            str+=getArguments().getString(Consts.EMAIL);
-        if(getArguments().getString(Consts.PHONE_NUMBER)!=null)
-            str+=getArguments().getString(Consts.PHONE_NUMBER);
-        str+= " ?";
+        if (_first != null)
+            str += " First Name, ";
+        if (_last != null)
+            str += " Last Name";
+        if (_email != null)
+            str += " Email";
+        if (_phone != null)
+            str += " Phone Number";
+        str += " ?";
+
+
         builder.setMessage(str)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Repository.instance.changeUserDetails(Consts.FIRST_NAME, Consts.LAST_NAME, Consts.EMAIL, Consts.PHONE_NUMBER, new FirebaseModel.Callback<Integer>(){
+                        Repository.instance.changeUserDetails(_first, _last, _email, _phone, new FirebaseModel.Callback<String>() {
                             @Override
-                            public void onComplete(Integer data) {
-                                if(data!=null)
-                                    Toast.makeText(getActivity(), "Your profile was changed", Toast.LENGTH_LONG).show();
+                            public void onComplete(String data) {
+                                if (data != null && data != "")
+                                    Toast.makeText(getActivity().getApplicationContext(), "Your profile was changed.\n"+data+" was changed.", Toast.LENGTH_LONG).show();
                                 else
-                                    Toast.makeText(getActivity(), "There is problem", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getActivity().getApplicationContext(), "There is problem", Toast.LENGTH_LONG).show();
                                 getActivity().finish();
                             }
                         });
@@ -58,10 +62,10 @@ public class ChangeDetailsFragment extends DialogFragment{
         return builder.create();
     }
 
-    public void setArgument(String first, String last, String email, String phone){
-        _first = first;
-        _last = last;
-        _email = email;
-        _phone = phone;
+    public void getArgumentsAndInit() {
+        _first = getArguments().getString(Consts.FIRST_NAME);
+        _last = getArguments().getString(Consts.LAST_NAME);
+        _email = getArguments().getString(Consts.EMAIL);
+        _phone = getArguments().getString(Consts.PHONE_NUMBER);
     }
 }
