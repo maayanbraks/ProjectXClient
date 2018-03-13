@@ -9,13 +9,12 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.LoginActivity;
-import com.example.malicteam.projectxclient.MainActivity;
+import com.example.malicteam.projectxclient.Activity.LoginActivity;
 import com.example.malicteam.projectxclient.R;
 import com.google.firebase.auth.FirebaseAuth;
 
 
-public class LogoutDialogFragment extends DialogFragment implements IResultsDialog {
+public class LogoutDialogFragment extends DialogFragment {
 
     private Activity _activity;
 
@@ -29,6 +28,7 @@ public class LogoutDialogFragment extends DialogFragment implements IResultsDial
                 .setPositiveButton("Yes, Log me out", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         FirebaseAuth.getInstance().signOut();
+                        Intent intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class);
                         Toast.makeText(_activity, getString(R.string.massage_logout), Toast.LENGTH_LONG).show();
                     }
                 })

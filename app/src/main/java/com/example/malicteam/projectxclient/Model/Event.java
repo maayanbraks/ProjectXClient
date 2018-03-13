@@ -1,9 +1,4 @@
-package Model;
-
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
-import org.json.JSONArray;
+package com.example.malicteam.projectxclient.Model;
 
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -15,28 +10,35 @@ import java.util.List;
  * Created by Maayan on 04-Jan-18.
  */
 
-public class Event implements Serializable{
 
-    private static final long serialVersionUID = 1L;
+
+
+
+//@Entity(tableName = "events")
+public class Event implements Serializable{
+//    @PrimaryKey
+//    @NonNull
     private int id;
-    private String content;
+    private String contentUrl;
     private String title;
-    private String date;
+    private final String date;
     private List<Integer> usersIds;
     private String description;
     private int adminId;
 
-    public Event(String content, String title, List<Integer> usersIds, String description, int adminId) {
-        this.content = content;
+    private static final long serialVersionUID = 1L;
+
+    public Event(String contentUrl, String title, List<Integer> usersIds, String description, int adminId, Date date) {
+        this.contentUrl = contentUrl;
         this.title = title;
         this.usersIds = usersIds;
         this.description = description;
         this.adminId = adminId;
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:MM:SS");
-        Date d = new Date();
+        Date d = date;
         this.date = dateFormat.format(d);
         this.id = Math.abs((this.adminId + this.date).hashCode());
-
+        generateId();
     }
 
     public int getAdminId() {
@@ -47,16 +49,12 @@ public class Event implements Serializable{
         return id;
     }
 
-    public String getContent() {
-        return content;
+    public String getContentUrl() {
+        return contentUrl;
     }
 
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void addContent(String content) {
-        this.content.concat("\n" + content);
+    public void setContent(String url) {
+        this.contentUrl = url;
     }
 
     public String getTitle() {
@@ -69,10 +67,6 @@ public class Event implements Serializable{
 
     public String getDate() {
         return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
     }
 
     public List<Integer> getUsersIds() {
@@ -89,5 +83,13 @@ public class Event implements Serializable{
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public void generateId() {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:MM:SS");
+        Date d = new Date();
+        String str = dateFormat.format(d);
+        str += Integer.toString(adminId);
+        this.id = Math.abs(str.hashCode());
     }
 }
