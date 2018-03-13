@@ -8,14 +8,12 @@ import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
-import com.example.malicteam.projectxclient.IActivityWithBitmap;
+import static com.example.malicteam.projectxclient.Consts.REQUEST_IMAGE_CAPTURE;
 
 public class PictureDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        IActivityWithBitmap activity = (IActivityWithBitmap)getActivity();
-
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage("How do you want to get your picture?")
                 .setTitle("Profile Picture")
@@ -27,9 +25,10 @@ public class PictureDialogFragment extends DialogFragment {
                 })
                 .setPositiveButton("Take A Picture", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        activity.setAction(activity.REQUEST_IMAGE_CAPTURE);
-
-
+                        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                            getActivity().startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+                        }
                     }
                 })
                 .setNeutralButton("Upload Picture", new DialogInterface.OnClickListener() {

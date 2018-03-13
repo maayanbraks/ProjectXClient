@@ -3,19 +3,16 @@ package com.example.malicteam.projectxclient.Dialogs;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.LoginActivity;
-import com.example.malicteam.projectxclient.MainActivity;
 import com.example.malicteam.projectxclient.R;
 import com.google.firebase.auth.FirebaseAuth;
 
 
-public class LogoutDialogFragment extends DialogFragment implements IResultsDialog {
+public class LogoutDialogFragment extends DialogFragment {
 
     private Activity _activity;
 

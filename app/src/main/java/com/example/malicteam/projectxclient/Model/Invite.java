@@ -1,4 +1,4 @@
-package Model;
+package com.example.malicteam.projectxclient.Model;
 
 /**
  * Created by Charcon on 07/03/2018.

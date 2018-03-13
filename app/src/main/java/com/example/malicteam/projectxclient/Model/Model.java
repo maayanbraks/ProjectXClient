@@ -1,4 +1,4 @@
-package Model;
+package com.example.malicteam.projectxclient.Model;
 
 import android.graphics.Bitmap;
 
@@ -18,4 +18,6 @@ public class Model {
         void onSuccess(Bitmap image);
         void onFail();
     }
+
+
 }

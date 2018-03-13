@@ -1,11 +1,11 @@
-package com.example.malicteam.projectxclient;
+package com.example.malicteam.projectxclient.Activity;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Patterns;
@@ -16,21 +16,24 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.malicteam.projectxclient.Consts;
 import com.example.malicteam.projectxclient.Dialogs.PictureDialogFragment;
+import com.example.malicteam.projectxclient.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-import java.util.Calendar;
+
 import java.util.LinkedList;
 
-import Model.FirebaseModel;
-import Model.Model;
-import Model.User;
+import com.example.malicteam.projectxclient.Model.FirebaseModel;
 
-public class SignupActivity extends AppCompatActivity implements IActivityWithBitmap {
+import com.example.malicteam.projectxclient.Model.Repository;
+import com.example.malicteam.projectxclient.Model.User;
+
+public class SignupActivity extends AppCompatActivity {
 
     private EditText inputEmail, inputPassword, firstName, lastName, phone;
     private Button btnSignIn, btnSignUp;
@@ -64,7 +67,6 @@ public class SignupActivity extends AppCompatActivity implements IActivityWithBi
             public void onClick(View v) {
                 PictureDialogFragment dialog = new PictureDialogFragment();
                 dialog.show(getSupportFragmentManager(), "ProfilePictureDialog");
-                //Activity mainActivity = (MainActivity)getActivity();
             }
         });
 
@@ -94,10 +96,6 @@ public class SignupActivity extends AppCompatActivity implements IActivityWithBi
                     return;
 
                 final String[] pictureUrl = {null};
-                //if (bitmap != null) {
-//                    FirebaseModel.saveImage(bitmap, User.generateId(email), new Model.SaveImageListener() {
-//                        @Override
-//                        public void complete(String url) {
 
                 //create user
                 auth.createUserWithEmailAndPassword(email, password)
@@ -107,31 +105,59 @@ public class SignupActivity extends AppCompatActivity implements IActivityWithBi
                                 progressBar.setVisibility(View.GONE);
                                 if (!task.isSuccessful()) {
                                     Toast.makeText(SignupActivity.this, "Authentication failed." + task.getException(), Toast.LENGTH_SHORT).show();
-                                }
-                                else {
-                                    //SUCCESS
+                                } else {
+                                    //Google Auth Succeed
                                     Toast.makeText(SignupActivity.this, "Thank you for registering", Toast.LENGTH_SHORT).show();
 
-                                    if(bitmap!=null) {
-                                        FirebaseModel.saveImage(bitmap, User.generateId(email), new Model.SaveImageListener() {
+                                    if (bitmap != null) {
+                                        Repository.instance.saveProfilePicture(bitmap, email, new FirebaseModel.Callback<String>() {
                                             @Override
-                                            public void complete(String url)
-                                            {
-                                                pictureUrl[0] = url;
-                                                addNewUser(pictureUrl[0]);
-                                            }
+                                            public void onComplete(String url) {
+                                                User newUser;
+                                                if (url != null)
+                                                    newUser = new User(firstName.getText().toString(), lastName.getText().toString(), phone.getText().toString(), inputEmail.getText().toString(),
+                                                            new LinkedList<Integer>(), new LinkedList<Integer>(), url);
+                                                else
+                                                    newUser = new User(firstName.getText().toString(), lastName.getText().toString(), phone.getText().toString(), inputEmail.getText().toString(),
+                                                            new LinkedList<Integer>(), new LinkedList<Integer>());
 
+                                                Repository.instance.addNewUserToDB(newUser, new FirebaseModel.Callback<User>() {
+                                                    @Override
+                                                    public void onComplete(User data) {
+
+                                                        if (data == null)
+                                                            Toast.makeText(SignupActivity.this, "Action failed." + task.getException(), Toast.LENGTH_SHORT).show();
+                                                        else {
+                                                            Toast.makeText(SignupActivity.this, "Welcome!!! " + newUser.getFirstName(), Toast.LENGTH_SHORT).show();
+                                                            Intent intent = new Intent(SignupActivity.this, MainActivity.class);
+                                                            intent.putExtra(Consts.UID_KEY, newUser.getId());
+                                                            startActivity(intent);
+                                                            finish();
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    } else {
+                                        Repository.instance.addNewUserToDB(new User(firstName.getText().toString(), lastName.getText().toString(), phone.getText().toString(), inputEmail.getText().toString(),
+                                                new LinkedList<Integer>(), new LinkedList<Integer>()), new FirebaseModel.Callback<User>() {
                                             @Override
-                                            public void fail() {
-                                                addNewUser(null);
+                                            public void onComplete(User data) {
+                                                if (data == null)
+                                                    Toast.makeText(SignupActivity.this, "Action failed." + task.getException(), Toast.LENGTH_SHORT).show();
+                                                else {
+                                                    Toast.makeText(SignupActivity.this, "Welcome!!! from //HOPAPA", Toast.LENGTH_SHORT).show();
+                                                    //HOPAPA
+                                                    Intent intent = new Intent(SignupActivity.this, MainActivity.class);
+                                                    intent.putExtra(Consts.UID_KEY, data.getId());
+                                                    startActivity(intent);
+                                                    finish();
+                                                }
+
                                             }
                                         });
 
                                     }
-                                    else{
-                                        addNewUser(null);
-                                    }
-
                                 }
                             }
                         })
@@ -148,6 +174,7 @@ public class SignupActivity extends AppCompatActivity implements IActivityWithBi
             }
         });
     }
+
 
     private boolean checkInputs(String fName, String lName, String password, String email, String phoneNumber) {
         if (TextUtils.isEmpty(email)) {
@@ -194,49 +221,23 @@ public class SignupActivity extends AppCompatActivity implements IActivityWithBi
         progressBar.setVisibility(View.GONE);
     }
 
-    public void addNewUser(String Url) {
-        if (Url != null)
-            FirebaseModel.addUser(new User(firstName.getText().toString(), lastName.getText().toString(), phone.getText().toString(), inputEmail.getText().toString(), new LinkedList<>(),Url));
-        else
-            FirebaseModel.addUser(new User(firstName.getText().toString(), lastName.getText().toString(), phone.getText().toString(), inputEmail.getText().toString(), new LinkedList<>()));
-
-        finish();
-    }
-
     public final static boolean isValidEmail(CharSequence target) {
         return (!TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches());
-    }
-
-    public void setAction(int action) {
-        this.action = action;
-        profilePicture.setImageBitmap(bitmap);
-        executePictureAction();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_IMAGE_CAPTURE) {
+        //Handle - take picture
+        if (requestCode == Consts.REQUEST_IMAGE_CAPTURE) {
             if (resultCode == Activity.RESULT_OK) {
                 Bundle extras = data.getExtras();
                 bitmap = (Bitmap) extras.get("data");
                 profilePicture.setImageBitmap(bitmap);
             }
         }
-    }
 
-    private void executePictureAction() {
-        if (action == REQUEST_IMAGE_CAPTURE) {
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            final Calendar c = Calendar.getInstance();
-            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-            }
-        }
-//        else if(action == )
-//        {
-//            //TODO upload picture
-//        }
+        //TODO add handle upload picture
     }
 }

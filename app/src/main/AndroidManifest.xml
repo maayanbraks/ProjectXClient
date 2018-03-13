@@ -12,19 +12,21 @@
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+
     <uses-feature android:name="android.hardware.camera" />
 
     <application
+        android:name=".Model.MyApp"
         android:allowBackup="true"
         android:icon="@drawable/outalk_logo"
         android:label="@string/app_name"
         android:roundIcon="@drawable/outalk_logo"
-        android:supportsRtl="true"
+        android:supportsRtl="false"
         android:theme="@style/AppTheme">
+
         <activity
-            android:name=".MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:name=".Activity.LoginActivity"
+            android:label="@string/login_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,23 +34,26 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".FriendsListActivity"
+            android:name=".Activity.MainActivity"
+            android:label="@string/app_name">
+
+        </activity>
+
+        <activity android:name=".Activity.SignupActivity">
+
+        </activity>
+        <activity
+            android:name=".Activity.FriendsListActivity"
             android:label="@string/friends_list_title" />
         <activity
-            android:name=".AddFriendActivity"
-            android:label="@string/add_friend_title" />
-        <activity
-            android:name=".NewEventActivity"
+            android:name=".Activity.NewEventActivity"
             android:label="@string/new_event_title" />
         <activity
-            android:name=".EventListActivity"
-            android:label="@string/event_list_title" />
-        <activity
-            android:name=".EventSettingsActivity"
-            android:label="@string/event_settings_title" />
-        <activity
-            android:name=".AccountSettingsActivity"
+            android:name=".Activity.AccountSettingsActivity"
             android:label="@string/account_settings_title" />
+        <activity android:name=".Activity.EventDetails" />
+        <activity android:name=".Activity.RecordingActivity" />
+        <activity android:name=".Activity.ResetPasswordActivity"></activity>
 
         <meta-data
             android:name="android.support.VERSION"
@@ -57,11 +62,6 @@
             android:name="android.arch.lifecycle.VERSION"
             android:value="27.0.0-SNAPSHOT" />
 
-        <activity android:name=".EventDetails" />
-        <activity android:name=".RecordingActivity" />
-        <activity android:name=".SignupActivity" />
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".ResetPasswordActivity"></activity>
     </application>
 
 </manifest>

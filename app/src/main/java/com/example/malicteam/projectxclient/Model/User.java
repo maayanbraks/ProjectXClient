@@ -1,4 +1,4 @@
-package Model;
+package com.example.malicteam.projectxclient.Model;
 
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -10,21 +10,25 @@ import java.util.List;
 /**
  * Created by Maayan on 10-Jan-18.
  */
-//TODO handle with date
 
+//@Entity(tableName = "users")
 public class User implements Serializable {
+//    @PrimaryKey
+//    @NonNull
+    private int id;//hash code from email
+
     private String firstName;
     private String lastName;
-    private int id;//hash code from email
-    private String joinDate;
+    private String lastLogin;
     private String phoneNumber;
     private String email;
     private List<Integer> friendsIds;
+    private List<Integer> eventsIds;
     private String pictureUrl;
     private final boolean admin = false;
 
 
-    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds) {
+    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.id = generateId(email);
@@ -32,15 +36,21 @@ public class User implements Serializable {
         this.email = email;
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date date = new Date();
-        this.joinDate = dateFormat.format(date);
+        this.lastLogin = dateFormat.format(date);
         this.pictureUrl = null;
+
         if (friendsIds != null)
             this.friendsIds = friendsIds;
         else
             this.friendsIds = new LinkedList<Integer>();
+
+        if (eventsIds != null)
+            this.eventsIds = eventsIds;
+        else
+            this.eventsIds = new LinkedList<Integer>();
     }
 
-    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, String pictureUrl) {
+    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds, String pictureUrl) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.id = generateId(email);
@@ -48,8 +58,19 @@ public class User implements Serializable {
         this.email = email;
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date date = new Date();
-        this.joinDate = dateFormat.format(date);
+        this.lastLogin = dateFormat.format(date);
         this.pictureUrl = pictureUrl;
+        this.eventsIds = new LinkedList<Integer>();
+
+        if (friendsIds != null)
+            this.friendsIds = friendsIds;
+        else
+            this.friendsIds = new LinkedList<Integer>();
+
+        if (eventsIds != null)
+            this.eventsIds = eventsIds;
+        else
+            this.eventsIds = new LinkedList<Integer>();
     }
 
     @Override
@@ -60,17 +81,24 @@ public class User implements Serializable {
         str += "Email: " + email + "\n";
         str += "Phone: " + phoneNumber + "\n";
         str += "Id: " + id + "\n";
-        str += "Date: " + joinDate + "\n";
+        str += "Date: " + lastLogin + "\n";
         if (pictureUrl != null)
             str += "PictureUrl:" + pictureUrl + "\n";
+
         str += "Friends Count:" + friendsIds.size() + "\n";
         int index = 1;
         for (int id : friendsIds) {
             str += "\t" + index + ") " + id + "\n";
             index++;
         }
-
+        str += "Events Count:" + eventsIds.size() + "\n";
+        index = 1;
+        for (int id : eventsIds) {
+            str += "\t" + index + ") " + id + "\n";
+            index++;
+        }
         return str;
+
     }
 
     public String getFirstName() {
@@ -97,8 +125,8 @@ public class User implements Serializable {
         this.id = generateId(email);
     }
 
-    public String getJoinDate() {
-        return joinDate;
+    public String getLastLogin() {
+        return lastLogin;
     }
 
     public String getPhoneNumber() {
@@ -131,6 +159,14 @@ public class User implements Serializable {
 
     public void addFriend(int id) {
         friendsIds.add(id);
+    }
+
+    public List<Integer> getEventsIds() {
+        return eventsIds;
+    }
+
+    public void addEvent(int id) {
+        eventsIds.add(id);
     }
 
     public static int generateId(String email) {
