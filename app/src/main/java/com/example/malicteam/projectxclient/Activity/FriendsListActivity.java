@@ -215,7 +215,7 @@ public class FriendsListActivity extends FragmentActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(FriendsListActivity.this, FriendDetailsActivity.class);
-                    intent.putExtra(Consts.UID_KEY, friend.getId());
+                    intent.putExtra(Consts.USER, friend);
                     startActivity(intent);
                 }
             });

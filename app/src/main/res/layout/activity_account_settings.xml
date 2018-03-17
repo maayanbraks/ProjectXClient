@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context="com.example.malicteam.projectxclient.Activity.FriendsListActivity"
     tools:layout_editor_absoluteY="81dp"
-    android:background="@color/white">
+    android:background="@color/appBackground">
 
 
     <LinearLayout

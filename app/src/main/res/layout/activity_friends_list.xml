@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.example.malicteam.projectxclient.Activity.FriendsListActivity"
-    android:background="@color/white">
+    android:background="@color/appBackground">
 
     <LinearLayout
         android:layout_width="match_parent"

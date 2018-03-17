@@ -2,6 +2,7 @@ package com.example.malicteam.projectxclient.Model;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -41,10 +42,6 @@ public class FirebaseModel {
         void onComplete(T data);
     }
 
-    public interface GetUserListener {
-        void onComplete(User user);
-    }
-
     //Firebase Methods
     //Users
     public static void getUserAndObserve(String id, final Callback<User> callback) {
@@ -66,7 +63,7 @@ public class FirebaseModel {
                     friends = decodeListFromString(friendsString);
                 List<Integer> events = new LinkedList<Integer>();
                 if (value.get("EventsList") != null)
-                    friends = decodeListFromString((String) value.get("EventsList"));
+                    events = decodeListFromString((String) value.get("EventsList"));
 
                 _currentUser = (new User(firstName, lastName, phone, email, friends, events, pictureUrl));
                 callback.onComplete(_currentUser);
@@ -104,6 +101,9 @@ public class FirebaseModel {
         }
     }
 
+    /*
+    remove current user - from DB & Google Auth
+     */
     public static void removeAccount(final Callback<Boolean> callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -131,24 +131,79 @@ public class FirebaseModel {
         }
     }
 
+    //User Setters
     public static void setFirstName(int id, String name) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("Users").child(Integer.toString(_currentUser.getId())).child("FirstName");
+        DatabaseReference myRef = database.getReference("Users").child(Integer.toString(id)).child("FirstName");
         myRef.setValue(name);
     }
 
     public static void setLastName(int id, String name) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("Users").child(Integer.toString(_currentUser.getId())).child("LastName");
+        DatabaseReference myRef = database.getReference("Users").child(Integer.toString(id)).child("LastName");
         myRef.setValue(name);
     }
 
     public static void setEmail(int id, String email) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("Users").child(Integer.toString(_currentUser.getId())).child("Mail");
+        DatabaseReference myRef = database.getReference("Users").child(Integer.toString(id)).child("Mail");
         myRef.setValue(email);
     }
+    public static void setPhone(int id, String phone) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("Users").child(Integer.toString(_currentUser.getId())).child("Phone");
+        myRef.setValue(phone);
+    }
+    /*
+    get Picture and change the profile picture of user <id>
+     */
+    public static void setPictureUrl(int id, Bitmap bitmap, Callback<Boolean> callback){
+        saveImage(bitmap, id, new Model.SaveImageListener() {
+            @Override
+            public void complete(String url) {
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference myRef = database.getReference("Users").child(Integer.toString(id)).child("PictureUrl");
+                myRef.setValue(url);
+                callback.onComplete(true);
+            }
 
+            @Override
+            public void fail() {
+                callback.onComplete(false);
+            }
+        });
+
+
+    }
+
+    public static void setFriends(int userId, List<User> friends, Repository.AddFriendsListener listener) {
+        try {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference("Users").child(Integer.toString(userId)).child("FriendsList");
+            LinkedList<Integer> ids = new LinkedList<>();
+            for (User u : friends) {
+                ids.add(u.getId());
+            }
+            myRef.setValue(generateStringFromList(ids));
+            listener.onSuccess();
+        } catch (Exception e) {
+            listener.onFail("There is a problem. Please try later.\n(error 638)");
+        }
+    }
+    public static void setFriends(int userId, String friends, Repository.AddFriendsListener listener) {
+        try {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference("Users").child(Integer.toString(userId)).child("FriendsList");
+            myRef.setValue(friends);
+            listener.onSuccess();
+        } catch (Exception e) {
+            listener.onFail("There is a probleb. Please try later.\n(error 9876)");
+        }
+    }
+
+    /*
+    save Profile Picture - Default save image as <UserID>
+     */
     public static void saveImage(Bitmap imageBmp, int userId, final Model.SaveImageListener listener) {
 
         StorageReference imagesRef = _storage.getReference().child("Images").child("ProfilePictures").child(Integer.toString(userId));
@@ -173,57 +228,10 @@ public class FirebaseModel {
         });
     }
 
-    public static void setPictureUrl(int id, Bitmap bitmap, Callback<Boolean> callback){
-        saveImage(bitmap, id, new Model.SaveImageListener() {
-            @Override
-            public void complete(String url) {
-                    FirebaseDatabase database = FirebaseDatabase.getInstance();
-                    DatabaseReference myRef = database.getReference("Users").child(Integer.toString(id)).child("PictureUrl");
-                    myRef.setValue(url);
-                    callback.onComplete(true);
-            }
-
-            @Override
-            public void fail() {
-                callback.onComplete(false);
-            }
-        });
 
 
-    }
 
 
-    public static void setPhone(int id, String phone) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("Users").child(Integer.toString(_currentUser.getId())).child("Phone");
-        myRef.setValue(phone);
-    }
-
-    public static void setFriends(int userId, List<User> friends, Repository.AddFriendsListener listener) {
-        try {
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference myRef = database.getReference("Users").child(Integer.toString(userId)).child("FriendsList");
-            LinkedList<Integer> ids = new LinkedList<>();
-            for (User u : friends) {
-                ids.add(u.getId());
-            }
-            myRef.setValue(generateStringFromList(ids));
-            listener.onSuccess();
-        } catch (Exception e) {
-            listener.onFail("There is a problem. Please try later.\n(error 638)");
-        }
-    }
-
-    public static void setFriends(int userId, String friends, Repository.AddFriendsListener listener) {
-        try {
-            FirebaseDatabase database = FirebaseDatabase.getInstance();
-            DatabaseReference myRef = database.getReference("Users").child(Integer.toString(userId)).child("FriendsList");
-            myRef.setValue(friends);
-            listener.onSuccess();
-        } catch (Exception e) {
-            listener.onFail("There is a probleb. Please try later.\n(error 9876)");
-        }
-    }
 
     public static void getFriends(int userId, final Callback<List<User>> callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -263,14 +271,14 @@ public class FirebaseModel {
                         String email = (String) value.get("Mail");
                         String pictureUrl = (String) value.get("PictureUrl");
                         //----WE dont need it for now----
-//                        List<Integer> friends = new LinkedList<Integer>();
-//                        if (value.get("FriendsList") != null)
-//                            friends = decodeListFromString((String) value.get("FriendsList"));
-//                        List<Integer> events = new LinkedList<Integer>();
-//                        if (value.get("EventsList") != null)
-//                            friends = decodeListFromString((String) value.get("EventsList"));
+                        List<Integer> friends = new LinkedList<Integer>();
+                        if (value.get("FriendsList") != null)
+                            friends = decodeListFromString((String) value.get("FriendsList"));
+                        List<Integer> events = new LinkedList<Integer>();
+                        if (value.get("EventsList") != null)
+                            events = decodeListFromString((String) value.get("EventsList"));
 
-                        finalList.add(new User(firstName, lastName, phone, email, new LinkedList<>(), new LinkedList<>(), pictureUrl));
+                        finalList.add(new User(firstName, lastName, phone, email, friends, events, pictureUrl));
                     }
                 }
                 callback.onComplete(finalList);
@@ -296,7 +304,6 @@ public class FirebaseModel {
                 else
                     callback.onComplete(-1);
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 callback.onComplete(null);
@@ -306,7 +313,10 @@ public class FirebaseModel {
     }
     //END of Users
 
-    public static void getImage(String url, final Model.GetImageListener listener) {
+    /*
+    Get url & callback return Image from Firebase.
+     */
+    public static void getImage(String url, Callback<Bitmap> callback) {
         if (url != null) {
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference httpsReference = storage.getReferenceFromUrl(url);
@@ -314,13 +324,17 @@ public class FirebaseModel {
             httpsReference.getBytes(3 * ONE_MEGABYTE).addOnSuccessListener(new OnSuccessListener<byte[]>() {
                 @Override
                 public void onSuccess(byte[] bytes) {
-                    Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                    listener.onSuccess(image);
+                    try {
+                        Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+                        callback.onComplete(image);
+                    }catch (Exception e){
+                        Log.d("tag", "asdf");
+                    }
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(Exception exception) {
-                    listener.onFail();
+                    callback.onComplete(null);
                 }
             });
         }
@@ -368,8 +382,6 @@ public class FirebaseModel {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<Event> events = new LinkedList<>();
-
-
                 for (DataSnapshot snap : dataSnapshot.getChildren()) {
                     Map<String, Object> value = (Map<String, Object>) snap.getValue();
                     int id = (int) value.get("ID");
@@ -382,7 +394,6 @@ public class FirebaseModel {
                         List<Integer> users = new LinkedList<Integer>();
                         if (value.get("UsersList") != null)
                             users = decodeListFromString((String) value.get("UsersList"));
-
                         events.add(new Event(contentUrl, title, users, description, adminId, date));
                     }
                 }
@@ -424,12 +435,12 @@ public class FirebaseModel {
     public static LinkedList<Integer> decodeListFromString(String list) {
         list = list.replace("{", "").replace("}", "").replace(" ", "");
         String[] ids = list.split(",");
-        LinkedList<Integer> friendsList = new LinkedList<>();
+        LinkedList<Integer> finalList = new LinkedList<>();
         for (String s : ids) {
             if (s != null && s != "")
-                friendsList.add(Integer.parseInt(s));
+                finalList.add(Integer.parseInt(s));
         }
-        return friendsList;
+        return finalList;
     }
 
     public static String generateStringFromList(List<Integer> list) {
