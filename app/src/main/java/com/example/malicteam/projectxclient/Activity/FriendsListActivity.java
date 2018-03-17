@@ -8,12 +8,8 @@ import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -37,13 +33,13 @@ import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
 
 public class FriendsListActivity extends FragmentActivity {
-    private List<User> friends = new LinkedList<>();
+
     private int userId;
-    private User waitForAction = null;
     private UserViewModel currentUser = null;
+    private List<User> friends = new LinkedList<>();
     private MyAdapter adapter = new MyAdapter();
     private ListView friendsListView = null;
-
+    private User waitForAction = null;//Clicked User
     private String emailString = "";
 
     @Override
@@ -52,7 +48,7 @@ public class FriendsListActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends_list);
 
-        userId = getIntent().getIntExtra(Consts.UID_KEY, Consts.DEFAULT_UID);
+        userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
 
         Repository.instance.getFriends(userId, new FirebaseModel.Callback<List<User>>() {
             @Override
@@ -64,7 +60,7 @@ public class FriendsListActivity extends FragmentActivity {
         });
 
         currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
-        currentUser.init(userId);
+        currentUser.init(userId, true);
 //        friendsListData = ViewModelProviders.of(this).get(FriendsViewModel.class);
 //        friendsListData.init(userId);
 
@@ -215,7 +211,7 @@ public class FriendsListActivity extends FragmentActivity {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(FriendsListActivity.this, FriendDetailsActivity.class);
-                    intent.putExtra(Consts.USER, friend);
+                    intent.putExtra(Consts.USER_ID, friend.getId());
                     startActivity(intent);
                 }
             });

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Patterns;
@@ -130,7 +129,7 @@ public class SignupActivity extends AppCompatActivity {
                                                         else {
                                                             Toast.makeText(SignupActivity.this, "Welcome!!! " + newUser.getFirstName(), Toast.LENGTH_SHORT).show();
                                                             Intent intent = new Intent(SignupActivity.this, MainActivity.class);
-                                                            intent.putExtra(Consts.UID_KEY, newUser.getId());
+                                                            intent.putExtra(Consts.USER_ID, newUser.getId());
                                                             startActivity(intent);
                                                             finish();
                                                         }
@@ -149,7 +148,7 @@ public class SignupActivity extends AppCompatActivity {
                                                     Toast.makeText(SignupActivity.this, "Welcome!!! from //HOPAPA", Toast.LENGTH_SHORT).show();
                                                     //HOPAPA
                                                     Intent intent = new Intent(SignupActivity.this, MainActivity.class);
-                                                    intent.putExtra(Consts.UID_KEY, data.getId());
+                                                    intent.putExtra(Consts.USER_ID, data.getId());
                                                     startActivity(intent);
                                                     finish();
                                                 }

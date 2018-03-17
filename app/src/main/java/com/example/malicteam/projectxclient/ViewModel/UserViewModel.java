@@ -14,9 +14,12 @@ public class UserViewModel extends ViewModel {
     private int userId;
     private LiveData<User> user;
 
-    public void init(int userId) {
+    public void init(int userId, boolean isMainUser) {
         this.userId = userId;
-        user = Repository.instance.getUser(userId);
+        if (isMainUser)
+            user = Repository.instance.getUser(userId);
+        else
+            user = Repository.instance.getSomeUser(userId);
     }
     public LiveData<User> getUser() {
         return user;

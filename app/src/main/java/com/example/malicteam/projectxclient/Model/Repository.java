@@ -32,6 +32,7 @@ public class Repository {
     public static final Repository instance = new Repository();
 
     private MutableLiveData<User> userLiveData;
+    private List<MutableLiveData<User>> someUser;
     //private MutableLiveData<List<Event>> eventsData;
     //private MutableLiveData<List<User>> friendsLiveData;
 
@@ -40,7 +41,7 @@ public class Repository {
             if (userLiveData == null) {
                 userLiveData = new MutableLiveData<User>();
                 FirebaseAuth auth = FirebaseAuth.getInstance();
-                FirebaseModel.getUserAndObserve(Integer.toString(User.generateId(auth.getCurrentUser().getEmail())), new FirebaseModel.Callback<User>() {
+                FirebaseModel.LoggedInUserAndObserve(Integer.toString(id), new FirebaseModel.Callback<User>() {
                     @Override
                     public void onComplete(User data) {
                         if (data != null)
@@ -50,6 +51,32 @@ public class Repository {
             }
         }
         return userLiveData;
+    }
+
+    public LiveData<User> getSomeUser(int id) {
+        synchronized (this) {
+            //check if exist
+            if (someUser != null) {
+                for (MutableLiveData<User> u : someUser) {
+                    if(u.getValue().getId() == id)
+                        return u;
+                }
+            }
+            else // list is null
+                someUser = new LinkedList<MutableLiveData<User>>();
+
+            someUser.add(new MutableLiveData<>());
+
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            FirebaseModel.LoggedInUserAndObserve(Integer.toString(id), new FirebaseModel.Callback<User>() {
+                @Override
+                public void onComplete(User data) {
+                    someUser.get(someUser.size() - 1).setValue(data);
+                }
+            });
+
+        }
+        return someUser.get(someUser.size() - 1);
     }
 
     public interface AddFriendsListener {
@@ -84,7 +111,7 @@ public class Repository {
                                             newList.add(u.getId());
                                         }
                                         newList.add(friendId);
-                                        FirebaseModel.setFriends(userId ,FirebaseModel.generateStringFromList(newList), new AddFriendsListener() {
+                                        FirebaseModel.setFriends(userId, FirebaseModel.generateStringFromList(newList), new AddFriendsListener() {
                                             @Override
                                             public void onSuccess() {
                                                 FirebaseModel.getFriends(userId, new FirebaseModel.Callback<List<User>>() {
@@ -113,10 +140,10 @@ public class Repository {
         });
     }
 
-    public void getFriends(int friendId, FirebaseModel.Callback<List<User>> callback){
+    public void getFriends(int friendId, FirebaseModel.Callback<List<User>> callback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         int userId = User.generateId(auth.getCurrentUser().getEmail());
-        FirebaseModel.getFriends(userId, new FirebaseModel.Callback<List<User>>(){
+        FirebaseModel.getFriends(userId, new FirebaseModel.Callback<List<User>>() {
             @Override
             public void onComplete(List<User> data) {
                 callback.onComplete(data);
@@ -186,11 +213,10 @@ public class Repository {
         callback.onComplete(str);
     }
 
-    public void setPictureUrl(Bitmap bitmap, FirebaseModel.Callback<Boolean>callback)
-    {
+    public void setPictureUrl(Bitmap bitmap, FirebaseModel.Callback<Boolean> callback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         int id = User.generateId(auth.getCurrentUser().getEmail());
-        FirebaseModel.setPictureUrl(id,bitmap, callback);
+        FirebaseModel.setPictureUrl(id, bitmap, callback);
     }
 
     public void removeAccount(FirebaseModel.Callback<Boolean> callback) {
@@ -233,8 +259,29 @@ public class Repository {
         void onFail();
     }
 
+    public void getProfilePicture(String url, FirebaseModel.Callback<Bitmap> callback) {
+        if (url == null || url.equals("")) {
+            callback.onComplete(null);
+        } else {
+            //check if image exsist localy
+            String fileName = URLUtil.guessFileName(url, null, null);
+            Bitmap image = loadImageFromFile(fileName);
+
+            if (image != null) {
+                callback.onComplete(image);
+            } else {
+                FirebaseModel.getImage(url, new FirebaseModel.Callback<Bitmap>() {
+                    @Override
+                    public void onComplete(Bitmap data) {
+                        callback.onComplete(data);
+                    }
+                });
+            }
+        }
+    }
+
+    //Default user (connected user)
     public void getProfilePicture(FirebaseModel.Callback<Bitmap> callback) {
-        //String url = userLiveData.getValue().getPictureUrl();
         String url = userLiveData.getValue().getPictureUrl();
         if (url == null || url.equals("")) {
             callback.onComplete(null);

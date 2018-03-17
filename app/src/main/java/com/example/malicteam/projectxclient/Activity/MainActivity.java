@@ -61,10 +61,10 @@ public class MainActivity extends AppCompatActivity
         EventAdapter adapter = new EventAdapter();
         eventListView.setAdapter(adapter);
 
-        userId = getIntent().getIntExtra(Consts.UID_KEY, Consts.DEFAULT_UID);
+        userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
 
         currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
-        currentUser.init(userId);
+        currentUser.init(userId, true);
 //        eventsData = ViewModelProviders.of(this).get(EventsViewModel.class);
 //        eventsData.init(userId);
 
@@ -203,14 +203,14 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_friends_list:
                 if (!this.getClass().getName().equals(FriendsListActivity.class.getName())) {
                     intent = new Intent(this, FriendsListActivity.class);
-                    intent.putExtra(Consts.UID_KEY, userId);
+                    intent.putExtra(Consts.USER_ID, userId);
                     startActivity(intent);
                 }
                 break;
             case R.id.nav_settings_account:
                 if (!this.getClass().getName().equals(AccountSettingsActivity.class.getName())) {
                     intent = new Intent(this, AccountSettingsActivity.class);
-                    intent.putExtra(Consts.UID_KEY, userId);
+                    intent.putExtra(Consts.USER_ID, userId);
                     startActivity(intent);
                 }
                 break;

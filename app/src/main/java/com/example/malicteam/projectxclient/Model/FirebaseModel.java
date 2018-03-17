@@ -2,7 +2,6 @@ package com.example.malicteam.projectxclient.Model;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -44,7 +43,7 @@ public class FirebaseModel {
 
     //Firebase Methods
     //Users
-    public static void getUserAndObserve(String id, final Callback<User> callback) {
+    public static void LoggedInUserAndObserve(String id, final Callback<User> callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Users").child(id);
 
@@ -75,7 +74,38 @@ public class FirebaseModel {
             }
         });
     }
+    public static void getSomeUserAndObserve(String id, final Callback<User> callback) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("Users").child(id);
 
+        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            User user = null;
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Map<String, Object> value = (Map<String, Object>) dataSnapshot.getValue();
+                String firstName = (String) value.get("FirstName");
+                String lastName = (String) value.get("LastName");
+                String phone = (String) value.get("Phone");
+                String email = (String) value.get("Mail");
+                String pictureUrl = (String) value.get("PictureUrl");
+                List<Integer> friends = new LinkedList<Integer>();
+                String friendsString = (String) value.get("FriendsList");
+                if (friendsString != null)
+                    friends = decodeListFromString(friendsString);
+                List<Integer> events = new LinkedList<Integer>();
+                if (value.get("EventsList") != null)
+                    events = decodeListFromString((String) value.get("EventsList"));
+
+                user = (new User(firstName, lastName, phone, email, friends, events, pictureUrl));
+                callback.onComplete(_currentUser);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callback.onComplete(null);
+            }
+        });
+    }
     public static void addUser(User user, Callback<User> callback) {
         try {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -151,7 +181,7 @@ public class FirebaseModel {
     }
     public static void setPhone(int id, String phone) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("Users").child(Integer.toString(_currentUser.getId())).child("Phone");
+        DatabaseReference myRef = database.getReference("Users").child(Integer.toString(id)).child("Phone");
         myRef.setValue(phone);
     }
     /*
