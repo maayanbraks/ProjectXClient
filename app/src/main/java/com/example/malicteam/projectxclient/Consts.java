@@ -18,6 +18,7 @@ public interface Consts {
     public static final String SAVE_AS = "saveAs";
     public static final String PDF = "PDF";
     public static final String TXT = "TXT";
+    public static final String USER = "user";
 
     public static final int DEFAULT_UID = 1376351813;
     static final int REQUEST_WRITE_STORAGE = 11;

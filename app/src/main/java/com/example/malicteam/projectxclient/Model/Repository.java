@@ -233,29 +233,23 @@ public class Repository {
         void onFail();
     }
 
-    public void getProfilePicture(final GetImageListener listener) {
+    public void getProfilePicture(FirebaseModel.Callback<Bitmap> callback) {
+        //String url = userLiveData.getValue().getPictureUrl();
         String url = userLiveData.getValue().getPictureUrl();
         if (url == null || url.equals("")) {
-            listener.onFail();
+            callback.onComplete(null);
         } else {
             //check if image exsist localy
             String fileName = URLUtil.guessFileName(url, null, null);
             Bitmap image = loadImageFromFile(fileName);
 
             if (image != null) {
-                listener.onSuccess(image);
+                callback.onComplete(image);
             } else {
-                FirebaseModel.getImage(url, new Model.GetImageListener() {
+                FirebaseModel.getImage(url, new FirebaseModel.Callback<Bitmap>() {
                     @Override
-                    public void onSuccess(Bitmap image) {
-                        String fileName = URLUtil.guessFileName(url, null, null);
-                        saveImageToFile(image, fileName);
-                        listener.onSuccess(image);
-                    }
-
-                    @Override
-                    public void onFail() {
-                        listener.onFail();
+                    public void onComplete(Bitmap data) {
+                        callback.onComplete(data);
                     }
                 });
             }

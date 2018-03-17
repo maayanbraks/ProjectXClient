@@ -53,17 +53,18 @@ public class AccountSettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_account_settings);
         profilePicture = (ImageView) findViewById(R.id.userPic_editAccount);
 
-        Repository.instance.getProfilePicture(new Repository.GetImageListener() {
-            @Override
-            public void onSuccess(Bitmap image) {
-                profilePicture.setImageBitmap(bitmap);
-            }
-
-            @Override
-            public void onFail() {
-                profilePicture.setImageResource(R.drawable.outalk_logo);
-            }
-        });
+        Repository.instance.getProfilePicture(
+                new FirebaseModel.Callback<Bitmap>() {
+                    @Override
+                    public void onComplete(Bitmap data) {
+                        if (data != null) {
+                            profilePicture.setImageBitmap(data);
+                        } else {
+                            profilePicture.setImageResource(R.drawable.outalk_logo);
+                        }
+                    }
+                }
+        );
 
         userId = getIntent().getIntExtra(Consts.UID_KEY, Consts.DEFAULT_UID);
 
@@ -75,7 +76,6 @@ public class AccountSettingsActivity extends AppCompatActivity {
                 initDetails(user);
             }
         });
-
         initButtons();
     }
 
@@ -116,17 +116,18 @@ public class AccountSettingsActivity extends AppCompatActivity {
 
             ImageView profilePic = (ImageView) findViewById(R.id.userPic_editAccount);
             if (user.getPictureUrl() != null) {
-                Repository.instance.getProfilePicture(new Repository.GetImageListener() {
-                    @Override
-                    public void onSuccess(Bitmap image) {
-                        profilePic.setImageBitmap(image);
-                    }
-
-                    @Override
-                    public void onFail() {
-                        profilePic.setImageResource(R.drawable.outalk_logo);
-                    }
-                });
+                Repository.instance.getProfilePicture(
+                        new FirebaseModel.Callback<Bitmap>() {
+                            @Override
+                            public void onComplete(Bitmap data) {
+                                if (data != null) {
+                                    profilePicture.setImageBitmap(data);
+                                } else {
+                                    profilePicture.setImageResource(R.drawable.outalk_logo);
+                                }
+                            }
+                        }
+                );
             } else
                 profilePic.setImageResource(R.drawable.outalk_logo);
 
@@ -212,11 +213,10 @@ public class AccountSettingsActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(String url) {
                             if (url != null)
-                                Repository.instance.setPictureUrl(bitmap, new FirebaseModel.Callback<Boolean>(){
+                                Repository.instance.setPictureUrl(bitmap, new FirebaseModel.Callback<Boolean>() {
                                     @Override
                                     public void onComplete(Boolean data) {
-                                        if(data == true)
-                                        {
+                                        if (data == true) {
                                             changePicture.setClickable(false);
                                             Toast.makeText(AccountSettingsActivity.this, "Your picture uploaded", Toast.LENGTH_SHORT).show();
                                         }

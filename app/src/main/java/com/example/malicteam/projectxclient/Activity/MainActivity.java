@@ -28,6 +28,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.malicteam.projectxclient.Consts;
+import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.R;
 //import com.example.malicteam.projectxclient.ViewModel.EventsViewModel;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
@@ -46,7 +47,7 @@ public class MainActivity extends AppCompatActivity
     private TextView userNameHeader;
     private TextView userEmailHeader;
     private NavigationView navigationView;
-//    private EventsViewModel eventsData = null;
+    //    private EventsViewModel eventsData = null;
     private UserViewModel currentUser = null;
     private int userId;
     private List<Event> eventsList = new LinkedList<>();
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         final ListView eventListView = (ListView) findViewById(R.id._listOfEvents);
-        MyAdapter adapter = new MyAdapter();
+        EventAdapter adapter = new EventAdapter();
         eventListView.setAdapter(adapter);
 
         userId = getIntent().getIntExtra(Consts.UID_KEY, Consts.DEFAULT_UID);
@@ -71,8 +72,8 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         View headerLayout = navigationView.getHeaderView(0);
-        userNameHeader =(TextView) (headerLayout.findViewById(R.id.userName_head));
-        userEmailHeader = (TextView)(headerLayout.findViewById(R.id.userMail_head));
+        userNameHeader = (TextView) (headerLayout.findViewById(R.id.userName_head));
+        userEmailHeader = (TextView) (headerLayout.findViewById(R.id.userMail_head));
 
         currentUser.getUser().observe(this, new Observer<User>() {
             @Override
@@ -83,9 +84,9 @@ public class MainActivity extends AppCompatActivity
                     try {
                         userNameHeader.setText(user.getFirstName() + " " + user.getLastName());
                         userEmailHeader.setText(user.getEmail());
-                    }catch (Exception e)
-                    {
-                        Log.d("tag", e.getMessage());}
+                    } catch (Exception e) {
+                        Log.d("tag", e.getMessage());
+                    }
                     userId = user.getId();
                 } else {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -128,8 +129,6 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
-
-
 
 
         eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -245,21 +244,23 @@ public class MainActivity extends AppCompatActivity
 
     private void updateProfilePicture(String url) {
         ImageView profilePic = findViewById(R.id.userPic_head);
-        Repository.instance.getProfilePicture(new Repository.GetImageListener() {
-            @Override
-            public void onSuccess(Bitmap image) {
-                profilePic.setImageBitmap(image);
-            }
+        Repository.instance.getProfilePicture(
+                new FirebaseModel.Callback<Bitmap>() {
+                    @Override
+                    public void onComplete(Bitmap data) {
+                        if (data != null)
+                            profilePic.setImageBitmap(data);
+                        else
+                            profilePic.setImageResource(R.drawable.outalk_logo);
+                    }
+                }
 
-            @Override
-            public void onFail() {
-                profilePic.setImageResource(R.drawable.outalk_logo);
-            }
-        });
+        );
     }
 
+
     //Events List adapter
-    class MyAdapter extends BaseAdapter {
+    class EventAdapter extends BaseAdapter {
 
         @Override
         public int getCount() {

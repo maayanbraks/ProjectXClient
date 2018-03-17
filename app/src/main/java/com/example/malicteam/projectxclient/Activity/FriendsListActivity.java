@@ -37,11 +37,9 @@ import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
 
 public class FriendsListActivity extends FragmentActivity {
-    boolean isFriendAlready = false;
     private List<User> friends = new LinkedList<>();
     private int userId;
     private User waitForAction = null;
-    //private FriendsViewModel friendsListData = null;
     private UserViewModel currentUser = null;
     private MyAdapter adapter = new MyAdapter();
     private ListView friendsListView = null;
@@ -71,34 +69,15 @@ public class FriendsListActivity extends FragmentActivity {
 //        friendsListData.init(userId);
 
         friendsListView = (ListView) findViewById(R.id.list_friendsList);
-        try {
-            friendsListView.setAdapter(adapter);
-            Log.d("tag", "dsfdsfds");
-        } catch (Exception e) {
-            Log.d("tag", "dsfdsfds");
-        }
-
-        Log.d("ok", "so far so good");
-
-
-//        friendsListData.getFriends().observe(this, new Observer<List<User>>() {
-//            @Override
-//            public void onChanged(@Nullable List<User> users) {
-//                friends = users;
-//                if (adapter != null)
-//                    adapter.notifyDataSetChanged();
-//            }
-//        });
+        friendsListView.setAdapter(adapter);
 
         friendsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 waitForAction = friends.get(position);
 
-                for(int i=0; i<parent.getChildCount(); i++)
-                {
-                    if(i == position)
-                    {
+                for (int i = 0; i < parent.getChildCount(); i++) {
+                    if (i == position) {
                         parent.getChildAt(i).setBackgroundColor(Color.WHITE);
                     }
                 }
@@ -123,31 +102,6 @@ public class FriendsListActivity extends FragmentActivity {
         });
 
         //initButtons();
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.logout_actionMenu) {
-            Repository.instance.logout();
-            startActivity(new Intent(FriendsListActivity.this, LoginActivity.class));
-            finish();
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private void initButtons() {
@@ -191,9 +145,6 @@ public class FriendsListActivity extends FragmentActivity {
 
                 AlertDialog d = builder.create();
                 d.show();
-
-
-                Log.d("okkk", "okkkkkk");
             }
         });
 
@@ -207,7 +158,6 @@ public class FriendsListActivity extends FragmentActivity {
                     builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            try{
                             Repository.instance.deleteFromFriends(waitForAction.getId(), new FirebaseModel.Callback<List<User>>() {
                                 @Override
                                 public void onComplete(List<User> data) {
@@ -219,10 +169,8 @@ public class FriendsListActivity extends FragmentActivity {
                                     } else
                                         Toast.makeText(getApplicationContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
                                 }
-                            });}
-                            catch (Exception e){
-                                Log.d("fgd", "ASDfadsf");
-                            }
+                            });
+
                         }
                     })
                             .setNegativeButton("No, Cancel!", new DialogInterface.OnClickListener() {
@@ -263,9 +211,18 @@ public class FriendsListActivity extends FragmentActivity {
 
             view.setBackgroundColor(Color.WHITE);
 
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(FriendsListActivity.this, FriendDetailsActivity.class);
+                    intent.putExtra(Consts.USER, friend);
+                    startActivity(intent);
+                }
+            });
+
             TextView firstName = (TextView) view.findViewById(R.id.firstName_friendsRow);
-            TextView lastName = (TextView)view.findViewById(R.id.lastName_friendsRow);
-            TextView email = (TextView)view.findViewById(R.id.email_friendsRow);
+            TextView lastName = (TextView) view.findViewById(R.id.lastName_friendsRow);
+            TextView email = (TextView) view.findViewById(R.id.email_friendsRow);
             firstName.setText(friend.getFirstName());
             lastName.setText(friend.getLastName());
             email.setText(friend.getEmail());

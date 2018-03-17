@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.malicteam.projectxclient.Activity.RecordingActivity"
-    android:background="@color/white">
+    android:background="@color/appBackground">
 
     <TextView
         android:id="@+id/title_recording"
