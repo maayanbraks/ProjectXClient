@@ -259,11 +259,6 @@ public class FirebaseModel {
         });
     }
 
-
-
-
-
-
     public static void getFriends(int userId, final FirebaseCallback<List<User>> firebaseCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId)).child("FriendsList");

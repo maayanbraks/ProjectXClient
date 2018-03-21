@@ -128,9 +128,7 @@ public class FriendsListActivity extends FragmentActivity {
                             public void onComplete(Boolean data) {
                                 if (data) {
                                     Toast.makeText(getApplicationContext(), "Added", Toast.LENGTH_SHORT).show();
-//                                    friends = data;
-//                                    if (adapter != null)
-//                                        adapter.notifyDataSetChanged();
+                                    refreshList();
                                 } else
                                     Toast.makeText(getApplicationContext(), "Cannot add to your friends right now, please try later...", Toast.LENGTH_LONG).show();
                             }
@@ -169,9 +167,7 @@ public class FriendsListActivity extends FragmentActivity {
                                 public void onComplete(Boolean data) {
                                     if (data != null) {
                                         Toast.makeText(getApplicationContext(), "Deleted", Toast.LENGTH_SHORT).show();
-//                                        friends = data;
-//                                        if (adapter != null)
-//                                            adapter.notifyDataSetChanged();
+                                        refreshList();
                                     } else
                                         Toast.makeText(getApplicationContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
                                 }
@@ -196,9 +192,7 @@ public class FriendsListActivity extends FragmentActivity {
         });
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    private void refreshList(){
         Repository.instance.getFriends(userId, new FirebaseModel.FirebaseCallback<List<User>>() {
             @Override
             public void onComplete(List<User> data) {
@@ -216,6 +210,12 @@ public class FriendsListActivity extends FragmentActivity {
                 Toast.makeText(getApplicationContext(), "msg #3232", Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        refreshList();
     }
 
     class MyAdapter extends BaseAdapter {
@@ -271,9 +271,7 @@ public class FriendsListActivity extends FragmentActivity {
                                         public void onComplete(Boolean data) {
                                             if (data) {
                                                 Toast.makeText(getApplicationContext(), "Deleted", Toast.LENGTH_SHORT).show();
-//                                                friends = data;
-//                                                if (adapter != null)
-//                                                    adapter.notifyDataSetChanged();
+                                                refreshList();
                                             } else
                                                 Toast.makeText(getApplicationContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
                                         }
