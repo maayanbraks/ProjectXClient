@@ -109,7 +109,7 @@ public class SignupActivity extends AppCompatActivity {
                                     Toast.makeText(SignupActivity.this, "Thank you for registering", Toast.LENGTH_SHORT).show();
 
                                     if (bitmap != null) {
-                                        Repository.instance.saveProfilePicture(bitmap, email, new FirebaseModel.Callback<String>() {
+                                        Repository.instance.saveProfilePicture(bitmap, email, new FirebaseModel.FirebaseCallback<String>() {
                                             @Override
                                             public void onComplete(String url) {
                                                 User newUser;
@@ -120,7 +120,7 @@ public class SignupActivity extends AppCompatActivity {
                                                     newUser = new User(firstName.getText().toString(), lastName.getText().toString(), phone.getText().toString(), inputEmail.getText().toString(),
                                                             new LinkedList<Integer>(), new LinkedList<Integer>());
 
-                                                Repository.instance.addNewUserToDB(newUser, new FirebaseModel.Callback<User>() {
+                                                Repository.instance.addNewUserToDB(newUser, new FirebaseModel.FirebaseCallback<User>() {
                                                     @Override
                                                     public void onComplete(User data) {
 
@@ -134,12 +134,23 @@ public class SignupActivity extends AppCompatActivity {
                                                             finish();
                                                         }
                                                     }
+
+                                                    @Override
+                                                    public void onCancel() {
+                                                        Toast.makeText(SignupActivity.this, "Cancel!!! " + newUser.getFirstName(), Toast.LENGTH_SHORT).show();
+                                                        finish();
+                                                    }
                                                 });
+                                            }
+
+                                            @Override
+                                            public void onCancel() {
+                                                Toast.makeText(SignupActivity.this, "Action Cancaled." + task.getException(), Toast.LENGTH_SHORT).show();
                                             }
                                         });
                                     } else {
                                         Repository.instance.addNewUserToDB(new User(firstName.getText().toString(), lastName.getText().toString(), phone.getText().toString(), inputEmail.getText().toString(),
-                                                new LinkedList<Integer>(), new LinkedList<Integer>()), new FirebaseModel.Callback<User>() {
+                                                new LinkedList<Integer>(), new LinkedList<Integer>()), new FirebaseModel.FirebaseCallback<User>() {
                                             @Override
                                             public void onComplete(User data) {
                                                 if (data == null)
@@ -153,6 +164,11 @@ public class SignupActivity extends AppCompatActivity {
                                                     finish();
                                                 }
 
+                                            }
+
+                                            @Override
+                                            public void onCancel() {
+                                                Toast.makeText(SignupActivity.this, "Cancel!!! from //HOPAPA", Toast.LENGTH_SHORT).show();
                                             }
                                         });
 

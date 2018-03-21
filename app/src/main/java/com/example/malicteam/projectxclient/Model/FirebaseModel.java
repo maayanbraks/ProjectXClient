@@ -37,13 +37,14 @@ public class FirebaseModel {
 
 
     //Interfaces
-    public interface Callback<T> {
+    public interface FirebaseCallback<T> {
         void onComplete(T data);
+        void onCancel();
     }
 
     //Firebase Methods
     //Users
-    public static void LoggedInUserAndObserve(String id, final Callback<User> callback) {
+    public static void LoggedInUserAndObserve(String id, final FirebaseCallback<User> firebaseCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Users").child(id);
 
@@ -65,16 +66,16 @@ public class FirebaseModel {
                     events = decodeListFromString((String) value.get("EventsList"));
 
                 _currentUser = (new User(firstName, lastName, phone, email, friends, events, pictureUrl));
-                callback.onComplete(_currentUser);
+                firebaseCallback.onComplete(_currentUser);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                callback.onComplete(null);
+                firebaseCallback.onCancel();
             }
         });
     }
-    public static void getSomeUserAndObserve(String id, final Callback<User> callback) {
+    public static void getSomeUserAndObserve(String id, final FirebaseCallback<User> firebaseCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Users").child(id);
 
@@ -97,16 +98,16 @@ public class FirebaseModel {
                     events = decodeListFromString((String) value.get("EventsList"));
 
                 user = (new User(firstName, lastName, phone, email, friends, events, pictureUrl));
-                callback.onComplete(_currentUser);
+                firebaseCallback.onComplete(_currentUser);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                callback.onComplete(null);
+                firebaseCallback.onCancel();
             }
         });
     }
-    public static void addUser(User user, Callback<User> callback) {
+    public static void addUser(User user, FirebaseCallback<User> firebaseCallback) {
         try {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference("Users").child(Integer.toString(user.getId()));
@@ -125,16 +126,16 @@ public class FirebaseModel {
 
             myRef.setValue(value);
 
-            callback.onComplete(user);
+            firebaseCallback.onComplete(user);
         } catch (Exception e) {
-            callback.onComplete(null);
+            firebaseCallback.onCancel();
         }
     }
 
     /*
     remove current user - from DB & Google Auth
      */
-    public static void removeAccount(final Callback<Boolean> callback) {
+    public static void removeAccount(final FirebaseCallback<Boolean> firebaseCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         boolean success = false;
@@ -153,9 +154,9 @@ public class FirebaseModel {
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
                                 myRef.removeValue();
-                                callback.onComplete(true);
+                                firebaseCallback.onComplete(true);
                             } else
-                                callback.onComplete(null);
+                                firebaseCallback.onCancel();
                         }
                     });
         }
@@ -187,26 +188,26 @@ public class FirebaseModel {
     /*
     get Picture and change the profile picture of user <id>
      */
-    public static void setPictureUrl(int id, Bitmap bitmap, Callback<Boolean> callback){
+    public static void setPictureUrl(int id, Bitmap bitmap, FirebaseCallback<Boolean> firebaseCallback){
         saveImage(bitmap, id, new Model.SaveImageListener() {
             @Override
             public void complete(String url) {
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference myRef = database.getReference("Users").child(Integer.toString(id)).child("PictureUrl");
                 myRef.setValue(url);
-                callback.onComplete(true);
+                firebaseCallback.onComplete(true);
             }
 
             @Override
             public void fail() {
-                callback.onComplete(false);
+                firebaseCallback.onCancel();
             }
         });
 
 
     }
 
-    public static void setFriends(int userId, List<User> friends, Repository.AddFriendsListener listener) {
+    public static void setFriends(int userId, List<User> friends, FirebaseCallback callback) {
         try {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference("Users").child(Integer.toString(userId)).child("FriendsList");
@@ -215,19 +216,19 @@ public class FirebaseModel {
                 ids.add(u.getId());
             }
             myRef.setValue(generateStringFromList(ids));
-            listener.onSuccess();
+            callback.onComplete(true);
         } catch (Exception e) {
-            listener.onFail("There is a problem. Please try later.\n(error 638)");
+            callback.onCancel();
         }
     }
-    public static void setFriends(int userId, String friends, Repository.AddFriendsListener listener) {
+    public static void setFriends(int userId, String friends, FirebaseCallback<Boolean> callback) {
         try {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference("Users").child(Integer.toString(userId)).child("FriendsList");
             myRef.setValue(friends);
-            listener.onSuccess();
+            callback.onComplete(true);
         } catch (Exception e) {
-            listener.onFail("There is a probleb. Please try later.\n(error 9876)");
+            callback.onCancel();
         }
     }
 
@@ -263,7 +264,7 @@ public class FirebaseModel {
 
 
 
-    public static void getFriends(int userId, final Callback<List<User>> callback) {
+    public static void getFriends(int userId, final FirebaseCallback<List<User>> firebaseCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId)).child("FriendsList");
         final List<Integer>[] ids = new List[]{new LinkedList<Integer>()};
@@ -274,55 +275,53 @@ public class FirebaseModel {
                     ids[0] = new LinkedList<Integer>();
                 else {
                     ids[0] = decodeListFromString((String) dataSnapshot.getValue());
+
+                    DatabaseReference myRef = database.getReference("Users");
+                    myRef.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            List<User> finalList = new LinkedList<>();
+                            for (DataSnapshot snap : dataSnapshot.getChildren()) {
+                                Map<String, Object> value = (Map<String, Object>) snap.getValue();
+                                int id = Integer.parseInt(snap.getKey());
+
+                                if (ids[0] != null && ids[0].size() > 0 && ids[0].contains(id)) {
+                                    String firstName = (String) value.get("FirstName");
+                                    String lastName = (String) value.get("LastName");
+                                    String phone = (String) value.get("Phone");
+                                    String email = (String) value.get("Mail");
+                                    String pictureUrl = (String) value.get("PictureUrl");
+                                    //----WE dont need it for now----
+                                    List<Integer> friends = new LinkedList<Integer>();
+                                    if (value.get("FriendsList") != null)
+                                        friends = decodeListFromString((String) value.get("FriendsList"));
+                                    List<Integer> events = new LinkedList<Integer>();
+                                    if (value.get("EventsList") != null)
+                                        events = decodeListFromString((String) value.get("EventsList"));
+
+                                    finalList.add(new User(firstName, lastName, phone, email, friends, events, pictureUrl));
+                                }
+                            }
+                            firebaseCallback.onComplete(finalList);
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            firebaseCallback.onCancel();
+                        }
+                    });
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                callback.onComplete(null);
+                firebaseCallback.onComplete(null);
             }
         });
 
-        DatabaseReference myRef = database.getReference("Users");
-        myRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<User> finalList = new LinkedList<>();
-
-
-                for (DataSnapshot snap : dataSnapshot.getChildren()) {
-                    Map<String, Object> value = (Map<String, Object>) snap.getValue();
-                    int id = Integer.parseInt(snap.getKey());
-
-                    if (ids[0] != null && ids[0].size() > 0 && ids[0].contains(id)) {
-                        String firstName = (String) value.get("FirstName");
-                        String lastName = (String) value.get("LastName");
-                        String phone = (String) value.get("Phone");
-                        String email = (String) value.get("Mail");
-                        String pictureUrl = (String) value.get("PictureUrl");
-                        //----WE dont need it for now----
-                        List<Integer> friends = new LinkedList<Integer>();
-                        if (value.get("FriendsList") != null)
-                            friends = decodeListFromString((String) value.get("FriendsList"));
-                        List<Integer> events = new LinkedList<Integer>();
-                        if (value.get("EventsList") != null)
-                            events = decodeListFromString((String) value.get("EventsList"));
-
-                        finalList.add(new User(firstName, lastName, phone, email, friends, events, pictureUrl));
-                    }
-                }
-                callback.onComplete(finalList);
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                callback.onComplete(null);
-            }
-        });
     }
 
-    public static void isExistUser(int id, Callback callback) {
+    public static void isExistUser(int id, FirebaseCallback firebaseCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Users").child(Integer.toString(id));
 
@@ -330,13 +329,13 @@ public class FirebaseModel {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists())
-                    callback.onComplete(id);
+                    firebaseCallback.onComplete(id);
                 else
-                    callback.onComplete(-1);
+                    firebaseCallback.onComplete(-1);
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                callback.onComplete(null);
+                firebaseCallback.onComplete(null);
             }
         });
 
@@ -344,9 +343,9 @@ public class FirebaseModel {
     //END of Users
 
     /*
-    Get url & callback return Image from Firebase.
+    Get url & firebaseCallback return Image from Firebase.
      */
-    public static void getImage(String url, Callback<Bitmap> callback) {
+    public static void getImage(String url, FirebaseCallback<Bitmap> firebaseCallback) {
         if (url != null) {
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference httpsReference = storage.getReferenceFromUrl(url);
@@ -356,7 +355,7 @@ public class FirebaseModel {
                 public void onSuccess(byte[] bytes) {
                     try {
                         Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        callback.onComplete(image);
+                        firebaseCallback.onComplete(image);
                     }catch (Exception e){
                         Log.d("tag", "asdf");
                     }
@@ -364,7 +363,7 @@ public class FirebaseModel {
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(Exception exception) {
-                    callback.onComplete(null);
+                    firebaseCallback.onComplete(null);
                 }
             });
         }
@@ -387,7 +386,7 @@ public class FirebaseModel {
     }
 
 
-    public static void getEventsAndObserve(int userId, final Callback<List<Event>> callback) {
+    public static void getEventsAndObserve(int userId, final FirebaseCallback<List<Event>> firebaseCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId)).child("EventsList");
         final List<Integer>[] ids = new List[]{new LinkedList<Integer>()};
@@ -403,7 +402,7 @@ public class FirebaseModel {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                callback.onComplete(null);
+                firebaseCallback.onComplete(null);
             }
         });
 
@@ -427,13 +426,13 @@ public class FirebaseModel {
                         events.add(new Event(contentUrl, title, users, description, adminId, date));
                     }
                 }
-                callback.onComplete(events);
+                firebaseCallback.onComplete(events);
 
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                callback.onComplete(null);
+                firebaseCallback.onComplete(null);
             }
         });
     }

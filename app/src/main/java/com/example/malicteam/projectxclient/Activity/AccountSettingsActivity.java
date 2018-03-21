@@ -49,7 +49,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
         profilePicture = (ImageView) findViewById(R.id.userPic_editAccount);
 
         Repository.instance.getProfilePicture(
-                new FirebaseModel.Callback<Bitmap>() {
+                new FirebaseModel.FirebaseCallback<Bitmap>() {
                     @Override
                     public void onComplete(Bitmap data) {
                         if (data != null) {
@@ -57,6 +57,11 @@ public class AccountSettingsActivity extends AppCompatActivity {
                         } else {
                             profilePicture.setImageResource(R.drawable.outalk_logo);
                         }
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        profilePicture.setImageResource(R.drawable.outalk_logo);
                     }
                 }
         );
@@ -112,7 +117,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
             ImageView profilePic = (ImageView) findViewById(R.id.userPic_editAccount);
             if (user.getPictureUrl() != null) {
                 Repository.instance.getProfilePicture(
-                        new FirebaseModel.Callback<Bitmap>() {
+                        new FirebaseModel.FirebaseCallback<Bitmap>() {
                             @Override
                             public void onComplete(Bitmap data) {
                                 if (data != null) {
@@ -120,6 +125,11 @@ public class AccountSettingsActivity extends AppCompatActivity {
                                 } else {
                                     profilePicture.setImageResource(R.drawable.outalk_logo);
                                 }
+                            }
+
+                            @Override
+                            public void onCancel() {
+                                profilePicture.setImageResource(R.drawable.outalk_logo);
                             }
                         }
                 );
@@ -174,7 +184,6 @@ public class AccountSettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 LogoutDialogFragment logoutDialog = new LogoutDialogFragment();
-                logoutDialog.setContainsActivity(AccountSettingsActivity.this);
                 logoutDialog.show(getSupportFragmentManager(), "LogoutDialog");
                 Intent intent = new Intent(AccountSettingsActivity.this, MainActivity.class);
                 startActivity(intent);
@@ -204,11 +213,11 @@ public class AccountSettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (bitmap != null) {
-                    Repository.instance.saveProfilePicture(bitmap, viewModel.getUser().getValue().getEmail(), new FirebaseModel.Callback<String>() {
+                    Repository.instance.saveProfilePicture(bitmap, viewModel.getUser().getValue().getEmail(), new FirebaseModel.FirebaseCallback<String>() {
                         @Override
                         public void onComplete(String url) {
                             if (url != null)
-                                Repository.instance.setPictureUrl(bitmap, new FirebaseModel.Callback<Boolean>() {
+                                Repository.instance.setPictureUrl(bitmap, new FirebaseModel.FirebaseCallback<Boolean>() {
                                     @Override
                                     public void onComplete(Boolean data) {
                                         if (data == true) {
@@ -216,9 +225,18 @@ public class AccountSettingsActivity extends AppCompatActivity {
                                             Toast.makeText(AccountSettingsActivity.this, "Your picture uploaded", Toast.LENGTH_SHORT).show();
                                         }
                                     }
+
+                                    @Override
+                                    public void onCancel() {
+
+                                    }
                                 });
                             else
                                 Toast.makeText(AccountSettingsActivity.this, "There is problem with the picture", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onCancel() {
                         }
                     });
                 } else {

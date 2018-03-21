@@ -2,24 +2,27 @@ package com.example.malicteam.projectxclient.Activity;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Consts;
-import com.example.malicteam.projectxclient.Dialogs.PictureDialogFragment;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
-import com.example.malicteam.projectxclient.Model.Model;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.R;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
+
+import java.util.List;
 
 public class FriendDetailsActivity extends AppCompatActivity {
 
@@ -50,6 +53,46 @@ public class FriendDetailsActivity extends AppCompatActivity {
                 initDetails(user);
             }
         });
+
+        Button deleteButton  =(Button)findViewById(R.id.deleteFriendButton_friendDetails);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (viewModel.getUser() != null) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(FriendDetailsActivity.this);
+                    builder.setTitle("Delete Friend");
+                    builder.setMessage("Are you sure you wand delete " + viewModel.getUser().getValue().getFirstName() + " " + viewModel.getUser().getValue().getLastName() + " from your friends?");
+                    builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Repository.instance.deleteFromFriends(viewModel.getUser().getValue().getId(), new FirebaseModel.FirebaseCallback<Boolean>() {
+                                @Override
+                                public void onComplete(Boolean data) {
+                                    if (data) {
+                                        Toast.makeText(getApplicationContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    } else
+                                        Toast.makeText(getApplicationContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
+                                }
+
+                                @Override
+                                public void onCancel() {
+                                    dialog.cancel();
+                                }
+                            });
+
+                        }
+                    })
+                            .setNegativeButton("No, Cancel!", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+                    builder.show();
+                }
+            }
+        });
     }
 
     private void initDetails(User user) {
@@ -66,7 +109,7 @@ public class FriendDetailsActivity extends AppCompatActivity {
 
         //Profile Picture
         Repository.instance.getProfilePicture(user.getPictureUrl(),
-                new FirebaseModel.Callback<Bitmap>() {
+                new FirebaseModel.FirebaseCallback<Bitmap>() {
                     @Override
                     public void onComplete(Bitmap data) {
                         if (data != null) {
@@ -75,7 +118,15 @@ public class FriendDetailsActivity extends AppCompatActivity {
                             profilePicture.setImageResource(R.drawable.outalk_logo);
                         }
                     }
+
+                    @Override
+                    public void onCancel() {
+                        profilePicture.setImageResource(R.drawable.outalk_logo);
+                    }
                 }
+
         );
     }
+
+
 }

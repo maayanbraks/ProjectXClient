@@ -245,13 +245,18 @@ public class MainActivity extends AppCompatActivity
     private void updateProfilePicture(String url) {
         ImageView profilePic = findViewById(R.id.userPic_head);
         Repository.instance.getProfilePicture(
-                new FirebaseModel.Callback<Bitmap>() {
+                new FirebaseModel.FirebaseCallback<Bitmap>() {
                     @Override
                     public void onComplete(Bitmap data) {
                         if (data != null)
                             profilePic.setImageBitmap(data);
                         else
                             profilePic.setImageResource(R.drawable.outalk_logo);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        profilePic.setImageResource(R.drawable.outalk_logo);
                     }
                 }
 

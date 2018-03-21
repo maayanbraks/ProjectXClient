@@ -39,7 +39,7 @@ public class ChangeDetailsFragment extends DialogFragment {
         builder.setMessage(str)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Repository.instance.changeUserDetails(_first, _last, _email, _phone, new FirebaseModel.Callback<String>() {
+                        Repository.instance.changeUserDetails(_first, _last, _email, _phone, new FirebaseModel.FirebaseCallback<String>() {
                             @Override
                             public void onComplete(String data) {
                                 if (data != null && data != "")
@@ -47,6 +47,11 @@ public class ChangeDetailsFragment extends DialogFragment {
                                 else
                                     Toast.makeText(getActivity().getApplicationContext(), "There is problem", Toast.LENGTH_LONG).show();
                                 getActivity().finish();
+                            }
+
+                            @Override
+                            public void onCancel() {
+
                             }
                         });
                     }
@@ -62,7 +67,7 @@ public class ChangeDetailsFragment extends DialogFragment {
         return builder.create();
     }
 
-    public void getArgumentsAndInit() {
+    private void getArgumentsAndInit() {
         _first = getArguments().getString(Consts.FIRST_NAME);
         _last = getArguments().getString(Consts.LAST_NAME);
         _email = getArguments().getString(Consts.EMAIL);
