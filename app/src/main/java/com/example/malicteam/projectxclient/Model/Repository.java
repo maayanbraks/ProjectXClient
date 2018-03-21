@@ -32,6 +32,7 @@ public class Repository {
     public static final Repository instance = new Repository();
 
     private MutableLiveData<User> userLiveData;
+    private List<MutableLiveData<User>> someUser;
     //private MutableLiveData<List<Event>> eventsData;
     //private MutableLiveData<List<User>> friendsLiveData;
 
@@ -40,11 +41,15 @@ public class Repository {
             if (userLiveData == null) {
                 userLiveData = new MutableLiveData<User>();
                 FirebaseAuth auth = FirebaseAuth.getInstance();
-                FirebaseModel.getUserAndObserve(Integer.toString(User.generateId(auth.getCurrentUser().getEmail())), new FirebaseModel.Callback<User>() {
+                FirebaseModel.LoggedInUserAndObserve(Integer.toString(id), new FirebaseModel.FirebaseCallback<User>() {
                     @Override
                     public void onComplete(User data) {
                         if (data != null)
                             userLiveData.setValue(data);
+                    }
+
+                    @Override
+                    public void onCancel() {
                     }
                 });
             }
@@ -52,82 +57,123 @@ public class Repository {
         return userLiveData;
     }
 
-    public interface AddFriendsListener {
-        void onSuccess();
+    public LiveData<User> getSomeUser(int id) {
+        synchronized (this) {
+            //check if exist
+            if (someUser != null) {
+                for (MutableLiveData<User> u : someUser) {
+                    if (u.getValue().getId() == id)
+                        return u;
+                }
+            } else // list is null
+                someUser = new LinkedList<MutableLiveData<User>>();
 
-        void onFail(String msg);
+            someUser.add(new MutableLiveData<>());
+
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            FirebaseModel.LoggedInUserAndObserve(Integer.toString(id), new FirebaseModel.FirebaseCallback<User>() {
+                @Override
+                public void onComplete(User data) {
+                    someUser.get(someUser.size() - 1).setValue(data);
+                }
+
+                @Override
+                public void onCancel() {
+                }
+            });
+
+        }
+        return someUser.get(someUser.size() - 1);
     }
 
-    public void addFriend(String email, FirebaseModel.Callback<List<User>> callback) {
+//    public interface AddFriendsListener {
+//        void onSuccess();
+//
+//        void onFail(String msg);
+//    }
+
+    public void addFriend(String email, FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         int userId = User.generateId(auth.getCurrentUser().getEmail());
-        FirebaseModel.getFriends(userId, new FirebaseModel.Callback<List<User>>() {
+        //List<User> _friendsList = new LinkedList<>();
+
+        FirebaseModel.getFriends(userId, new FirebaseModel.FirebaseCallback<List<User>>() {
             @Override
             public void onComplete(List<User> friendsList) {
                 boolean found = false;
-                if (friendsList != null) {
-                    //first ew check if it not exist
+                if (friendsList != null) {//if there is friends
+                    //first we check if it not exist
                     for (int i = 0; i < friendsList.size() && !found; i++) {
                         if (friendsList.get(i).getEmail().equals(email))
                             found = true;
                     }
-                    //if it not exist
-                    if (!found) {
-                        //check if it Signed user
-                        FirebaseModel.isExistUser(User.generateId(email), new FirebaseModel.Callback<Integer>() {
-                            @Override
-                            public void onComplete(Integer friendId) {
-                                if (friendId != null) {
-                                    if (friendId > 0) {
-                                        LinkedList<Integer> newList = new LinkedList<>();
-                                        for (User u : friendsList) {
-                                            newList.add(u.getId());
-                                        }
-                                        newList.add(friendId);
-                                        FirebaseModel.setFriends(userId ,FirebaseModel.generateStringFromList(newList), new AddFriendsListener() {
-                                            @Override
-                                            public void onSuccess() {
-                                                FirebaseModel.getFriends(userId, new FirebaseModel.Callback<List<User>>() {
-                                                    @Override
-                                                    public void onComplete(List<User> finalNewList) {
-                                                        callback.onComplete(finalNewList);
-                                                    }
-                                                });
-                                            }
-
-                                            @Override
-                                            public void onFail(String msg) {
-                                                callback.onComplete(null);
-                                            }
-                                        });
-                                    } else
-                                        callback.onComplete(null);
-                                } else
-                                    callback.onComplete(null);
-                            }
-                        });
-                    } else
-                        callback.onComplete(null);
                 }
+                //if it not exist
+                if (!found) {
+                    //check if it Signed user
+                    FirebaseModel.isExistUser(User.generateId(email), new FirebaseModel.FirebaseCallback<Integer>() {
+                        @Override
+                        public void onComplete(Integer friendId) {//ok - go on
+                            if (friendId != null && friendId > 0) {
+                                LinkedList<Integer> newList = new LinkedList<>();
+                                for (User u : friendsList) {//make list of IDs
+                                    newList.add(u.getId());
+                                }
+                                newList.add(friendId);
+                                FirebaseModel.setFriends(userId, FirebaseModel.generateStringFromList(newList), new FirebaseModel.FirebaseCallback<Boolean>() {
+                                    @Override
+                                    public void onComplete(Boolean data) {
+                                        //Mission is complete
+                                        firebaseCallback.onComplete(data);
+                                    }
+
+                                    @Override
+                                    public void onCancel() {
+                                        firebaseCallback.onCancel();
+                                    }
+                                });
+                            } else
+                                firebaseCallback.onCancel();
+                        }
+
+                        @Override
+                        public void onCancel() {
+                            firebaseCallback.onCancel();
+                        }
+                    });
+                } else {
+                    //already friend
+                    firebaseCallback.onCancel();
+                }
+            }//END onComplete get friends
+
+            @Override
+            public void onCancel() {
+                firebaseCallback.onCancel();
             }
         });
     }
 
-    public void getFriends(int friendId, FirebaseModel.Callback<List<User>> callback){
+    public void getFriends(int friendId, FirebaseModel.FirebaseCallback<List<User>> firebaseCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         int userId = User.generateId(auth.getCurrentUser().getEmail());
-        FirebaseModel.getFriends(userId, new FirebaseModel.Callback<List<User>>(){
+        FirebaseModel.getFriends(userId, new FirebaseModel.FirebaseCallback<List<User>>() {
             @Override
             public void onComplete(List<User> data) {
-                callback.onComplete(data);
+                firebaseCallback.onComplete(data);
+            }
+
+            @Override
+            public void onCancel() {
+                firebaseCallback.onCancel();
             }
         });
     }
 
-    public void deleteFromFriends(int friendId, FirebaseModel.Callback<List<User>> callback) {
+    public void deleteFromFriends(int friendId, FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         int userId = User.generateId(auth.getCurrentUser().getEmail());
-        FirebaseModel.getFriends(userId, new FirebaseModel.Callback<List<User>>() {
+        FirebaseModel.getFriends(userId, new FirebaseModel.FirebaseCallback<List<User>>() {
             @Override
             public void onComplete(List<User> data) {
                 boolean found = false;
@@ -137,30 +183,35 @@ public class Repository {
                             User u = data.get(i);
                             found = true;
                             data.remove(u);
-                            FirebaseModel.setFriends(userId, data, new AddFriendsListener() {
+                            FirebaseModel.setFriends(userId, data, new FirebaseModel.FirebaseCallback<Boolean>() {
                                 @Override
-                                public void onSuccess() {
-                                    callback.onComplete(data);
+                                public void onComplete(Boolean data) {
+                                    firebaseCallback.onComplete(data);
                                 }
 
                                 @Override
-                                public void onFail(String msg) {
-                                    callback.onComplete(null);
+                                public void onCancel() {
+                                    firebaseCallback.onCancel();
                                 }
                             });
 
                         }
                     }
                     if (!found)
-                        callback.onComplete(null);
+                        firebaseCallback.onCancel();
                 } else {
-                    callback.onComplete(null);
+                    firebaseCallback.onCancel();
                 }
+            }
+
+            @Override
+            public void onCancel() {
+                firebaseCallback.onCancel();
             }
         });
     }
 
-    public void changeUserDetails(String firstName, String lastName, String email, String phone, FirebaseModel.Callback<String> callback) {
+    public void changeUserDetails(String firstName, String lastName, String email, String phone, FirebaseModel.FirebaseCallback<String> firebaseCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         int userId = User.generateId(auth.getCurrentUser().getEmail());
 
@@ -183,23 +234,22 @@ public class Repository {
             str += "Phone ";
         }
 
-        callback.onComplete(str);
+        firebaseCallback.onComplete(str);
     }
 
-    public void setPictureUrl(Bitmap bitmap, FirebaseModel.Callback<Boolean>callback)
-    {
+    public void setPictureUrl(Bitmap bitmap, FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         int id = User.generateId(auth.getCurrentUser().getEmail());
-        FirebaseModel.setPictureUrl(id,bitmap, callback);
+        FirebaseModel.setPictureUrl(id, bitmap, firebaseCallback);
     }
 
-    public void removeAccount(FirebaseModel.Callback<Boolean> callback) {
-        FirebaseModel.removeAccount(callback);
+    public void removeAccount(FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
+        FirebaseModel.removeAccount(firebaseCallback);
     }
 
 
-    public void addNewUserToDB(User user, FirebaseModel.Callback callback) {
-        FirebaseModel.addUser(user, callback);
+    public void addNewUserToDB(User user, FirebaseModel.FirebaseCallback firebaseCallback) {
+        FirebaseModel.addUser(user, firebaseCallback);
     }
 
 
@@ -208,7 +258,7 @@ public class Repository {
 //            if (friendsLiveData == null) {
 //                friendsLiveData = new MutableLiveData<List<User>>();
 //                FirebaseAuth auth = FirebaseAuth.getInstance();
-//                FirebaseModel.getFriends(User.generateId(auth.getCurrentUser().getEmail()), new FirebaseModel.Callback<List<User>>() {
+//                FirebaseModel.getFriends(User.generateId(auth.getCurrentUser().getEmail()), new FirebaseModel.FirebaseCallback<List<User>>() {
 //                    @Override
 //                    public void onComplete(List<User> data) {
 //                        if (data != null)
@@ -231,45 +281,77 @@ public class Repository {
         void onSuccess(Bitmap image);
 
         void onFail();
+
     }
 
-    public void getProfilePicture(FirebaseModel.Callback<Bitmap> callback) {
-        //String url = userLiveData.getValue().getPictureUrl();
-        String url = userLiveData.getValue().getPictureUrl();
+    public void getProfilePicture(String url, FirebaseModel.FirebaseCallback<Bitmap> firebaseCallback) {
         if (url == null || url.equals("")) {
-            callback.onComplete(null);
+            firebaseCallback.onCancel();
         } else {
             //check if image exsist localy
             String fileName = URLUtil.guessFileName(url, null, null);
             Bitmap image = loadImageFromFile(fileName);
 
             if (image != null) {
-                callback.onComplete(image);
+                firebaseCallback.onComplete(image);
             } else {
-                FirebaseModel.getImage(url, new FirebaseModel.Callback<Bitmap>() {
+                FirebaseModel.getImage(url, new FirebaseModel.FirebaseCallback<Bitmap>() {
                     @Override
                     public void onComplete(Bitmap data) {
-                        callback.onComplete(data);
+                        firebaseCallback.onComplete(data);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        firebaseCallback.onCancel();
                     }
                 });
             }
         }
     }
 
-    public void saveProfilePicture(Bitmap bitmap, String email, FirebaseModel.Callback callback) {
+    //Default user (connected user)
+    public void getProfilePicture(FirebaseModel.FirebaseCallback<Bitmap> firebaseCallback) {
+        String url = userLiveData.getValue().getPictureUrl();
+        if (url == null || url.equals("")) {
+            firebaseCallback.onCancel();
+        } else {
+            //check if image exsist localy
+            String fileName = URLUtil.guessFileName(url, null, null);
+            Bitmap image = loadImageFromFile(fileName);
+
+            if (image != null) {
+                firebaseCallback.onComplete(image);
+            } else {
+                FirebaseModel.getImage(url, new FirebaseModel.FirebaseCallback<Bitmap>() {
+                    @Override
+                    public void onComplete(Bitmap data) {
+                        firebaseCallback.onComplete(data);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        firebaseCallback.onCancel();
+                    }
+                });
+            }
+        }
+    }
+
+    public void saveProfilePicture(Bitmap bitmap, String email, FirebaseModel.FirebaseCallback firebaseCallback) {
 
         FirebaseModel.saveImage(bitmap, User.generateId(email), new Model.SaveImageListener() {
             @Override
             public void complete(String url) {
                 String fileName = URLUtil.guessFileName(url, null, null);
                 saveImageToFile(bitmap, fileName);
-                callback.onComplete(url);
+                firebaseCallback.onComplete(url);
                 Log.d("sad", "profile pic saved locally & onFirebase & added to gallery");
             }
 
             @Override
             public void fail() {
-                callback.onComplete(null);
+                firebaseCallback.onCancel();
             }
         });
     }
@@ -333,7 +415,7 @@ public class Repository {
 //            if (eventsData == null) {
 //                eventsData = new MutableLiveData<>();
 //                FirebaseAuth auth = FirebaseAuth.getInstance();
-//                FirebaseModel.getEventsAndObserve(userLiveData.getValue().getId(), new FirebaseModel.Callback<List<Event>>() {
+//                FirebaseModel.getEventsAndObserve(userLiveData.getValue().getId(), new FirebaseModel.FirebaseCallback<List<Event>>() {
 //                    @Override
 //                    public void onComplete(List<Event> data) {
 //                        if (data != null)

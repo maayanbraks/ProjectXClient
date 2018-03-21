@@ -6,7 +6,7 @@ package com.example.malicteam.projectxclient;
 
 public interface Consts {
     //intents put extra Constants
-    public static final String UID_KEY = "userId";
+    public static final String USER_ID = "userId";
     public static final String SEND_EVENT = "sendEvent";
     public static final String EVENT_USERS = "eventUsers";
     public static final String EVENT_TITLE = "eventTitle";

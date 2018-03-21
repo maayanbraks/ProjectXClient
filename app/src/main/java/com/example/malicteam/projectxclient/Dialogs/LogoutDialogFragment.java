@@ -16,8 +16,6 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class LogoutDialogFragment extends DialogFragment {
 
-    private Activity _activity;
-
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
@@ -29,7 +27,7 @@ public class LogoutDialogFragment extends DialogFragment {
                     public void onClick(DialogInterface dialog, int id) {
                         FirebaseAuth.getInstance().signOut();
                         Intent intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class);
-                        Toast.makeText(_activity, getString(R.string.massage_logout), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), getString(R.string.massage_logout), Toast.LENGTH_LONG).show();
                     }
                 })
                 .setNegativeButton("Cancel. Stay login", new DialogInterface.OnClickListener() {
@@ -41,9 +39,5 @@ public class LogoutDialogFragment extends DialogFragment {
         builder.setCancelable(false);
         // Create the AlertDialog object and return it
         return builder.create();
-    }
-
-    public void setContainsActivity(Activity activity) {
-        _activity = activity;
     }
 }
