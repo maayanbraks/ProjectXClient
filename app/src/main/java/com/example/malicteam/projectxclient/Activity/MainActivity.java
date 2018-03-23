@@ -1,7 +1,11 @@
 package com.example.malicteam.projectxclient.Activity;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -29,6 +33,7 @@ import android.widget.TextView;
 
 import com.example.malicteam.projectxclient.Consts;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
+import com.example.malicteam.projectxclient.Model.Invite;
 import com.example.malicteam.projectxclient.R;
 //import com.example.malicteam.projectxclient.ViewModel.EventsViewModel;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
@@ -39,6 +44,7 @@ import java.util.List;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.Model.Repository;
+import com.google.firebase.auth.FirebaseAuth;
 
 
 public class MainActivity extends AppCompatActivity
@@ -115,11 +121,32 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+            /////////
+//////////////////////////////// invitation code -
+        Repository.instance.getInvite("" + userId, new FirebaseModel.FirebaseCallback<Invite>() {
+            @Override
+            public void onComplete(Invite invite) {
+                Invitation(invite);
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        }, new FirebaseModel.GetInvitation() {
+            @Override
+            public void onComplete(Invite invite) {
+                Invitation(invite);
+            }
+        });
+        ///////////////
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.record_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), NewEventActivity.class);
+                int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+                intent.putExtra(Consts.USER_ID, id);
                 startActivity(intent);
             }
         });
@@ -301,5 +328,79 @@ public class MainActivity extends AppCompatActivity
             return view;
         }
     }
+    public void Invitation(final Invite invite) {
+        final Context context = this;
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+
+        // set title
+        alertDialogBuilder.setTitle("You got new Invitation, from "+invite.getInviteFromId());
+
+        // set dialog message
+        alertDialogBuilder
+                .setCancelable(false)
+                .setNegativeButton("Decline",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        declineToInvite(invite);
+                        //Todo make delined to invite
+                        // dialog.cancel();
+                    }})
+                .setPositiveButton("Agree",new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog,int id) {
+                        Log.d("TAG","You have agreed invite");
+                        agreeToInvite(invite);
+                        //Todo make Agree to evnet
+                       // GetInEvent(invite.getEventId());
+                        // MainActivity.this.finish();
+                    }
+
+                });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        if(!((Activity) context).isFinishing()) {
+            alertDialog.show();
+        }
+    }
+    public void agreeToInvite(Invite invite ) {
+        //TODO
+        //get in to event.
+        getInEvent(invite.getEventId());
+        //delete from invite DB
+//        Repository.instance.removeInvite(new FirebaseModel.Callback<Boolean>() {
+//            @Override
+//            public void onComplete(Boolean data) {
+//            }
+//        }, invite);
+
+
+    }
+    public void declineToInvite(Invite invite ) {
+        //TODO
+        //delete from invite DB
+        Repository.instance.removeInvite(new FirebaseModel.FirebaseCallback<Boolean>() {
+            @Override
+            public void onComplete(Boolean data) {
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        }, invite);
+
+    }
+    public void getInEvent (String eventId) {
+        Intent intent;
+        intent = new Intent(getApplicationContext(),RecordingActivity.class);
+        intent.putExtra("eventidToGetIn",eventId);
+        int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+        intent.putExtra(Consts.USER_ID, id);
+       // Log.d("Tag","eventID="+eventId);
+        startActivity(intent);
+    }
+
+
 
 }

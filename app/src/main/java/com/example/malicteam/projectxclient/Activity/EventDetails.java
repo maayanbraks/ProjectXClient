@@ -29,9 +29,9 @@ public class EventDetails extends AppCompatActivity {
         title.setText(event.getTitle());
         _date.setText(event.getDate());
         String part = "Participats: ";
-        for (int num : event.getUsersIds()) {
-            part.concat(Integer.toString(num));
-        }
+//        for (int num : event.getUsersIds()) {
+//            part.concat(Integer.toString(num));
+//        }
         _participates.setText("part");
         desc.setText("Description:" + event.getDescription());
 

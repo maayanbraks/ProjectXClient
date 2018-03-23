@@ -18,6 +18,10 @@ public class Model {
         void onSuccess(Bitmap image);
         void onFail();
     }
+    public interface SaveAudioListener {
+        void complete(String url);
+        void fail();
+    }
 
 
 }
