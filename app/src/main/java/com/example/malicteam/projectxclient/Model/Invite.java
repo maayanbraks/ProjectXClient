@@ -6,30 +6,30 @@ package com.example.malicteam.projectxclient.Model;
 
 public class Invite {
     private String eventId;
-    private String email;
-    private String inviteFrom;
+    private String userId;
+    private String inviteFromId;
 
 
-    public Invite(String eventId, String email, String inviteFrom) {
+    public Invite(String eventId, String userId, String inviteFromId) {
         this.eventId = eventId;
-        this.email = email;
-        this.inviteFrom = inviteFrom;
+        this.userId = userId;
+        this.inviteFromId = inviteFromId;
     }
 
-    public void setInviteFrom(String _inviteFrom) {
-        this.inviteFrom = _inviteFrom;
+    public void setInviteFrom(String _inviteFromId) {
+        this.inviteFromId = _inviteFromId;
     }
 
-    public String getInviteFrom() {
-        return this.inviteFrom;
+    public String getInviteFromId() {
+        return this.inviteFromId;
     }
 
     public void setEventId(String eventId) {
         this.eventId = eventId;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
 
@@ -37,7 +37,9 @@ public class Invite {
         return this.eventId;
     }
 
-    public String getEmail() {
-        return this.email;
+    public String getuserId() {
+        return this.userId;
     }
+
+
 }

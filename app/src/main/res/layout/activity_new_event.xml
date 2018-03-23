@@ -4,77 +4,104 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/appBackground"
     android:orientation="vertical"
     tools:context="com.example.malicteam.projectxclient.Activity.NewEventActivity">
-
-        <EditText
-            android:id="@+id/new_event_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Title"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:textColor="@color/colorAccent"
-            android:layout_marginTop="30dp"/>
-
-
-
-        <EditText
-            android:id="@+id/new_event_participants"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Users"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:textColor="@color/colorAccent"
-            android:layout_marginTop="15dp"/>
-
-        <EditText
-            android:id="@+id/new_event_description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="Description"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:textColor="@color/colorAccent"
-            android:layout_marginTop="15dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
         android:orientation="horizontal">
 
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Save As:" />
+            android:text="Title:" />
 
-        <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-            android:id="@+id/save_as_group"
+        <EditText
+            android:id="@+id/new_event_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:orientation="horizontal">
 
-            <RadioButton
-                android:id="@+id/radio_pdf"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add user:" />
+
+        <EditText
+            android:id="@+id/new_event_participants"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </EditText>
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:gravity="center"
+            app:srcCompat="@android:drawable/ic_input_add" />
+
+
+    </LinearLayout>
+    <TextView
+        android:id="@+id/newEvent_Invites"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Invites:" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Description:" />
+
+        <EditText
+            android:id="@+id/new_event_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        </EditText>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save As:" />
+
+        <RadioGroup
+            android:id="@+id/save_as_group"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <RadioButton android:id="@+id/radio_pdf"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:onClick="onRadioButtonClicked"
-                android:text="PDF" />
-
-            <RadioButton
-                android:id="@+id/radio_txt"
+                android:text="PDF"
+                android:onClick="onRadioButtonClicked"/>
+            <RadioButton android:id="@+id/radio_txt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:onClick="onRadioButtonClicked"
-                android:text="TXT" />
+                android:text="TXT"
+                android:onClick="onRadioButtonClicked"/>
         </RadioGroup>
     </LinearLayout>
 
@@ -83,14 +110,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="24dp"
         android:text="Start record" />
-
-    <android.support.constraint.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </android.support.constraint.ConstraintLayout>
 
 
 </LinearLayout>

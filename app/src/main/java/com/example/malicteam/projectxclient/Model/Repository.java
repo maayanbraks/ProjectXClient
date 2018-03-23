@@ -1,5 +1,6 @@
 package com.example.malicteam.projectxclient.Model;
 
+import android.app.Activity;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.webkit.URLUtil;
 
+import com.example.malicteam.projectxclient.Model.FirebaseModel.GetInvitation;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.File;
@@ -57,7 +59,20 @@ public class Repository {
 
         void onFail(String msg);
     }
+    public void ifExistUser(String mail,FirebaseModel.Callback<Integer> callback) {
+        FirebaseModel.isExistUser(User.generateId(mail),callback);
+    }
 
+    public void getUserById(int id, FirebaseModel.Callback<List<User>> callback){
+
+        FirebaseModel.getUserById(id,callback);
+
+        }
+    public void getEventById(int id, FirebaseModel.Callback<List<Event>> callback){
+
+        FirebaseModel.getEventById(id,callback);
+
+    }
     public void addFriend(String email, FirebaseModel.Callback<List<User>> callback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         int userId = User.generateId(auth.getCurrentUser().getEmail());
@@ -123,6 +138,7 @@ public class Repository {
             }
         });
     }
+
 
     public void deleteFromFriends(int friendId, FirebaseModel.Callback<List<User>> callback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -192,16 +208,29 @@ public class Repository {
         int id = User.generateId(auth.getCurrentUser().getEmail());
         FirebaseModel.setPictureUrl(id,bitmap, callback);
     }
+    public void saveRecord(String Path,String eventId,final Model.SaveAudioListener listener,FirebaseModel.Callback callback)
+    {
+    FirebaseModel.saveRecord(Path,eventId,listener,callback);
+    }
 
     public void removeAccount(FirebaseModel.Callback<Boolean> callback) {
         FirebaseModel.removeAccount(callback);
+    }
+    public void removeInvite(FirebaseModel.Callback<Boolean> callback,Invite invite) {
+        FirebaseModel.removeInvite(callback,invite);
     }
 
 
     public void addNewUserToDB(User user, FirebaseModel.Callback callback) {
         FirebaseModel.addUser(user, callback);
     }
+    public void addNewInvite(Invite invite, FirebaseModel.Callback callback) {
+        FirebaseModel.addInvite(invite);
+    }
+    public void getInvite(String id,FirebaseModel.Callback callback,GetInvitation invitation) {
+        FirebaseModel.getInvite(id,invitation);
 
+    }
 
 //    public LiveData<List<User>> getFriends() {
 //        synchronized (this) {
@@ -345,13 +374,13 @@ public class Repository {
 //        return eventsData;
 //    }
 
-    public void addEvent(String title, String description, Date date, List<Integer> users) {
+    public void addEvent(Event event) {
         //TODO add locally DB
         //TODO create Content file and save locally
         //TODO save firebase content
         String url = "";
 
-        FirebaseModel.addNewEvent(new Event(url, title, users, description, userLiveData.getValue().getId(), date));
+        FirebaseModel.addNewEvent(event);
     }
 
 //    public File getContentFile(){
@@ -359,5 +388,6 @@ public class Repository {
 //        //TODO get content image
 //
 //    }
+
 
 }
