@@ -49,7 +49,7 @@ public class FirebaseModel {
 
     //Firebase Methods
     //Users
-    public static void getUserAndObserve(String id, final Callback<User> callback) {
+    public static void getUserAndObserve(String id, final FirebaseCallback<User> firebaseCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Users").child(id);
 
@@ -166,7 +166,7 @@ public class FirebaseModel {
                     });
         }
     }
-    public static void removeInvite(final Callback<Boolean> callback,Invite invite) {
+    public static void removeInvite(final FirebaseCallback<Boolean> callback,Invite invite) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         boolean success = false;
             //Delete from DB
@@ -332,8 +332,7 @@ public class FirebaseModel {
 
     }
 
-    public static void isExistUser(int id, FirebaseCallback firebaseCallback) {
-   public static void getUserById(int userId, final Callback<List<User>> callback) {
+   public static void getUserById(int userId, FirebaseCallback<List<User>> callback) {
        FirebaseDatabase database = FirebaseDatabase.getInstance();
        DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId));
        List<User> userList = new LinkedList<>();
@@ -356,7 +355,7 @@ public class FirebaseModel {
            }
        });
    }
-    public static void getEventById(int eventId, final Callback<List<Event>> callback) {
+    public static void getEventById(int eventId, final FirebaseCallback<List<Event>> callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference idsListRef = database.getReference("Events").child(Integer.toString(eventId));
         List<Event> userList = new LinkedList<>();
@@ -381,7 +380,7 @@ public class FirebaseModel {
             }
         });
     }
-    public static void isExistUser(int id, Callback callback) {
+    public static void isExistUser(int id, FirebaseCallback firebaseCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Users").child(Integer.toString(id));
 
@@ -577,7 +576,7 @@ public class FirebaseModel {
         str += "}";
         return str;
     }
-    public static void saveRecord(String Path,String eventId,final Model.SaveAudioListener listener,Callback callback) {
+    public static void saveRecord(String Path,String eventId,final Model.SaveAudioListener listener,FirebaseCallback callback) {
         StorageReference storageRef = _storage.getReference("Record").child(eventId);
         // File or Blob
         Uri file;

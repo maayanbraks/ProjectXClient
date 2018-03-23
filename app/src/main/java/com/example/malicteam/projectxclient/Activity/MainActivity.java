@@ -123,10 +123,15 @@ public class MainActivity extends AppCompatActivity
 
             /////////
 //////////////////////////////// invitation code -
-        Repository.instance.getInvite("" + userId, new FirebaseModel.Callback<Invite>() {
+        Repository.instance.getInvite("" + userId, new FirebaseModel.FirebaseCallback<Invite>() {
             @Override
             public void onComplete(Invite invite) {
                 Invitation(invite);
+            }
+
+            @Override
+            public void onCancel() {
+
             }
         }, new FirebaseModel.GetInvitation() {
             @Override
@@ -141,7 +146,7 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), NewEventActivity.class);
                 int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
-                intent.putExtra(Consts.UID_KEY, id);
+                intent.putExtra(Consts.USER_ID, id);
                 startActivity(intent);
             }
         });
@@ -374,9 +379,14 @@ public class MainActivity extends AppCompatActivity
     public void declineToInvite(Invite invite ) {
         //TODO
         //delete from invite DB
-        Repository.instance.removeInvite(new FirebaseModel.Callback<Boolean>() {
+        Repository.instance.removeInvite(new FirebaseModel.FirebaseCallback<Boolean>() {
             @Override
             public void onComplete(Boolean data) {
+            }
+
+            @Override
+            public void onCancel() {
+
             }
         }, invite);
 
@@ -386,7 +396,7 @@ public class MainActivity extends AppCompatActivity
         intent = new Intent(getApplicationContext(),RecordingActivity.class);
         intent.putExtra("eventidToGetIn",eventId);
         int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
-        intent.putExtra(Consts.UID_KEY, id);
+        intent.putExtra(Consts.USER_ID, id);
        // Log.d("Tag","eventID="+eventId);
         startActivity(intent);
     }

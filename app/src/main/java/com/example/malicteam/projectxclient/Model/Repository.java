@@ -41,7 +41,7 @@ public class Repository {
             if (userLiveData == null) {
                 userLiveData = new MutableLiveData<User>();
                 FirebaseAuth auth = FirebaseAuth.getInstance();
-                FirebaseModel.LoggedInUserAndObserve(Integer.toString(id), new FirebaseModel.FirebaseCallback<User>() {
+                FirebaseModel.getUserAndObserve(Integer.toString(id), new FirebaseModel.FirebaseCallback<User>() {
                     @Override
                     public void onComplete(User data) {
                         if (data != null)
@@ -71,7 +71,7 @@ public class Repository {
             someUser.add(new MutableLiveData<>());
 
             FirebaseAuth auth = FirebaseAuth.getInstance();
-            FirebaseModel.LoggedInUserAndObserve(Integer.toString(id), new FirebaseModel.FirebaseCallback<User>() {
+            FirebaseModel.getSomeUserAndObserve(Integer.toString(id), new FirebaseModel.FirebaseCallback<User>() {
                 @Override
                 public void onComplete(User data) {
                     someUser.get(someUser.size() - 1).setValue(data);
@@ -92,18 +92,17 @@ public class Repository {
 //        void onFail(String msg);
 //    }
 
-    public void addFriend(String email, FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
-    public void getUserById(int id, FirebaseModel.Callback<List<User>> callback){
+    public void getUserById(int id, FirebaseModel.FirebaseCallback<List<User>> callback){
 
         FirebaseModel.getUserById(id,callback);
 
         }
-    public void getEventById(int id, FirebaseModel.Callback<List<Event>> callback){
+    public void getEventById(int id, FirebaseModel.FirebaseCallback<List<Event>> callback){
 
         FirebaseModel.getEventById(id,callback);
 
     }
-    public void addFriend(String email, FirebaseModel.Callback<List<User>> callback) {
+    public void addFriend(String email, FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         int userId = User.generateId(auth.getCurrentUser().getEmail());
         //List<User> _friendsList = new LinkedList<>();
@@ -222,7 +221,7 @@ public class Repository {
         });
     }
 
-    public void changeUserDetails(String firstName, String lastName, String email, String phone, FirebaseModel.Callback<String> callback) {
+    public void changeUserDetails(String firstName, String lastName, String email, String phone, FirebaseModel.FirebaseCallback<String> firebaseCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         int userId = User.generateId(auth.getCurrentUser().getEmail());
 
@@ -253,7 +252,7 @@ public class Repository {
         int id = User.generateId(auth.getCurrentUser().getEmail());
         FirebaseModel.setPictureUrl(id, bitmap, firebaseCallback);
     }
-    public void saveRecord(String Path,String eventId,final Model.SaveAudioListener listener,FirebaseModel.Callback callback)
+    public void saveRecord(String Path,String eventId,final Model.SaveAudioListener listener,FirebaseModel.FirebaseCallback callback)
     {
     FirebaseModel.saveRecord(Path,eventId,listener,callback);
     }
@@ -261,7 +260,7 @@ public class Repository {
     public void removeAccount(FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
         FirebaseModel.removeAccount(firebaseCallback);
     }
-    public void removeInvite(FirebaseModel.Callback<Boolean> callback,Invite invite) {
+    public void removeInvite(FirebaseModel.FirebaseCallback<Boolean> callback,Invite invite) {
         FirebaseModel.removeInvite(callback,invite);
     }
 
@@ -269,10 +268,10 @@ public class Repository {
     public void addNewUserToDB(User user, FirebaseModel.FirebaseCallback firebaseCallback) {
         FirebaseModel.addUser(user, firebaseCallback);
     }
-    public void addNewInvite(Invite invite, FirebaseModel.Callback callback) {
+    public void addNewInvite(Invite invite, FirebaseModel.FirebaseCallback callback) {
         FirebaseModel.addInvite(invite);
     }
-    public void getInvite(String id,FirebaseModel.Callback callback,GetInvitation invitation) {
+    public void getInvite(String id,FirebaseModel.FirebaseCallback callback,FirebaseModel.GetInvitation invitation) {
         FirebaseModel.getInvite(id,invitation);
 
     }

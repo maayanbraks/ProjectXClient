@@ -142,7 +142,7 @@ public class NewEventActivity extends AppCompatActivity {
         event = new Event(null, null, null, null, null, null, null);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_event);
-        userId = getIntent().getIntExtra(Consts.UID_KEY, Consts.DEFAULT_UID);
+        userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
         currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
         //currentUser.init(userId);
         startRecord = (Button) findViewById(R.id.new_event_start);
@@ -179,7 +179,7 @@ public class NewEventActivity extends AppCompatActivity {
                 intent.putExtra("sendNewEvent", event);
                 intent.putExtra("currectuser", userId);
                 int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
-                intent.putExtra(Consts.UID_KEY, id);
+                intent.putExtra(Consts.USER_ID, id);
                 startActivity(intent);
             }
         });
@@ -191,12 +191,12 @@ public class NewEventActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String parti = _part.getText().toString();
 
-                Repository.instance.ifExistUser(parti, new FirebaseModel.Callback<Integer>() {
+                FirebaseModel.isExistUser(User.generateId(parti), new FirebaseModel.FirebaseCallback<Integer>() {
                     @Override
                     public void onComplete(Integer id) {
                         if (id >0) {// if found user
                             Log.d("TAG","Found id,");
-                            Repository.instance.getUserById(id, new FirebaseModel.Callback<List<User>>() {
+                            Repository.instance.getUserById(id, new FirebaseModel.FirebaseCallback<List<User>>() {
                                 @Override
                                 public void onComplete(List<User> data) {
                                     Log.d("TAG","data size=,"+data.size());
@@ -215,6 +215,11 @@ public class NewEventActivity extends AppCompatActivity {
                                     else
                                         UsersInvites = UsersInvites + "," + user.getId();
                                 }
+
+                                @Override
+                                public void onCancel() {
+
+                                }
                             });
 
 
@@ -223,6 +228,11 @@ public class NewEventActivity extends AppCompatActivity {
                         }
                         else
                             Toast.makeText(getApplication(), "Cant find user," + parti, Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onCancel() {
+
                     }
                 });
             }
@@ -275,10 +285,15 @@ public class NewEventActivity extends AppCompatActivity {
             ///  Model.Invite invite= new Model.Invite(eventId,item,Mymail);
             ///     Model.Invite
             Invite invite= new Invite(eventId,item,""+userId);
-            Repository.instance.addNewInvite(invite, new FirebaseModel.Callback<Invite>() {
+            Repository.instance.addNewInvite(invite, new FirebaseModel.FirebaseCallback<Invite>() {
                 @Override
                 public void onComplete(Invite invite) {
                     Log.d("TAG","succeed adding new invite.");
+                }
+
+                @Override
+                public void onCancel() {
+
                 }
             });
             //  / //    invite = new Model.Invite(eventId, item, _currectUser.getEmail().replace("@", ""));

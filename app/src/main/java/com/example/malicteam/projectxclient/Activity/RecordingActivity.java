@@ -220,7 +220,7 @@ public class RecordingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording);
         eventIdTogetIn=" ";
-        userId = getIntent().getIntExtra(Consts.UID_KEY, Consts.DEFAULT_UID);
+        userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
         mFileName = getExternalCacheDir().getAbsolutePath();
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
         StartRecording = findViewById(R.id.btnStart);
@@ -343,15 +343,20 @@ public class RecordingActivity extends AppCompatActivity {
 //                Toast.makeText(getApplication(), "Upload failed." , Toast.LENGTH_SHORT).show();
 //            }
 //        }),new FirebaseModel.Callback<asd>();
-        }, new FirebaseModel.Callback() {
+        }, new FirebaseModel.FirebaseCallback<Boolean>() {
             @Override
-            public void onComplete(Object data) {
+            public void onComplete(Boolean data) {
+
+            }
+
+            @Override
+            public void onCancel() {
 
             }
         });
     }
         public void SetEventFromInvitation(String eventid) {
-        Repository.instance.getEventById(Integer.valueOf(eventid),new FirebaseModel.Callback<List<Event>>() {
+        Repository.instance.getEventById(Integer.valueOf(eventid),new FirebaseModel.FirebaseCallback<List<Event>>() {
 
             @Override
             public void onComplete(List<Event> EventList) {
@@ -383,6 +388,10 @@ public class RecordingActivity extends AppCompatActivity {
                 }
             }
 
+            @Override
+            public void onCancel() {
+
+            }
         });
 
 
