@@ -1,6 +1,5 @@
 package com.example.malicteam.projectxclient.Dialogs;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,7 +23,7 @@ public class RemoveAccountDialogFragment extends DialogFragment{
         builder.setMessage("Are you sure you want be removed???\n")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Repository.instance.removeAccount(new FirebaseModel.Callback<Boolean>() {
+                        Repository.instance.removeAccount(new FirebaseModel.FirebaseCallback<Boolean>() {
                             @Override
                             public void onComplete(Boolean data) {
                                 if(data != null) {
@@ -32,6 +31,11 @@ public class RemoveAccountDialogFragment extends DialogFragment{
                                     Toast.makeText(getActivity().getApplicationContext(), "We will miss you :(", Toast.LENGTH_LONG).show();
                                     getActivity().finish();
                                 }
+                            }
+
+                            @Override
+                            public void onCancel() {
+                                Toast.makeText(getActivity().getApplicationContext(), "Cancel", Toast.LENGTH_LONG).show();
                             }
                         });
                     }

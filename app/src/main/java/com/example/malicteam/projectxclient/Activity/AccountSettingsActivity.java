@@ -3,15 +3,12 @@ package com.example.malicteam.projectxclient.Activity;
 import android.app.Activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -30,8 +27,6 @@ import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
-
-import java.util.LinkedList;
 
 public class AccountSettingsActivity extends AppCompatActivity {
 
@@ -54,7 +49,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
         profilePicture = (ImageView) findViewById(R.id.userPic_editAccount);
 
         Repository.instance.getProfilePicture(
-                new FirebaseModel.Callback<Bitmap>() {
+                new FirebaseModel.FirebaseCallback<Bitmap>() {
                     @Override
                     public void onComplete(Bitmap data) {
                         if (data != null) {
@@ -63,13 +58,18 @@ public class AccountSettingsActivity extends AppCompatActivity {
                             profilePicture.setImageResource(R.drawable.outalk_logo);
                         }
                     }
+
+                    @Override
+                    public void onCancel() {
+                        profilePicture.setImageResource(R.drawable.outalk_logo);
+                    }
                 }
         );
 
-        userId = getIntent().getIntExtra(Consts.UID_KEY, Consts.DEFAULT_UID);
+        userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
 
         viewModel = ViewModelProviders.of(this).get(UserViewModel.class);
-        viewModel.init(userId);
+        viewModel.init(userId, true);
         viewModel.getUser().observe(this, new Observer<User>() {
             @Override
             public void onChanged(@Nullable User user) {
@@ -117,7 +117,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
             ImageView profilePic = (ImageView) findViewById(R.id.userPic_editAccount);
             if (user.getPictureUrl() != null) {
                 Repository.instance.getProfilePicture(
-                        new FirebaseModel.Callback<Bitmap>() {
+                        new FirebaseModel.FirebaseCallback<Bitmap>() {
                             @Override
                             public void onComplete(Bitmap data) {
                                 if (data != null) {
@@ -125,6 +125,11 @@ public class AccountSettingsActivity extends AppCompatActivity {
                                 } else {
                                     profilePicture.setImageResource(R.drawable.outalk_logo);
                                 }
+                            }
+
+                            @Override
+                            public void onCancel() {
+                                profilePicture.setImageResource(R.drawable.outalk_logo);
                             }
                         }
                 );
@@ -179,7 +184,6 @@ public class AccountSettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 LogoutDialogFragment logoutDialog = new LogoutDialogFragment();
-                logoutDialog.setContainsActivity(AccountSettingsActivity.this);
                 logoutDialog.show(getSupportFragmentManager(), "LogoutDialog");
                 Intent intent = new Intent(AccountSettingsActivity.this, MainActivity.class);
                 startActivity(intent);
@@ -209,11 +213,11 @@ public class AccountSettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (bitmap != null) {
-                    Repository.instance.saveProfilePicture(bitmap, viewModel.getUser().getValue().getEmail(), new FirebaseModel.Callback<String>() {
+                    Repository.instance.saveProfilePicture(bitmap, viewModel.getUser().getValue().getEmail(), new FirebaseModel.FirebaseCallback<String>() {
                         @Override
                         public void onComplete(String url) {
                             if (url != null)
-                                Repository.instance.setPictureUrl(bitmap, new FirebaseModel.Callback<Boolean>() {
+                                Repository.instance.setPictureUrl(bitmap, new FirebaseModel.FirebaseCallback<Boolean>() {
                                     @Override
                                     public void onComplete(Boolean data) {
                                         if (data == true) {
@@ -221,9 +225,18 @@ public class AccountSettingsActivity extends AppCompatActivity {
                                             Toast.makeText(AccountSettingsActivity.this, "Your picture uploaded", Toast.LENGTH_SHORT).show();
                                         }
                                     }
+
+                                    @Override
+                                    public void onCancel() {
+
+                                    }
                                 });
                             else
                                 Toast.makeText(AccountSettingsActivity.this, "There is problem with the picture", Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onCancel() {
                         }
                     });
                 } else {

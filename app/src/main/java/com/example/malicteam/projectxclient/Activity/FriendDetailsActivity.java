@@ -2,29 +2,32 @@ package com.example.malicteam.projectxclient.Activity;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.EditText;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Consts;
-import com.example.malicteam.projectxclient.Dialogs.PictureDialogFragment;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
-import com.example.malicteam.projectxclient.Model.Model;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.R;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
+import java.util.List;
+
 public class FriendDetailsActivity extends AppCompatActivity {
 
-    private User user;
-    //private UserViewModel viewModel = null;
-    //private int userId;
+    private UserViewModel viewModel = null;
+    private int userId;
 
     private ImageView profilePicture;
     private Bitmap bitmap = null;
@@ -33,50 +36,66 @@ public class FriendDetailsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friend_details);
-
+        //Profile Picture
         profilePicture = (ImageView) findViewById(R.id.userPic__friendDetails);
 
-        user = (User) getIntent().getSerializableExtra("user");
+        ProgressBar pb = (ProgressBar)findViewById(R.id.progress_friendDetails);
+        pb.setVisibility(View.VISIBLE);
 
-        FirebaseModel.getImage(user.getPictureUrl(), new FirebaseModel.Callback<Bitmap>() {
+        //User Details
+        userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
+        viewModel = ViewModelProviders.of(this).get(UserViewModel.class);
+        viewModel.init(userId, false);
+        viewModel.getUser().observe(this, new Observer<User>() {
             @Override
-            public void onComplete(Bitmap image) {
-                if (bitmap != null) {
-                    bitmap = image;
-                    profilePicture.setImageBitmap(bitmap);
-                }
-                else
-                    profilePicture.setImageResource(R.drawable.outalk_logo);
+            public void onChanged(@Nullable User user) {
+                pb.setVisibility(View.INVISIBLE);
+                initDetails(user);
             }
         });
 
+        Button deleteButton  =(Button)findViewById(R.id.deleteFriendButton_friendDetails);
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (viewModel.getUser() != null) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(FriendDetailsActivity.this);
+                    builder.setTitle("Delete Friend");
+                    builder.setMessage("Are you sure you wand delete " + viewModel.getUser().getValue().getFirstName() + " " + viewModel.getUser().getValue().getLastName() + " from your friends?");
+                    builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Repository.instance.deleteFromFriends(viewModel.getUser().getValue().getId(), new FirebaseModel.FirebaseCallback<Boolean>() {
+                                @Override
+                                public void onComplete(Boolean data) {
+                                    if (data) {
+                                        Toast.makeText(getApplicationContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                                        finish();
+                                    } else
+                                        Toast.makeText(getApplicationContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
+                                }
 
-//        Repository.instance.getProfilePicture(new Repository.GetImageListener() {
-//            @Override
-//            public void onSuccess(Bitmap image) {
-//                profilePicture.setImageBitmap(image);
-//            }
-//
-//            @Override
-//            public void onFail() {
-//                profilePicture.setImageResource(R.drawable.outalk_logo);
-//            }
-//        });
+                                @Override
+                                public void onCancel() {
+                                    dialog.cancel();
+                                }
+                            });
 
-//        userId = getIntent().getIntExtra(Consts.UID_KEY, Consts.DEFAULT_UID);
-//
-//        viewModel = ViewModelProviders.of(this).get(UserViewModel.class);
-//        viewModel.init(userId);
-//        viewModel.getUser().observe(this, new Observer<User>() {
-//            @Override
-//            public void onChanged(@Nullable User user) {
-//                initDetails(user);
-//            }
-//        });
-        initDetails();
+                        }
+                    })
+                            .setNegativeButton("No, Cancel!", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.cancel();
+                                }
+                            });
+                    builder.show();
+                }
+            }
+        });
     }
 
-    private void initDetails() {
+    private void initDetails(User user) {
         //if (viewModel.getUser() != null) {
         TextView firstName = (TextView) findViewById(R.id.firstName_friendDetails);
         TextView lastName = (TextView) findViewById(R.id.lastName_friendDetails);
@@ -88,21 +107,26 @@ public class FriendDetailsActivity extends AppCompatActivity {
         email.setText(user.getEmail());
         phoneNumber.setText(user.getPhoneNumber());
 
-//            ImageView profilePic = (ImageView) findViewById(R.id.userPic__friendDetails);
-//            if (user.getPictureUrl() != null) {
-//                Repository.instance.getProfilePicture(new Repository.GetImageListener() {
-//                    @Override
-//                    public void onSuccess(Bitmap image) {
-//                        profilePic.setImageBitmap(image);
-//                    }
-//
-//                    @Override
-//                    public void onFail() {
-//                        profilePic.setImageResource(R.drawable.outalk_logo);
-//                    }
-//                });
-//            } else
-//                profilePic.setImageResource(R.drawable.outalk_logo);
-//        }
+        //Profile Picture
+        Repository.instance.getProfilePicture(user.getPictureUrl(),
+                new FirebaseModel.FirebaseCallback<Bitmap>() {
+                    @Override
+                    public void onComplete(Bitmap data) {
+                        if (data != null) {
+                            profilePicture.setImageBitmap(data);
+                        } else {
+                            profilePicture.setImageResource(R.drawable.outalk_logo);
+                        }
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        profilePicture.setImageResource(R.drawable.outalk_logo);
+                    }
+                }
+
+        );
     }
+
+
 }
