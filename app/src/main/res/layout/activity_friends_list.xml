@@ -22,12 +22,15 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
+            <ImageButton
                 android:id="@+id/addFriendButton_friendsList"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="ADD" />
+                android:text="ADD"
+                android:src="@android:drawable/ic_menu_add"
+                android:backgroundTint="@color/appBackground"
+                android:tint="@color/colorPrimary"/>
 
             <TextView
                 android:id="@+id/title_friendsList"
@@ -46,12 +49,15 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <Button
+            <ImageButton
                 android:id="@+id/deleteFriendButton_friendList"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Delete" />
+                android:text="Delete"
+                android:src="@android:drawable/ic_menu_delete"
+                android:backgroundTint="@color/appBackground"
+                android:tint="@color/colorPrimary"/>
 
         </LinearLayout>
 

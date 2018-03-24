@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:background="@android:color/white">
 
     <TextView
         android:id="@+id/lastName_friendsRow"
@@ -42,7 +43,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/lastName_friendsRow" />
 
-    <Button
+    <ImageButton
         android:id="@+id/deleteFriendButton_friendRowList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -55,6 +56,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@android:drawable/ic_delete" />
+        android:src="@android:drawable/ic_menu_delete"
+        android:tint="@color/colorPrimaryDark"
+        android:backgroundTint="@android:color/white" />
 </android.support.constraint.ConstraintLayout>
 
