@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -87,29 +88,12 @@ public class FriendsListActivity extends FragmentActivity {
         friendsListView = (ListView) findViewById(R.id.list_friendsList);
         friendsListView.setAdapter(adapter);
 
-//        friendsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                waitForAction = friends.get(position);
-//
-//                for (int i = 0; i < parent.getChildCount(); i++) {
-//                    if (i == position) {
-//                        parent.getChildAt(i).setBackgroundColor(Color.WHITE);
-//                    }
-//                }
-//            }
-//
-//
-//        });
-
-
-
         //initButtons();
     }
 
     private void initButtons() {
-        Button addButton = (Button) findViewById(R.id.addFriendButton_friendsList);
-        Button deleteButton = (Button) findViewById(R.id.deleteFriendButton_friendList);
+        ImageButton addButton = (ImageButton) findViewById(R.id.addFriendButton_friendsList);
+        ImageButton deleteButton = (ImageButton) findViewById(R.id.deleteFriendButton_friendList);
 
 //Add friend
         addButton.setOnClickListener(new View.OnClickListener() {
@@ -154,44 +138,45 @@ public class FriendsListActivity extends FragmentActivity {
             }
         });
 //delete from the main delete button
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (waitForAction != null) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(FriendsListActivity.this);
-                    builder.setTitle("Delete Friend");
-                    builder.setMessage("Are you sure you wand delete " + waitForAction.getFirstName() + " " + waitForAction.getLastName() + " from your friends?");
-                    builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Repository.instance.deleteFromFriends(waitForAction.getId(), new FirebaseModel.FirebaseCallback<Boolean>() {
-                                @Override
-                                public void onComplete(Boolean data) {
-                                    if (data != null) {
-                                        Toast.makeText(getApplicationContext(), "Deleted", Toast.LENGTH_SHORT).show();
-                                        refreshList();
-                                    } else
-                                        Toast.makeText(getApplicationContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
-                                }
-
-                                @Override
-                                public void onCancel() {
-                                    dialog.cancel();
-                                }
-                            });
-
-                        }
-                    })
-                            .setNegativeButton("No, Cancel!", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.cancel();
-                                }
-                            });
-                    builder.show();
-                }
-            }
-        });
+        deleteButton.setVisibility(View.INVISIBLE);
+//        deleteButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (waitForAction != null) {
+//                    AlertDialog.Builder builder = new AlertDialog.Builder(FriendsListActivity.this);
+//                    builder.setTitle("Delete Friend");
+//                    builder.setMessage("Are you sure you wand delete " + waitForAction.getFirstName() + " " + waitForAction.getLastName() + " from your friends?");
+//                    builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
+//                        @Override
+//                        public void onClick(DialogInterface dialog, int which) {
+//                            Repository.instance.deleteFromFriends(waitForAction.getId(), new FirebaseModel.FirebaseCallback<Boolean>() {
+//                                @Override
+//                                public void onComplete(Boolean data) {
+//                                    if (data != null) {
+//                                        Toast.makeText(getApplicationContext(), "Deleted", Toast.LENGTH_SHORT).show();
+//                                        refreshList();
+//                                    } else
+//                                        Toast.makeText(getApplicationContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
+//                                }
+//
+//                                @Override
+//                                public void onCancel() {
+//                                    dialog.cancel();
+//                                }
+//                            });
+//
+//                        }
+//                    })
+//                            .setNegativeButton("No, Cancel!", new DialogInterface.OnClickListener() {
+//                                @Override
+//                                public void onClick(DialogInterface dialog, int which) {
+//                                    dialog.cancel();
+//                                }
+//                            });
+//                    builder.show();
+//                }
+//            }
+//        });
     }
 
     private void refreshList(){
@@ -241,10 +226,8 @@ public class FriendsListActivity extends FragmentActivity {
         public View getView(int i, View view, ViewGroup viewGroup) {
             if (view == null) {
                 view = getLayoutInflater().inflate(R.layout.friends_list_row, viewGroup, false);
-
+            }
                 User friend = friends.get(i);
-
-                view.setBackgroundColor(Color.WHITE);
 
                 //Friend Details - onClick
                 view.setOnClickListener(new View.OnClickListener() {
@@ -257,7 +240,7 @@ public class FriendsListActivity extends FragmentActivity {
                 });
 
                 //Delete Friend - Button (X button) of every friend on th list
-                Button deleteButton = (Button) view.findViewById(R.id.deleteFriendButton_friendRowList);
+                ImageButton deleteButton = (ImageButton) view.findViewById(R.id.deleteFriendButton_friendRowList);
                 if (deleteButton != null)
                     deleteButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -297,14 +280,14 @@ public class FriendsListActivity extends FragmentActivity {
                     });
 
 
+
+
                 TextView firstName = (TextView) view.findViewById(R.id.firstName_friendsRow);
                 TextView lastName = (TextView) view.findViewById(R.id.lastName_friendsRow);
                 TextView email = (TextView) view.findViewById(R.id.email_friendsRow);
                 firstName.setText(friend.getFirstName());
                 lastName.setText(friend.getLastName());
                 email.setText(friend.getEmail());
-            }
-
 
             return view;
         }
