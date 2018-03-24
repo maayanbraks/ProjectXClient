@@ -68,6 +68,21 @@ public class FriendsListActivity extends FragmentActivity {
         currentUser.init(userId, true);
 //        friendsListData = ViewModelProviders.of(this).get(FriendsViewModel.class);
 //        friendsListData.init(userId);
+        currentUser.getUser().observe(this, new Observer<User>() {
+            @Override
+            public void onChanged(@Nullable User user) {
+                if (user != null) {
+                    //update details
+                    userId = user.getId();
+                    initButtons();
+                } else {
+                    Intent intent = new Intent(FriendsListActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+        });
+
 
         friendsListView = (ListView) findViewById(R.id.list_friendsList);
         friendsListView.setAdapter(adapter);
@@ -87,20 +102,7 @@ public class FriendsListActivity extends FragmentActivity {
 
         });
 
-        currentUser.getUser().observe(this, new Observer<User>() {
-            @Override
-            public void onChanged(@Nullable User user) {
-                if (user != null) {
-                    //update details
-                    userId = user.getId();
-                    initButtons();
-                } else {
-                    Intent intent = new Intent(FriendsListActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                    finish();
-                }
-            }
-        });
+
 
         //initButtons();
     }
