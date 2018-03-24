@@ -118,6 +118,16 @@ import java.util.ListIterator;
 public class Event implements Serializable{
 
     private static final long serialVersionUID = 1L;
+
+    public boolean isRecording() {
+        return isRecording;
+    }
+
+    public void setRecording(boolean recording) {
+        isRecording = recording;
+    }
+
+    private boolean isRecording;
     private int id;
     private String content;
     private String title;
@@ -154,7 +164,7 @@ public class Event implements Serializable{
     }
 
     public Event(String content, String title, String usersIds, String description, String adminId, String time, String url) {
-
+        this.isRecording=true;
         this.content = content;
         this.title = title;
         this.usersIds = usersIds;
@@ -169,7 +179,7 @@ public class Event implements Serializable{
 
     }
     public Event(String content, String title,String usersIds, String description, String adminId,String time,int id,String url) {
-
+        this.isRecording=true;
         this.content = content;
         this.title = title;
         this.usersIds = usersIds;
@@ -184,7 +194,7 @@ public class Event implements Serializable{
 
     }
     public Event(String content, String title,String usersIds, String description, String adminId,String time,String id,String url) {
-
+        this.isRecording=true;
         this.content = content;
         this.title = title;
         this.usersIds = usersIds;
@@ -214,17 +224,18 @@ public class Event implements Serializable{
         return id;
     }
 
-
     @Override
     public String toString() {
         return "Event{" +
-                "id=" + id +
+                "isRecording=" + isRecording +
+                ", id=" + id +
                 ", content='" + content + '\'' +
                 ", title='" + title + '\'' +
                 ", date='" + date + '\'' +
                 ", usersIds='" + usersIds + '\'' +
+                ", recordURL='" + recordURL + '\'' +
+                ", adminId='" + adminId + '\'' +
                 ", description='" + description + '\'' +
-                ", adminId=" + adminId +
                 ", EventStartTime='" + EventStartTime + '\'' +
                 '}';
     }

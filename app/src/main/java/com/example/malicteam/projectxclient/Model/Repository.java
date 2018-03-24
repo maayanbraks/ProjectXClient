@@ -98,6 +98,10 @@ public class Repository {
         FirebaseModel.getEventById(id, callback);
 
     }
+    public void getEventRecordingStatus(int id, FirebaseModel.FirebaseCallback<List<Boolean>> callback){
+
+        FirebaseModel.getEventRecordingStatus(id,callback);
+    }
 
     public void addFriend(String email, final FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -156,6 +160,21 @@ public class Repository {
         FirebaseModel.getFriends(userId, new FirebaseModel.FirebaseCallback<List<User>>() {
             @Override
             public void onComplete(List<User> data) {
+                firebaseCallback.onComplete(data);
+            }
+
+            @Override
+            public void onCancel() {
+                firebaseCallback.onCancel();
+            }
+        });
+    }
+    public void getEvents(int eventid, FirebaseModel.FirebaseCallback<List<Event>> firebaseCallback) {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        int userId = User.generateId(auth.getCurrentUser().getEmail());
+        FirebaseModel.getEvents(userId, new FirebaseModel.FirebaseCallback<List<Event>>() {
+            @Override
+            public void onComplete(List<Event> data) {
                 firebaseCallback.onComplete(data);
             }
 
@@ -231,6 +250,10 @@ public class Repository {
     public void saveRecord(String Path, String eventId, final Model.SaveAudioListener listener, FirebaseModel.FirebaseCallback callback) {
         FirebaseModel.saveRecord(Path, eventId, listener, callback);
     }
+    public void saveRecord(String userId,String Path,String eventId,final Model.SaveAudioListener listener,FirebaseModel.FirebaseCallback callback)
+    {
+    FirebaseModel.saveRecord(userId,Path,eventId,listener,callback);
+    }
 
     public void removeAccount(final FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
         FirebaseModel.removeAccount(firebaseCallback);
@@ -251,6 +274,10 @@ public class Repository {
 
     public void getInvite(String id, final FirebaseModel.FirebaseCallback callback, FirebaseModel.GetInvitation invitation) {
         FirebaseModel.getInvite(id, invitation);
+
+    }
+    public void setEventList(User user,FirebaseModel.FirebaseCallback callback) {
+        FirebaseModel.setEventList(user,callback);
 
     }
 

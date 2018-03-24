@@ -7,12 +7,17 @@ import android.arch.persistence.room.TypeConverter;
 import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
 
+import android.support.annotation.NonNull;
+
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Created by Maayan on 10-Jan-18.
@@ -34,6 +39,9 @@ public class User implements Serializable {
     private List<Integer> friendsIds;
 
 //    @TypeConverters(ProductTypeConverters.class)
+
+
+
     private List<Integer> eventsIds;
 
     private String pictureUrl;
@@ -84,7 +92,37 @@ public class User implements Serializable {
         else
             this.eventsIds = new LinkedList<Integer>();
     }
+    public User() {
+        this.firstName = "";
+        this.lastName = "";
+        this.phoneNumber = null;
+        this.email = email;
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = new Date();
+        this.lastLogin = dateFormat.format(date);
+        this.eventsIds = new LinkedList<Integer>();
+        if (friendsIds != null)
+            this.friendsIds = friendsIds;
+        else
+            this.friendsIds = new LinkedList<Integer>();
 
+        if (eventsIds != null)
+            this.eventsIds = eventsIds;
+        else
+            this.eventsIds = new LinkedList<Integer>();
+    }
+    public void addEventToList(int event) {
+        this.eventsIds.add(event);
+    }
+    public void deleteEventFromList(int event) {
+        int index=0;
+        if (eventsIds.contains(event))
+            for (int i=0;i<eventsIds.size();i++) {
+            if (eventsIds.get(i)==event)
+                index=eventsIds.get(i);
+            }
+            eventsIds.remove(index);
+    }
     @Override
     public String toString() {
         String str = "";

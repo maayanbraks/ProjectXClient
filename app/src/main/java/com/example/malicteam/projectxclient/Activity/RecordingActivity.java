@@ -26,6 +26,7 @@ import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.R;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 
 import android.Manifest;
@@ -321,7 +322,7 @@ public class RecordingActivity extends AppCompatActivity {
     }
     private void uploadFile() {
         Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
-        Repository.instance.saveRecord(mFileName, "" + event.getId(), new Model.SaveAudioListener() {
+        Repository.instance.saveRecord(String.valueOf(userId),mFileName, "" + event.getId(), new Model.SaveAudioListener() {
             @Override
             public void complete(String url) {
 //                Toast.makeText(getApplication(), "Upload as succeed" , Toast.LENGTH_SHORT).show();
@@ -409,8 +410,13 @@ public class RecordingActivity extends AppCompatActivity {
         Date.setClickable(false);
         Date.setFocusableInTouchMode(false);
         partici.setText(event.getUsersIds());
-        Log.d("TAG","eventid="+event.getId());
+        //Log.d("TAG","eventid="+event.getId());
+      //  String setfilename="/outalk"+String.valueOf(event.getId()+"/");
+     //   setfilename+=userId;
+       // mFileName += setfilename+".3gp";
+       // Log.d("TAG",mFileName);
         mFileName += "/outalk" + event.getId() + ".3gp";
+
         if(!(CheckMeAdmin())){
             StartRecording.setText("Recording...");
             StartRecording.setClickable(false);
@@ -418,10 +424,37 @@ public class RecordingActivity extends AppCompatActivity {
 
         }
         StartRecordAll();
+        CheckRecordingStatus();
     }
     public void SetEventFromNewActivity() {
         SetActivity();
 
+    }
+
+    public void StopRecordingByAdmin() {
+        //notify user about that
+        Toast.makeText(getApplication(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
+        StartRecording = findViewById(R.id.btnStart);
+        StartRecording.setText("Record has stop");
+        //stop recording...
+        stopRecording();
+        mStartRecording = !mStartRecording;
+        uploadFile();
+    }
+    public void CheckRecordingStatus() {
+        Repository.instance.getEventRecordingStatus(event.getId(), new FirebaseModel.FirebaseCallback<List<Boolean>>() {
+            @Override
+            public void onComplete(List<Boolean> data) {
+                if (data.get(0)==false)
+                    Log.d("TAG","Stop recording byadmin func");
+                    StopRecordingByAdmin();
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        });
     }
 }
 
