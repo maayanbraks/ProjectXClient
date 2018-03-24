@@ -208,12 +208,16 @@ public class RecordingActivity extends AppCompatActivity {
         mRecorder.stop();
         mRecorder.release();
         mRecorder = null;
+        if (CheckMeAdmin())
+        {
+            setRecordingStatus();
+        }
         Log.d("TAG","Stop recording func");
+
         uploadFile();
         //FirebaseModel.addNewEvent(event);
 
     }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -255,11 +259,11 @@ public class RecordingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 onRecord(mStartRecording);
-
                 if (CheckMeAdmin()) {
                     if ((mStartRecording)) {
                         StartRecording.setText("Stop recording");
                         uploadFile();
+
                     } else {
                         StartRecording.setText("Start recording");
                     }
@@ -380,7 +384,7 @@ public class RecordingActivity extends AppCompatActivity {
 //                    partici.setText(event.getUsersIds());
 //                    mFileName += "/outalk" + event.getId() + ".3gp";
                     SetActivity();
-
+                    CheckRecordingStatus();
                     //check if me as admin
 
                     //
@@ -424,7 +428,7 @@ public class RecordingActivity extends AppCompatActivity {
 
         }
         StartRecordAll();
-        CheckRecordingStatus();
+
     }
     public void SetEventFromNewActivity() {
         SetActivity();
@@ -445,16 +449,30 @@ public class RecordingActivity extends AppCompatActivity {
         Repository.instance.getEventRecordingStatus(event.getId(), new FirebaseModel.FirebaseCallback<List<Boolean>>() {
             @Override
             public void onComplete(List<Boolean> data) {
-                if (data.get(0)==false)
+                if ((data.get(0)==false) && (!(CheckMeAdmin()))) {
                     Log.d("TAG","Stop recording byadmin func");
                     StopRecordingByAdmin();
-            }
-
+            }}
             @Override
             public void onCancel() {
 
             }
         });
+    }
+    public void setRecordingStatus() {
+          Log.d("TAG","SetRecordingStatus func in recordingacitivty");
+                Repository.instance.setRecodrdingStatus(String.valueOf(event.getId()), new FirebaseModel.FirebaseCallback() {
+                    @Override
+                    public void onComplete(Object data) {
+
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+                });
+
     }
 }
 
