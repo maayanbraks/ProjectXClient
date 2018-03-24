@@ -617,9 +617,48 @@ public class FirebaseModel {
         str += "}";
         return str;
     }
+    public static void getEvents(int userId, final FirebaseCallback<List<Event>> firebaseCallback) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId)).child("EventsList");
+        final List<Integer>[] ids = new List[]{new LinkedList<Integer>()};
+        idsListRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() == null)
+                    ids[0] = new LinkedList<Integer>();
+                else {
+                    ids[0] = decodeListFromString((String) dataSnapshot.getValue());
+                    List<Integer> listofevnets=ids[0];
+                    for (int i=0;i<listofevnets.size();i++)
+                    {
+                        getEventById(listofevnets.get(i),firebaseCallback);
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                firebaseCallback.onCancel();
+            }
+        });
+    }
+
+    public static void setEventList(User user, FirebaseCallback<Boolean> callback) {
+        try {
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference("Users").child(Integer.toString(user.getId())).child("EventsList");
+            myRef.setValue(generateStringFromList(user.getEventsIds()));
+            callback.onComplete(true);
+        } catch (Exception e) {
+            callback.onCancel();
+        }
+    }
+
 
     public static void saveRecord(String Path, String eventId, final Model.SaveAudioListener listener, final FirebaseCallback callback) {
         StorageReference storageRef = _storage.getReference("Record").child(eventId);
+    }
     public static void saveRecord(String userId,String Path,String eventId,final Model.SaveAudioListener listener,FirebaseCallback callback) {
         StorageReference storageRef = _storage.getReference("Record").child(eventId).child(userId);
         // File or Blob
