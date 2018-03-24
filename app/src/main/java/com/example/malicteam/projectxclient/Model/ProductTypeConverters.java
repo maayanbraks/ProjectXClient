@@ -12,7 +12,7 @@
 //public class ProductTypeConverters {
 //
 //    @TypeConverter
-//    public static LinkedList<Integer> decodeListFromString(String list) {
+//    public static LinkedList<Integer> toList(String list) {
 //        list = list.replace("{", "").replace("}", "").replace(" ", "");
 //        String[] ids = list.split(",");
 //        LinkedList<Integer> friendsList = new LinkedList<>();
@@ -23,7 +23,7 @@
 //    }
 //
 //    @TypeConverter
-//    public static String generateStringFromList(List<Integer> list) {
+//    public static String toString(List<Integer> list) {
 //        String str = "{ ";
 //        for (int id : list) {
 //            str += id + ", ";

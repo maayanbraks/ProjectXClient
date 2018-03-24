@@ -1,5 +1,12 @@
 package com.example.malicteam.projectxclient.Model;
 
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.TypeConverter;
+import android.arch.persistence.room.TypeConverters;
+import android.support.annotation.NonNull;
+
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
@@ -27,18 +34,20 @@ public class User implements Serializable {
     private String lastLogin;
     private String phoneNumber;
     private String email;
+
+//    @TypeConverters(ProductTypeConverters.class)
     private List<Integer> friendsIds;
 
-    public void setEventsIds(List<Integer> eventsIds) {
-        this.eventsIds = eventsIds;
-    }
+//    @TypeConverters(ProductTypeConverters.class)
+
 
 
     private List<Integer> eventsIds;
+
     private String pictureUrl;
-    private final boolean admin = false;
+    private boolean admin = false;
 
-
+//    @Ignore
     public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -140,6 +149,30 @@ public class User implements Serializable {
         }
         return str;
 
+    }
+
+    public void setEventsIds(List<Integer> eventsIds) {
+        this.eventsIds = eventsIds;
+    }
+
+    public void setFriendsIds(List<Integer> friendsIds) {
+        this.friendsIds = friendsIds;
+    }
+
+    public void setId(@NonNull int id) {
+        this.id = id;
+    }
+
+    public void setLastLogin(String lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(boolean admin) {
+        this.admin = admin;
     }
 
     public String getFirstName() {

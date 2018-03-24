@@ -86,27 +86,24 @@ public class Repository {
         return someUser.get(someUser.size() - 1);
     }
 
-//    public interface AddFriendsListener {
-//        void onSuccess();
-//
-//        void onFail(String msg);
-//    }
 
-    public void getUserById(int id, FirebaseModel.FirebaseCallback<List<User>> callback){
+    public void getUserById(int id, final FirebaseModel.FirebaseCallback<List<User>> callback) {
 
-        FirebaseModel.getUserById(id,callback);
+        FirebaseModel.getUserById(id, callback);
 
-        }
-    public void getEventById(int id, FirebaseModel.FirebaseCallback<List<Event>> callback){
+    }
 
-        FirebaseModel.getEventById(id,callback);
+    public void getEventById(int id, final FirebaseModel.FirebaseCallback<List<Event>> callback) {
+
+        FirebaseModel.getEventById(id, callback);
 
     }
     public void getEventRecordingStatus(int id, FirebaseModel.FirebaseCallback<List<Boolean>> callback){
 
         FirebaseModel.getEventRecordingStatus(id,callback);
     }
-    public void addFriend(String email, FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
+
+    public void addFriend(String email, final FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         int userId = User.generateId(auth.getCurrentUser().getEmail());
         //List<User> _friendsList = new LinkedList<>();
@@ -130,22 +127,11 @@ public class Repository {
                         public void onComplete(Integer friendId) {//ok - go on
                             if (friendId != null && friendId > 0) {
                                 LinkedList<Integer> newList = new LinkedList<>();
-                                for (User u : friendsList) {//make list of IDs
+                                for (User u : friendsList) {//makes list of IDs
                                     newList.add(u.getId());
                                 }
                                 newList.add(friendId);
-                                FirebaseModel.setFriends(userId, FirebaseModel.generateStringFromList(newList), new FirebaseModel.FirebaseCallback<Boolean>() {
-                                    @Override
-                                    public void onComplete(Boolean data) {
-                                        //Mission is complete
-                                        firebaseCallback.onComplete(data);
-                                    }
-
-                                    @Override
-                                    public void onCancel() {
-                                        firebaseCallback.onCancel();
-                                    }
-                                });
+                                FirebaseModel.setFriends(userId, FirebaseModel.generateStringFromList(newList), firebaseCallback);
                             } else
                                 firebaseCallback.onCancel();
                         }
@@ -168,7 +154,7 @@ public class Repository {
         });
     }
 
-    public void getFriends(int friendId, FirebaseModel.FirebaseCallback<List<User>> firebaseCallback) {
+    public void getFriends(int friendId, final FirebaseModel.FirebaseCallback<List<User>> firebaseCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         int userId = User.generateId(auth.getCurrentUser().getEmail());
         FirebaseModel.getFriends(userId, new FirebaseModel.FirebaseCallback<List<User>>() {
@@ -199,7 +185,7 @@ public class Repository {
         });
     }
 
-    public void deleteFromFriends(int friendId, FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
+    public void deleteFromFriends(int friendId, final FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         int userId = User.generateId(auth.getCurrentUser().getEmail());
         FirebaseModel.getFriends(userId, new FirebaseModel.FirebaseCallback<List<User>>() {
@@ -212,18 +198,7 @@ public class Repository {
                             User u = data.get(i);
                             found = true;
                             data.remove(u);
-                            FirebaseModel.setFriends(userId, data, new FirebaseModel.FirebaseCallback<Boolean>() {
-                                @Override
-                                public void onComplete(Boolean data) {
-                                    firebaseCallback.onComplete(data);
-                                }
-
-                                @Override
-                                public void onCancel() {
-                                    firebaseCallback.onCancel();
-                                }
-                            });
-
+                            FirebaseModel.setFriends(userId, data, firebaseCallback);
                         }
                     }
                     if (!found)
@@ -240,7 +215,7 @@ public class Repository {
         });
     }
 
-    public void changeUserDetails(String firstName, String lastName, String email, String phone, FirebaseModel.FirebaseCallback<String> firebaseCallback) {
+    public void changeUserDetails(String firstName, String lastName, String email, String phone, final FirebaseModel.FirebaseCallback<String> firebaseCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         int userId = User.generateId(auth.getCurrentUser().getEmail());
 
@@ -266,32 +241,38 @@ public class Repository {
         firebaseCallback.onComplete(str);
     }
 
-    public void setPictureUrl(Bitmap bitmap, FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
+    public void setPictureUrl(Bitmap bitmap, final FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         int id = User.generateId(auth.getCurrentUser().getEmail());
         FirebaseModel.setPictureUrl(id, bitmap, firebaseCallback);
     }
+
+    public void saveRecord(String Path, String eventId, final Model.SaveAudioListener listener, FirebaseModel.FirebaseCallback callback) {
+        FirebaseModel.saveRecord(Path, eventId, listener, callback);
     public void saveRecord(String userId,String Path,String eventId,final Model.SaveAudioListener listener,FirebaseModel.FirebaseCallback callback)
     {
     FirebaseModel.saveRecord(userId,Path,eventId,listener,callback);
     }
 
-    public void removeAccount(FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
+    public void removeAccount(final FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
         FirebaseModel.removeAccount(firebaseCallback);
     }
-    public void removeInvite(FirebaseModel.FirebaseCallback<Boolean> callback,Invite invite) {
-        FirebaseModel.removeInvite(callback,invite);
+
+    public void removeInvite(final FirebaseModel.FirebaseCallback<Boolean> callback, Invite invite) {
+        FirebaseModel.removeInvite(callback, invite);
     }
 
 
-    public void addNewUserToDB(User user, FirebaseModel.FirebaseCallback firebaseCallback) {
+    public void addNewUserToDB(User user, final FirebaseModel.FirebaseCallback firebaseCallback) {
         FirebaseModel.addUser(user, firebaseCallback);
     }
-    public void addNewInvite(Invite invite, FirebaseModel.FirebaseCallback callback) {
+
+    public void addNewInvite(Invite invite, final FirebaseModel.FirebaseCallback callback) {
         FirebaseModel.addInvite(invite);
     }
-    public void getInvite(String id,FirebaseModel.FirebaseCallback callback,FirebaseModel.GetInvitation invitation) {
-        FirebaseModel.getInvite(id,invitation);
+
+    public void getInvite(String id, final FirebaseModel.FirebaseCallback callback, FirebaseModel.GetInvitation invitation) {
+        FirebaseModel.getInvite(id, invitation);
 
     }
     public void setEventList(User user,FirebaseModel.FirebaseCallback callback) {
@@ -329,7 +310,7 @@ public class Repository {
         void onFail();
     }
 
-    public void getProfilePicture(String url, FirebaseModel.FirebaseCallback<Bitmap> firebaseCallback) {
+    public void getProfilePicture(String url, final FirebaseModel.FirebaseCallback<Bitmap> firebaseCallback) {
         if (url == null || url.equals("")) {
             firebaseCallback.onCancel();
         } else {
@@ -356,7 +337,7 @@ public class Repository {
     }
 
     //Default user (connected user)
-    public void getProfilePicture(FirebaseModel.FirebaseCallback<Bitmap> firebaseCallback) {
+    public void getProfilePicture(final FirebaseModel.FirebaseCallback<Bitmap> firebaseCallback) {
         String url = userLiveData.getValue().getPictureUrl();
         if (url == null || url.equals("")) {
             firebaseCallback.onCancel();
@@ -383,7 +364,7 @@ public class Repository {
         }
     }
 
-    public void saveProfilePicture(Bitmap bitmap, String email, FirebaseModel.FirebaseCallback firebaseCallback) {
+    public void saveProfilePicture(Bitmap bitmap, String email, final FirebaseModel.FirebaseCallback firebaseCallback) {
 
         FirebaseModel.saveImage(bitmap, User.generateId(email), new Model.SaveImageListener() {
             @Override

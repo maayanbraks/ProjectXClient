@@ -11,6 +11,7 @@
 ///**
 // * Created by Maayan on 12-Mar-18.
 // */
+//
 //@Dao
 //public interface EventDao {
 //    @Query("SELECT * FROM events")
