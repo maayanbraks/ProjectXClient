@@ -140,6 +140,19 @@ public class FirebaseModel {
         }
     }
 
+    public static void setRecordingStatus(String eventId, FirebaseCallback<Boolean> firebaseCallback) {
+        try {
+            Log.d("TAG","In setrecordingstatus func");
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference myRef = database.getReference("Events").child(eventId).child("RecordingStatus");
+            Map<String, Object> value = new HashMap<>();
+            myRef.setValue("false");
+            firebaseCallback.onComplete(false);
+        } catch (Exception e) {
+            firebaseCallback.onCancel();
+        }
+    }
+
     /*
     remove current user - from DB & Google Auth
      */

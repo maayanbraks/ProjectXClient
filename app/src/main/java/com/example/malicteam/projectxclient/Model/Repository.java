@@ -280,7 +280,10 @@ public class Repository {
         FirebaseModel.setEventList(user,callback);
 
     }
+    public void setRecodrdingStatus(String eventId,FirebaseModel.FirebaseCallback callback) {
+        FirebaseModel.setRecordingStatus(eventId,callback);
 
+    }
 //    public LiveData<List<User>> getFriends() {
 //        synchronized (this) {
 //            if (friendsLiveData == null) {
