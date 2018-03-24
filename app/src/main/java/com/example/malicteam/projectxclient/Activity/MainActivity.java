@@ -57,30 +57,19 @@ public class MainActivity extends AppCompatActivity
     private UserViewModel currentUser = null;
     private int userId;
     private List<Event> eventsList = new LinkedList<>();
-    private User myuser;
+    //private User myuser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        myuser=new User();
+
         final ListView eventListView = (ListView) findViewById(R.id._listOfEvents);
         EventAdapter adapter = new EventAdapter();
         eventListView.setAdapter(adapter);
-
         userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
-
         currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
         currentUser.init(userId, true);
-        //        eventsData = ViewModelProviders.of(this).get(EventsViewModel.class);
-//        eventsData.init(userId);
-
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        View headerLayout = navigationView.getHeaderView(0);
-        userNameHeader = (TextView) (headerLayout.findViewById(R.id.userName_head));
-        userEmailHeader = (TextView) (headerLayout.findViewById(R.id.userMail_head));
 
         currentUser.getUser().observe(this, new Observer<User>() {
 
@@ -89,19 +78,8 @@ public class MainActivity extends AppCompatActivity
                 if (user != null) {
                     //update details
                     updateProfilePicture(user.getPictureUrl());
-                    try {
-
-                        myuser.setEmail(user.getEmail());
-                        myuser.setPictureUrl(user.getPictureUrl());
-                        myuser.setFirstName(user.getFirstName());
-                        myuser.setLastName(user.getLastName());
-                        myuser.setId();
-                        myuser.setEventsIds(user.getEventsIds());
-                        userNameHeader.setText(user.getFirstName() + " " + user.getLastName());
-                        userEmailHeader.setText(user.getEmail());
-                    } catch (Exception e) {
-                        Log.d("tag", e.getMessage());
-                    }
+                    userNameHeader.setText(user.getFirstName() + " " + user.getLastName());
+                    userEmailHeader.setText(user.getEmail());
                     userId = user.getId();
                 } else {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -111,14 +89,16 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-//        eventsData.getEvents().observe(this, new Observer<List<Event>>() {
-//            @Override
-//            public void onChanged(@Nullable List<Event> events) {
-//                eventsList = events;
-//                if (adapter != null) adapter.notifyDataSetChanged();
-//            }
-//        });
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        View headerLayout = navigationView.getHeaderView(0);
+        userNameHeader = (TextView) (headerLayout.findViewById(R.id.userName_head));
+        userEmailHeader = (TextView) (headerLayout.findViewById(R.id.userMail_head));
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        //Permission
         boolean hasPermission = (ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
                 PackageManager.PERMISSION_GRANTED);
@@ -127,11 +107,7 @@ public class MainActivity extends AppCompatActivity
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, Consts.REQUEST_WRITE_STORAGE);
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-            /////////
-//////////////////////////////// invitation code -
+//invitation code:
         Repository.instance.getInvite("" + userId, new FirebaseModel.FirebaseCallback<Invite>() {
             @Override
             public void onComplete(Invite invite) {
@@ -148,15 +124,15 @@ public class MainActivity extends AppCompatActivity
                 Invitation(invite);
             }
         });
-        ///////////////
+        //End of - invitation code
 
-        ////////////
+        //Get Events
         Repository.instance.getEvents(userId, new FirebaseModel.FirebaseCallback<List<Event>>() {
             @Override
             public void onComplete(List<Event> data) {
                 eventsList = data;
-            if (adapter != null)
-                adapter.notifyDataSetChanged();
+                if (adapter != null)
+                    adapter.notifyDataSetChanged();
             }
 
             @Override
@@ -164,7 +140,18 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        //////////
+        eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Event event = eventsList.get(position);
+                Intent intent = new Intent(getApplicationContext(), EventDetails.class);
+                intent.putExtra(Consts.SEND_EVENT, event);
+                startActivity(intent);
+            }
+        });
+
+        //End of
+        //Floating add button
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.record_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -176,22 +163,13 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        //Draw
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-
-        eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Event event = eventsList.get(position);
-                Intent intent = new Intent(getApplicationContext(), EventDetails.class);
-                intent.putExtra(Consts.SEND_EVENT, event);
-                startActivity(intent);
-            }
-        });
     }
 
     @Override
@@ -316,7 +294,97 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    //Events List adapter
+    public void Invitation(final Invite invite) {
+        final Context context = this;
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+
+        // set title
+        alertDialogBuilder.setTitle("You got new Invitation, from " + invite.getInviteFromId());
+
+        // set dialog message
+        alertDialogBuilder
+                .setCancelable(false)
+                .setNegativeButton("Decline", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        declineToInvite(invite);
+                        //Todo make delined to invite
+                        // dialog.cancel();
+                    }
+                })
+                .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Log.d("TAG", "You have agreed invite");
+                        agreeToInvite(invite);
+                        //Todo make Agree to evnet
+                        // GetInEvent(invite.getEventId());
+                        // MainActivity.this.finish();
+                    }
+
+                });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        if (!((Activity) context).isFinishing()) {
+            alertDialog.show();
+        }
+    }
+
+    public void agreeToInvite(Invite invite) {
+        //TODO get in to event
+        //get in to event.
+        getInEvent(invite.getEventId());
+        //delete from invite DB
+//        Repository.instance.removeInvite(new FirebaseModel.Callback<Boolean>() {
+//            @Override
+//            public void onComplete(Boolean data) {
+//            }
+//        }, invite);
+        //Add event to myeventlist/
+        Log.d("TAG", "invitegetevnetid=" + invite.getEventId());
+        currentUser.getUser().getValue().addEventToList(Integer.valueOf(invite.getEventId()));
+        //update the userDatabase
+        Repository.instance.setEventList(currentUser.getUser().getValue(), new FirebaseModel.FirebaseCallback() {
+            @Override
+            public void onComplete(Object data) {
+
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        });
+    }
+
+    public void declineToInvite(Invite invite) {
+        //TODO
+        //delete from invite DB
+        Repository.instance.removeInvite(new FirebaseModel.FirebaseCallback<Boolean>() {
+            @Override
+            public void onComplete(Boolean data) {
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        }, invite);
+
+    }
+
+    public void getInEvent(String eventId) {
+        Intent intent;
+        intent = new Intent(getApplicationContext(), RecordingActivity.class);
+        intent.putExtra("eventidToGetIn", eventId);
+        int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+        intent.putExtra(Consts.USER_ID, id);
+        // Log.d("Tag","eventID="+eventId);
+        startActivity(intent);
+    }
+
+    //Adapter class
     class EventAdapter extends BaseAdapter {
 
         @Override
@@ -353,92 +421,5 @@ public class MainActivity extends AppCompatActivity
             return view;
         }
     }
-    public void Invitation(final Invite invite) {
-        final Context context = this;
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-
-        // set title
-        alertDialogBuilder.setTitle("You got new Invitation, from "+invite.getInviteFromId());
-
-        // set dialog message
-        alertDialogBuilder
-                .setCancelable(false)
-                .setNegativeButton("Decline",new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int id) {
-                        declineToInvite(invite);
-                        //Todo make delined to invite
-                        // dialog.cancel();
-                    }})
-                .setPositiveButton("Agree",new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog,int id) {
-                        Log.d("TAG","You have agreed invite");
-                        agreeToInvite(invite);
-                        //Todo make Agree to evnet
-                       // GetInEvent(invite.getEventId());
-                        // MainActivity.this.finish();
-                    }
-
-                });
-
-        // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
-
-        // show it
-        if(!((Activity) context).isFinishing()) {
-            alertDialog.show();
-        }
-    }
-    public void agreeToInvite(Invite invite ) {
-        //TODO
-        //get in to event.
-        getInEvent(invite.getEventId());
-        //delete from invite DB
-//        Repository.instance.removeInvite(new FirebaseModel.Callback<Boolean>() {
-//            @Override
-//            public void onComplete(Boolean data) {
-//            }
-//        }, invite);
-        //Add event to myeventlist/
-        Log.d("TAG","invitegetevnetid="+invite.getEventId());
-        myuser.addEventToList(Integer.valueOf(invite.getEventId()));
-        //update the userDatabase
-        Repository.instance.setEventList(myuser, new FirebaseModel.FirebaseCallback() {
-            @Override
-            public void onComplete(Object data) {
-
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-        });
-    }
-    public void declineToInvite(Invite invite ) {
-        //TODO
-        //delete from invite DB
-        Repository.instance.removeInvite(new FirebaseModel.FirebaseCallback<Boolean>() {
-            @Override
-            public void onComplete(Boolean data) {
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-        }, invite);
-
-    }
-    public void getInEvent (String eventId) {
-        Intent intent;
-        intent = new Intent(getApplicationContext(),RecordingActivity.class);
-        intent.putExtra("eventidToGetIn",eventId);
-        int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
-        intent.putExtra(Consts.USER_ID, id);
-       // Log.d("Tag","eventID="+eventId);
-        startActivity(intent);
-    }
-
-
 
 }

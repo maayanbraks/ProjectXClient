@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ProjectXClient.iml" filepath="$PROJECT_DIR$/ProjectXClient.iml" />
-      <module fileurl="file://C:\Users\Charcon\Desktop\fghgg\Project_Client\ProjectXClient\ProjectXClient.iml" filepath="C:\Users\Charcon\Desktop\fghgg\Project_Client\ProjectXClient\ProjectXClient.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

@@ -115,14 +115,14 @@ import android.Manifest;
 
 public class RecordingActivity extends AppCompatActivity {
 
-    //    private static final String LOG_TAG = "AudioRecordTest";
+//    private static final String LOG_TAG = "AudioRecordTest";
 //    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
 //    private static String mFileName = null;
 //
-//    //private RecordButton mRecordButton = null;
+//    private RecordButton mRecordButton = null;
 //    private MediaRecorder mRecorder = null;
 //
-//   // private PlayButton   mPlayButton = null;
+//    private PlayButton   mPlayButton = null;
 //    private MediaPlayer mPlayer = null;
 //    private boolean permissionToRecordAccepted = false;
     boolean mStartPlaying = true;
@@ -136,12 +136,14 @@ public class RecordingActivity extends AppCompatActivity {
     private MediaRecorder mRecorder = null;
     private Event event;
     private MediaPlayer mPlayer = null;
-    private int currectUserid;
     private String invitedPpl;
     private int userId;
     // Requesting permission to RECORD_AUDIO
     private boolean permissionToRecordAccepted = false;
     private String [] permissions = {Manifest.permission.RECORD_AUDIO};
+
+    private boolean recordingBoolean = false;
+    ImageButton pauseButton;
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
