@@ -73,7 +73,7 @@ public class FriendsListActivity extends FragmentActivity {
             public void onChanged(@Nullable User user) {
                 if (user != null) {
                     //update details
-                    userId = user.getId();
+                    //userId = user.getId();
                     initButtons();
                 } else {
                     Intent intent = new Intent(FriendsListActivity.this, LoginActivity.class);
@@ -87,20 +87,20 @@ public class FriendsListActivity extends FragmentActivity {
         friendsListView = (ListView) findViewById(R.id.list_friendsList);
         friendsListView.setAdapter(adapter);
 
-        friendsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                waitForAction = friends.get(position);
-
-                for (int i = 0; i < parent.getChildCount(); i++) {
-                    if (i == position) {
-                        parent.getChildAt(i).setBackgroundColor(Color.WHITE);
-                    }
-                }
-            }
-
-
-        });
+//        friendsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                waitForAction = friends.get(position);
+//
+//                for (int i = 0; i < parent.getChildCount(); i++) {
+//                    if (i == position) {
+//                        parent.getChildAt(i).setBackgroundColor(Color.WHITE);
+//                    }
+//                }
+//            }
+//
+//
+//        });
 
 
 
@@ -153,7 +153,7 @@ public class FriendsListActivity extends FragmentActivity {
                 d.show();
             }
         });
-//delete
+//delete from the main delete button
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
