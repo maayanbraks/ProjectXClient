@@ -33,8 +33,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-
-
 public class FirebaseModel {
 
     //Data Members
@@ -349,48 +347,32 @@ public class FirebaseModel {
         DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId)).child("EventsList");
         final List<Integer>[] ids = new List[]{new LinkedList<Integer>()};
         idsListRef.addValueEventListener(new ValueEventListener() {
-            @Override
+                @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.getValue() == null)
                     ids[0] = new LinkedList<Integer>();
                 else {
                     ids[0] = decodeListFromString((String) dataSnapshot.getValue());
+                    List<Integer> listofevnets=ids[0];
+                    for (int i=0;i<listofevnets.size();i++)
+                    {
+                        getEventById(listofevnets.get(i),firebaseCallback);
+                    }
 
-                    DatabaseReference myRef = database.getReference("Events");
-                    myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            List<Event> finalList = new LinkedList<>();
-                            for (DataSnapshot snap : dataSnapshot.getChildren()) {
-                                Map<String, Object> value = (Map<String, Object>) snap.getValue();
-                                String eventId = (String) value.get("ID");
-                                String eventName = (String) value.get("Title");
-                                String desc = (String) value.get("Description");
-                                String admin = (String) value.get("adminId");
-                                String Date = (String) value.get("Date");
-                                String usersList = (String) value.get("UsersList");
-                                String RecordingStatus = (String) value.get("RecordingStatus");
-                                Event event=new Event(null,eventName,usersList,desc,admin,Date,eventId,null);
-                                    finalList.add(event);
-                                firebaseCallback.onComplete(finalList);
-                                }
+                   }
+              }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                                firebaseCallback.onCancel();
                             }
+                        });
+        }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                            firebaseCallback.onCancel();
-                        }
-                    });
-                }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                firebaseCallback.onComplete(null);
-            }
-        });
 
-    }
+
+
 
     public static void getUserById(int userId, FirebaseCallback<List<User>> callback) {
        FirebaseDatabase database = FirebaseDatabase.getInstance();
