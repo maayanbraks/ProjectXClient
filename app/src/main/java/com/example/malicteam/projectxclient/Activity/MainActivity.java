@@ -57,12 +57,13 @@ public class MainActivity extends AppCompatActivity
     private UserViewModel currentUser = null;
     private int userId;
     private List<Event> eventsList = new LinkedList<>();
+    private User myuser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        myuser=new User();
         final ListView eventListView = (ListView) findViewById(R.id._listOfEvents);
         EventAdapter adapter = new EventAdapter();
         eventListView.setAdapter(adapter);
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity
 
         currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
         currentUser.init(userId, true);
-//        eventsData = ViewModelProviders.of(this).get(EventsViewModel.class);
+        //        eventsData = ViewModelProviders.of(this).get(EventsViewModel.class);
 //        eventsData.init(userId);
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -82,12 +83,20 @@ public class MainActivity extends AppCompatActivity
         userEmailHeader = (TextView) (headerLayout.findViewById(R.id.userMail_head));
 
         currentUser.getUser().observe(this, new Observer<User>() {
+
             @Override
             public void onChanged(@Nullable User user) {
                 if (user != null) {
                     //update details
                     updateProfilePicture(user.getPictureUrl());
                     try {
+
+                        myuser.setEmail(user.getEmail());
+                        myuser.setPictureUrl(user.getPictureUrl());
+                        myuser.setFirstName(user.getFirstName());
+                        myuser.setLastName(user.getLastName());
+                        myuser.setId();
+                        myuser.setEventsIds(user.getEventsIds());
                         userNameHeader.setText(user.getFirstName() + " " + user.getLastName());
                         userEmailHeader.setText(user.getEmail());
                     } catch (Exception e) {
@@ -140,6 +149,22 @@ public class MainActivity extends AppCompatActivity
             }
         });
         ///////////////
+
+        ////////////
+        Repository.instance.getEvents(userId, new FirebaseModel.FirebaseCallback<List<Event>>() {
+            @Override
+            public void onComplete(List<Event> data) {
+                eventsList = data;
+            if (adapter != null)
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancel() {
+            }
+        });
+
+        //////////
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.record_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -373,8 +398,21 @@ public class MainActivity extends AppCompatActivity
 //            public void onComplete(Boolean data) {
 //            }
 //        }, invite);
+        //Add event to myeventlist/
+        Log.d("TAG","invitegetevnetid="+invite.getEventId());
+        myuser.addEventToList(Integer.valueOf(invite.getEventId()));
+        //update the userDatabase
+        Repository.instance.setEventList(myuser, new FirebaseModel.FirebaseCallback() {
+            @Override
+            public void onComplete(Object data) {
 
+            }
 
+            @Override
+            public void onCancel() {
+
+            }
+        });
     }
     public void declineToInvite(Invite invite ) {
         //TODO
