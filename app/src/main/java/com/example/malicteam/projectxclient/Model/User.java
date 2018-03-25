@@ -1,32 +1,23 @@
 package com.example.malicteam.projectxclient.Model;
 
 import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
-import android.arch.persistence.room.TypeConverter;
-import android.arch.persistence.room.TypeConverters;
-import android.support.annotation.NonNull;
-
 import android.support.annotation.NonNull;
 
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
 /**
  * Created by Maayan on 10-Jan-18.
  */
 
-//@Entity(tableName = "users")
+@Entity(tableName = "users")
 public class User implements Serializable {
-//    @PrimaryKey
-//    @NonNull
+    @PrimaryKey
+    @NonNull
     private int id;//hash code from email
 
     private String firstName;
@@ -36,18 +27,18 @@ public class User implements Serializable {
     private String email;
 
 //    @TypeConverters(ProductTypeConverters.class)
-    private List<Integer> friendsIds;
+//    private List<Integer> friendsIds;
 
 //    @TypeConverters(ProductTypeConverters.class)
+//    private List<Integer> eventsIds;
 
-
-
-    private List<Integer> eventsIds;
+    private String friendsIds;
+    private String eventsIds;
 
     private String pictureUrl;
     private boolean admin = false;
 
-//    @Ignore
+    //    @Ignore
     public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -60,14 +51,14 @@ public class User implements Serializable {
         this.pictureUrl = null;
 
         if (friendsIds != null)
-            this.friendsIds = friendsIds;
+            this.friendsIds = FirebaseModel.generateStringFromList(friendsIds);
         else
-            this.friendsIds = new LinkedList<Integer>();
+            this.friendsIds = "{}";
 
         if (eventsIds != null)
-            this.eventsIds = eventsIds;
+            this.eventsIds = FirebaseModel.generateStringFromList(eventsIds);
         else
-            this.eventsIds = new LinkedList<Integer>();
+            this.eventsIds = "{}";
     }
 
     public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds, String pictureUrl) {
@@ -80,18 +71,19 @@ public class User implements Serializable {
         Date date = new Date();
         this.lastLogin = dateFormat.format(date);
         this.pictureUrl = pictureUrl;
-        this.eventsIds = new LinkedList<Integer>();
+        //this.eventsIds = new LinkedList<Integer>();
 
         if (friendsIds != null)
-            this.friendsIds = friendsIds;
+            this.friendsIds = FirebaseModel.generateStringFromList(friendsIds);
         else
-            this.friendsIds = new LinkedList<Integer>();
+            this.friendsIds = "{}";
 
         if (eventsIds != null)
-            this.eventsIds = eventsIds;
+            this.eventsIds = FirebaseModel.generateStringFromList(eventsIds);
         else
-            this.eventsIds = new LinkedList<Integer>();
+            this.eventsIds = "{}";
     }
+
     public User() {
         this.firstName = "";
         this.lastName = "";
@@ -100,29 +92,37 @@ public class User implements Serializable {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date date = new Date();
         this.lastLogin = dateFormat.format(date);
-        this.eventsIds = new LinkedList<Integer>();
+        //this.eventsIds = new LinkedList<Integer>();
         if (friendsIds != null)
             this.friendsIds = friendsIds;
         else
-            this.friendsIds = new LinkedList<Integer>();
+            this.friendsIds = "{}";
 
         if (eventsIds != null)
             this.eventsIds = eventsIds;
         else
-            this.eventsIds = new LinkedList<Integer>();
+            this.eventsIds = "{}";
     }
+
     public void addEventToList(int event) {
-        this.eventsIds.add(event);
+        List<Integer> list = FirebaseModel.decodeListFromString(this.eventsIds);
+        list.add(event);
+        this.eventsIds = FirebaseModel.generateStringFromList(list);
     }
+
     public void deleteEventFromList(int event) {
-        int index=0;
-        if (eventsIds.contains(event))
-            for (int i=0;i<eventsIds.size();i++) {
-            if (eventsIds.get(i)==event)
-                index=eventsIds.get(i);
+        int index = 0;
+        if (eventsIds.contains(Integer.toString(event))) {
+            List<Integer> list = FirebaseModel.decodeListFromString(this.eventsIds);
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i) == event)
+                    index = list.get(i);
             }
-            eventsIds.remove(index);
+            list.remove(index);
+            this.eventsIds = FirebaseModel.generateStringFromList(list);
+        }
     }
+
     @Override
     public String toString() {
         String str = "";
@@ -135,28 +135,24 @@ public class User implements Serializable {
         if (pictureUrl != null)
             str += "PictureUrl:" + pictureUrl + "\n";
 
-        str += "Friends Count:" + friendsIds.size() + "\n";
-        int index = 1;
-        for (int id : friendsIds) {
-            str += "\t" + index + ") " + id + "\n";
-            index++;
-        }
-        str += "Events Count:" + eventsIds.size() + "\n";
-        index = 1;
-        for (int id : eventsIds) {
-            str += "\t" + index + ") " + id + "\n";
-            index++;
-        }
+        int size = 0;
+        size = (friendsIds.split(",").length - 1);
+        str += "Friends Count:" + size +"\n";
+        str += "Friends:" + friendsIds;
+        size = (eventsIds.split(",").length - 1);
+        str += "Events Count:" + size + "\n";
+        str += "Events:" + eventsIds;
+
         return str;
 
     }
 
     public void setEventsIds(List<Integer> eventsIds) {
-        this.eventsIds = eventsIds;
+        this.eventsIds = FirebaseModel.generateStringFromList(eventsIds);
     }
 
     public void setFriendsIds(List<Integer> friendsIds) {
-        this.friendsIds = friendsIds;
+        this.friendsIds = FirebaseModel.generateStringFromList(friendsIds);
     }
 
     public void setId(@NonNull int id) {
@@ -227,20 +223,42 @@ public class User implements Serializable {
         this.pictureUrl = url;
     }
 
-    public List<Integer> getFriendsIds() {
+    public List<Integer> getFriendsIdsAsList() {
+        return FirebaseModel.decodeListFromString(friendsIds);
+    }
+
+    public String getFriendsIds() {
         return friendsIds;
     }
 
     public void addFriend(int id) {
-        friendsIds.add(id);
+        List<Integer> list = FirebaseModel.decodeListFromString(friendsIds);
+        list.add(id);
+        friendsIds = FirebaseModel.generateStringFromList(list);
     }
 
-    public List<Integer> getEventsIds() {
+
+    public List<Integer> getEventsIdsAsList() {
+        return FirebaseModel.decodeListFromString(eventsIds);
+    }
+
+
+    public String getEventsIds() {
         return eventsIds;
     }
 
     public void addEvent(int id) {
-        eventsIds.add(id);
+        List<Integer> list = FirebaseModel.decodeListFromString(eventsIds);
+        list.add(id);
+        eventsIds = FirebaseModel.generateStringFromList(list);
+    }
+
+    public void setFriendsIds(String friendsIds) {
+        this.friendsIds = friendsIds;
+    }
+
+    public void setEventsIds(String eventsIds) {
+        this.eventsIds = eventsIds;
     }
 
     public static int generateId(String email) {

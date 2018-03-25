@@ -2,10 +2,8 @@ package com.example.malicteam.projectxclient.Model;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.telecom.Call;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -128,8 +126,8 @@ public class FirebaseModel {
             value.put("Mail", user.getEmail());
             value.put("Phone", user.getPhoneNumber());
             value.put("PictureUrl", user.getPictureUrl());
-            value.put("FriendsList", generateStringFromList(user.getFriendsIds()));
-            value.put("EventsList", generateStringFromList(user.getEventsIds()));
+            value.put("FriendsList", generateStringFromList(user.getFriendsIdsAsList()));
+            value.put("EventsList", generateStringFromList(user.getEventsIdsAsList()));
             value.put("admin", false);
 
             myRef.setValue(value);
@@ -661,7 +659,7 @@ public class FirebaseModel {
         try {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference("Users").child(Integer.toString(user.getId())).child("EventsList");
-            myRef.setValue(generateStringFromList(user.getEventsIds()));
+            myRef.setValue(generateStringFromList(user.getEventsIdsAsList()));
             callback.onComplete(true);
         } catch (Exception e) {
             callback.onCancel();
