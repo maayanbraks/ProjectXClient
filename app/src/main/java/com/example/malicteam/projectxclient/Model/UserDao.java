@@ -15,7 +15,7 @@ import java.util.List;
 @Dao
 public interface UserDao {
     @Query("SELECT * FROM users")
-    List<User> getAllUsers();
+    List<User> getAllFriends();
 
     @Query("SELECT * FROM users WHERE users.id = :userId")
     User getUser(int userId);
@@ -24,5 +24,5 @@ public interface UserDao {
     void saveUser(User user);
 
     @Delete
-    void deleteUser(User employee);
+    void deleteUser(User user);
 }

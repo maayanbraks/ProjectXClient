@@ -25,21 +25,14 @@ public class User implements Serializable {
     private String lastLogin;
     private String phoneNumber;
     private String email;
-
-//    @TypeConverters(ProductTypeConverters.class)
-//    private List<Integer> friendsIds;
-
-//    @TypeConverters(ProductTypeConverters.class)
-//    private List<Integer> eventsIds;
-
     private String friendsIds;
     private String eventsIds;
-
     private String pictureUrl;
     private boolean admin = false;
+    private long lastUpdated;
 
     //    @Ignore
-    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds) {
+    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds, long lastUpdated) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.id = generateId(email);
@@ -49,6 +42,7 @@ public class User implements Serializable {
         Date date = new Date();
         this.lastLogin = dateFormat.format(date);
         this.pictureUrl = null;
+        this.lastUpdated = lastUpdated;
 
         if (friendsIds != null)
             this.friendsIds = FirebaseModel.generateStringFromList(friendsIds);
@@ -61,7 +55,7 @@ public class User implements Serializable {
             this.eventsIds = "{}";
     }
 
-    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds, String pictureUrl) {
+    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds, String pictureUrl,long lastUpdated) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.id = generateId(email);
@@ -102,7 +96,57 @@ public class User implements Serializable {
             this.eventsIds = eventsIds;
         else
             this.eventsIds = "{}";
+
+        this.lastUpdated = 0;
     }
+    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds, String pictureUrl) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.id = generateId(email);
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = new Date();
+        this.lastLogin = dateFormat.format(date);
+        this.pictureUrl = pictureUrl;
+        //this.eventsIds = new LinkedList<Integer>();
+        this.lastUpdated = date.getTime();
+
+        if (friendsIds != null)
+            this.friendsIds = FirebaseModel.generateStringFromList(friendsIds);
+        else
+            this.friendsIds = "{}";
+
+        if (eventsIds != null)
+            this.eventsIds = FirebaseModel.generateStringFromList(eventsIds);
+        else
+            this.eventsIds = "{}";
+    }
+
+    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.id = generateId(email);
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = new Date();
+        this.lastLogin = dateFormat.format(date);
+        this.pictureUrl = null;
+        this.lastUpdated = date.getTime();
+
+        if (friendsIds != null)
+            this.friendsIds = FirebaseModel.generateStringFromList(friendsIds);
+        else
+            this.friendsIds = "{}";
+
+        if (eventsIds != null)
+            this.eventsIds = FirebaseModel.generateStringFromList(eventsIds);
+        else
+            this.eventsIds = "{}";
+    }
+
+
 
     public void addEventToList(int event) {
         List<Integer> list = FirebaseModel.decodeListFromString(this.eventsIds);
@@ -123,29 +167,14 @@ public class User implements Serializable {
         }
     }
 
-    @Override
-    public String toString() {
-        String str = "";
-        str += "First Name: " + firstName + "\n";
-        str += "Last Name: " + lastName + "\n";
-        str += "Email: " + email + "\n";
-        str += "Phone: " + phoneNumber + "\n";
-        str += "Id: " + id + "\n";
-        str += "Date: " + lastLogin + "\n";
-        if (pictureUrl != null)
-            str += "PictureUrl:" + pictureUrl + "\n";
-
-        int size = 0;
-        size = (friendsIds.split(",").length - 1);
-        str += "Friends Count:" + size +"\n";
-        str += "Friends:" + friendsIds;
-        size = (eventsIds.split(",").length - 1);
-        str += "Events Count:" + size + "\n";
-        str += "Events:" + eventsIds;
-
-        return str;
-
+    public void setLastUpdated(long lastUpdated) {
+        this.lastUpdated = lastUpdated;
     }
+
+    public long getLastUpdated() {
+        return lastUpdated;
+    }
+
 
     public void setEventsIds(List<Integer> eventsIds) {
         this.eventsIds = FirebaseModel.generateStringFromList(eventsIds);
@@ -263,5 +292,29 @@ public class User implements Serializable {
 
     public static int generateId(String email) {
         return Math.abs(email.hashCode());
+    }
+
+    @Override
+    public String toString() {
+        String str = "";
+        str += "First Name: " + firstName + "\n";
+        str += "Last Name: " + lastName + "\n";
+        str += "Email: " + email + "\n";
+        str += "Phone: " + phoneNumber + "\n";
+        str += "Id: " + id + "\n";
+        str += "Date: " + lastLogin + "\n";
+        if (pictureUrl != null)
+            str += "PictureUrl:" + pictureUrl + "\n";
+
+        int size = 0;
+        size = (friendsIds.split(",").length - 1);
+        str += "Friends Count:" + size + "\n";
+        str += "Friends:" + friendsIds;
+        size = (eventsIds.split(",").length - 1);
+        str += "Events Count:" + size + "\n";
+        str += "Events:" + eventsIds;
+
+        return str;
+
     }
 }

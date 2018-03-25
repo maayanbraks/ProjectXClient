@@ -15,8 +15,8 @@ import static com.example.malicteam.projectxclient.Model.MyApp.getContext;
 @Database(entities = {Event.class, User.class}, version = 1)
 @TypeConverters(ProductTypeConverters.class)
 public abstract class AppLocalStoreDb extends RoomDatabase {
-    public abstract EventDao eventDao();
-    public abstract UserDao userDao();
+    public abstract EventDao EventDao();
+    public abstract UserDao UserDao();
 
     private static AppLocalStoreDb instance;
 

@@ -3,9 +3,11 @@ package com.example.malicteam.projectxclient.Model;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 import android.webkit.URLUtil;
@@ -19,22 +21,25 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import static android.content.Context.MODE_PRIVATE;
 /**
  * Created by Maayan on 11-Mar-18.
  */
-
+//Singleton
 public class Repository {
-
-    public static final Repository instance = new Repository();
-
     private MutableLiveData<User> userLiveData;
     private List<MutableLiveData<User>> someUser;
     //private MutableLiveData<List<Event>> eventsData;
     //private MutableLiveData<List<User>> friendsLiveData;
+
+    private List<User>friends = null;//holds local users
+
+    public static final Repository instance = new Repository();
+
+
 
     public LiveData<User> getUser(int id) {
         synchronized (this) {
@@ -154,18 +159,17 @@ public class Repository {
         });
     }
 
-    public void getFriends(int friendId, final FirebaseModel.FirebaseCallback<List<User>> firebaseCallback) {
+    public void getFriends(int userId, final FirebaseModel.FirebaseCallback<List<User>> firebaseCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        int userId = User.generateId(auth.getCurrentUser().getEmail());
         FirebaseModel.getFriends(userId, new FirebaseModel.FirebaseCallback<List<User>>() {
             @Override
             public void onComplete(List<User> data) {
+                updateFriendsDataInLocalStorage(data);
                 firebaseCallback.onComplete(data);
             }
-
             @Override
             public void onCancel() {
-                firebaseCallback.onCancel();
+                firebaseCallback.onComplete(friends);
             }
         });
     }
@@ -177,12 +181,17 @@ public class Repository {
             public void onComplete(List<Event> data) {
                 firebaseCallback.onComplete(data);
             }
-
             @Override
             public void onCancel() {
                 firebaseCallback.onCancel();
             }
         });
+    }
+
+    private void updateFriendsDataInLocalStorage(List<User> data)
+    {
+        MyTask task = new MyTask();
+        task.execute(data);
     }
 
     public void deleteFromFriends(int friendId, final FirebaseModel.FirebaseCallback<Boolean> firebaseCallback) {
@@ -472,4 +481,54 @@ public class Repository {
 //
 //    }
 
+
+
+    //CLASSES
+    class MyTask extends AsyncTask<List<User>,String,List<User>> {
+        @Override
+        protected List<User> doInBackground(List<User>[] lists) {
+            Log.d("TAG","starting updateEmployeeDataInLocalStorage in thread");
+            if (lists.length > 0) {
+                List<User> data = lists[0];
+                long lastUpdateDate = 0;
+//                try {
+////                    lastUpdateDate = MyApp.getContext()
+////                            .getSharedPreferences("TAG", MODE_PRIVATE).getLong("lastUpdateDate", 0);
+//                }catch (Exception e){
+//
+//                }
+                if (data != null && data.size() > 0) {
+                    //3. update the local DB
+                    long reacentUpdate = lastUpdateDate;
+                    for (User u : data) {
+                        try {
+                            AppLocalStoreDb.getLocalDatabase(MyApp.getContext()).UserDao().saveUser(u);
+                        }catch (Exception e)
+                        {
+                            Log.d("TAG", e.getMessage());
+                        }
+
+                        if (u.getLastUpdated() > reacentUpdate) {
+                            reacentUpdate = u.getLastUpdated();
+                        }
+                        Log.d("TAG", "updating: " + u.toString());
+                    }
+                    SharedPreferences.Editor editor = MyApp.getContext().getSharedPreferences("TAG", MODE_PRIVATE).edit();
+                    editor.putLong("lastUpdateDate", reacentUpdate);
+                    editor.commit();
+                }
+                //return the complete student list to the caller
+                List<User> friends = AppLocalStoreDb.getLocalDatabase(MyApp.getContext()).UserDao().getAllFriends();
+
+                return friends;
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<User> users) {
+            super.onPostExecute(users);
+            friends = users;
+        }
+    }
 }
