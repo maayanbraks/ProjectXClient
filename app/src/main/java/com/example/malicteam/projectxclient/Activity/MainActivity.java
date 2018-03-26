@@ -50,13 +50,14 @@ import com.google.firebase.auth.FirebaseAuth;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private List<Event> eventsList = new LinkedList<>();
     private TextView userNameHeader;
     private TextView userEmailHeader;
     private NavigationView navigationView;
     //    private EventsViewModel eventsData = null;
     private UserViewModel currentUser = null;
     private int userId;
-    private List<Event> eventsList = new LinkedList<>();
+
     //private User myuser;
 
     @Override
@@ -70,7 +71,6 @@ public class MainActivity extends AppCompatActivity
         userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
         currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
         currentUser.init(userId, true);
-
         currentUser.getUser().observe(this, new Observer<User>() {
 
             @Override
