@@ -115,7 +115,7 @@ import android.Manifest;
 
 public class RecordingActivity extends AppCompatActivity {
 
-//    private static final String LOG_TAG = "AudioRecordTest";
+    //    private static final String LOG_TAG = "AudioRecordTest";
 //    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
 //    private static String mFileName = null;
 //
@@ -140,7 +140,7 @@ public class RecordingActivity extends AppCompatActivity {
     private int userId;
     // Requesting permission to RECORD_AUDIO
     private boolean permissionToRecordAccepted = false;
-    private String [] permissions = {Manifest.permission.RECORD_AUDIO};
+    private String[] permissions = {Manifest.permission.RECORD_AUDIO};
 
     private boolean recordingBoolean = false;
     ImageButton pauseButton;
@@ -148,12 +148,12 @@ public class RecordingActivity extends AppCompatActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode){
+        switch (requestCode) {
             case REQUEST_RECORD_AUDIO_PERMISSION:
-                permissionToRecordAccepted  = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                permissionToRecordAccepted = grantResults[0] == PackageManager.PERMISSION_GRANTED;
                 break;
         }
-        if (!permissionToRecordAccepted ) finish();
+        if (!permissionToRecordAccepted) finish();
 
     }
 
@@ -210,11 +210,10 @@ public class RecordingActivity extends AppCompatActivity {
         mRecorder.stop();
         mRecorder.release();
         mRecorder = null;
-        if (CheckMeAdmin())
-        {
+        if (CheckMeAdmin()) {
             setRecordingStatus();
         }
-        Log.d("TAG","Stop recording func");
+        Log.d("TAG", "Stop recording func");
 
         uploadFile();
         //FirebaseModel.addNewEvent(event);
@@ -226,25 +225,22 @@ public class RecordingActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording);
-        eventIdTogetIn=" ";
+        eventIdTogetIn = " ";
         userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
         mFileName = getExternalCacheDir().getAbsolutePath();
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
         StartRecording = findViewById(R.id.btnStart);
-        if (getIntent().getSerializableExtra("sendNewEvent")!=null)
-        {
+        if (getIntent().getSerializableExtra("sendNewEvent") != null) {
             event = (Event) getIntent().getSerializableExtra("sendNewEvent");
         }
-        if (getIntent().getSerializableExtra("eventidToGetIn")!=null)
-        {
-            eventIdTogetIn=getIntent().getStringExtra("eventidToGetIn");
+        if (getIntent().getSerializableExtra("eventidToGetIn") != null) {
+            eventIdTogetIn = getIntent().getStringExtra("eventidToGetIn");
         }
         //
         if (!(eventIdTogetIn.equals(" "))) //means got enter by invite
         {
             SetEventFromInvitation(eventIdTogetIn);
-        }
-        else {// entered this activity from Creating new one(NewEventActivity)
+        } else {// entered this activity from Creating new one(NewEventActivity)
             SetEventFromNewActivity();
         }
 
@@ -299,17 +295,18 @@ public class RecordingActivity extends AppCompatActivity {
 
     }
 
-    private void StopRecording(){
+    private void StopRecording() {
         //TODO stop service of recording
     }
 
-    private void SaveConversation(){
+    private void SaveConversation() {
         //TODO save pdf file
     }
+
     private boolean CheckMeAdmin() {
         if (userId != Consts.DEFAULT_UID) {
-            Log.d("TAG","userId="+userId);
-            Log.d("TAG","event.getadminID="+event.getAdminId());
+            Log.d("TAG", "userId=" + userId);
+            Log.d("TAG", "event.getadminID=" + event.getAdminId());
             if (String.valueOf(userId).equals(event.getAdminId())) {
                 //Log.d("TAG","EQUAL");
                 return true;
@@ -326,9 +323,10 @@ public class RecordingActivity extends AppCompatActivity {
         mStartRecording = !mStartRecording;
 
     }
+
     private void uploadFile() {
         Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
-        Repository.instance.saveRecord(String.valueOf(userId),mFileName, "" + event.getId(), new Model.SaveAudioListener() {
+        Repository.instance.saveRecord(String.valueOf(userId), mFileName, "" + event.getId(), new Model.SaveAudioListener() {
             @Override
             public void complete(String url) {
 //                Toast.makeText(getApplication(), "Upload as succeed" , Toast.LENGTH_SHORT).show();
@@ -362,8 +360,9 @@ public class RecordingActivity extends AppCompatActivity {
             }
         });
     }
-        public void SetEventFromInvitation(String eventid) {
-        Repository.instance.getEventById(Integer.valueOf(eventid),new FirebaseModel.FirebaseCallback<List<Event>>() {
+
+    public void SetEventFromInvitation(String eventid) {
+        Repository.instance.getEventById(Integer.valueOf(eventid), new FirebaseModel.FirebaseCallback<List<Event>>() {
 
             @Override
             public void onComplete(List<Event> EventList) {
@@ -403,6 +402,7 @@ public class RecordingActivity extends AppCompatActivity {
 
 
     }
+
     public void SetActivity() {
         Button PlayRecording = findViewById(R.id.btnStop);
         TextView _eventTitle = findViewById(R.id.recording_title);
@@ -417,13 +417,13 @@ public class RecordingActivity extends AppCompatActivity {
         Date.setFocusableInTouchMode(false);
         partici.setText(event.getUsersIds());
         //Log.d("TAG","eventid="+event.getId());
-      //  String setfilename="/outalk"+String.valueOf(event.getId()+"/");
-     //   setfilename+=userId;
-       // mFileName += setfilename+".3gp";
-       // Log.d("TAG",mFileName);
+        //  String setfilename="/outalk"+String.valueOf(event.getId()+"/");
+        //   setfilename+=userId;
+        // mFileName += setfilename+".3gp";
+        // Log.d("TAG",mFileName);
         mFileName += "/outalk" + event.getId() + ".3gp";
 
-        if(!(CheckMeAdmin())){
+        if (!(CheckMeAdmin())) {
             StartRecording.setText("Recording...");
             StartRecording.setClickable(false);
             PlayRecording.setClickable(false);
@@ -432,6 +432,7 @@ public class RecordingActivity extends AppCompatActivity {
         StartRecordAll();
 
     }
+
     public void SetEventFromNewActivity() {
         SetActivity();
 
@@ -447,33 +448,37 @@ public class RecordingActivity extends AppCompatActivity {
         mStartRecording = !mStartRecording;
         uploadFile();
     }
+
     public void CheckRecordingStatus() {
         Repository.instance.getEventRecordingStatus(event.getId(), new FirebaseModel.FirebaseCallback<List<Boolean>>() {
             @Override
             public void onComplete(List<Boolean> data) {
-                if ((data.get(0)==false) && (!(CheckMeAdmin()))) {
-                    Log.d("TAG","Stop recording byadmin func");
+                if ((data.get(0) == false) && (!(CheckMeAdmin()))) {
+                    Log.d("TAG", "Stop recording byadmin func");
                     StopRecordingByAdmin();
-            }}
+                }
+            }
+
             @Override
             public void onCancel() {
 
             }
         });
     }
+
     public void setRecordingStatus() {
-          Log.d("TAG","SetRecordingStatus func in recordingacitivty");
-                Repository.instance.setRecodrdingStatus(String.valueOf(event.getId()), new FirebaseModel.FirebaseCallback() {
-                    @Override
-                    public void onComplete(Object data) {
+        Log.d("TAG", "SetRecordingStatus func in recordingacitivty");
+        Repository.instance.setRecodrdingStatus(String.valueOf(event.getId()), new FirebaseModel.FirebaseCallback() {
+            @Override
+            public void onComplete(Object data) {
 
-                    }
+            }
 
-                    @Override
-                    public void onCancel() {
+            @Override
+            public void onCancel() {
 
-                    }
-                });
+            }
+        });
 
     }
 }
