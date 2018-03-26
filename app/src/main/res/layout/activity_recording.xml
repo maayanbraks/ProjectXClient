@@ -4,22 +4,22 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.malicteam.projectxclient.Activity.RecordingActivity">
+    tools:context="com.example.malicteam.projectxclient.Activity.RecordingActivity"
+    android:background="@color/appBackground">
 
     <TextView
         android:id="@+id/recording_title"
-        android:layout_width="146dp"
-        android:layout_height="37dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="44dp"
-        android:gravity="center"
-        android:text="TextView"
-        android:textSize="20dp"
+        android:layout_marginTop="24dp"
+        android:text="Title"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.441"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recording_date" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="30sp"
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/recording_date"
