@@ -72,7 +72,6 @@ public class MainActivity extends AppCompatActivity
         currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
         currentUser.init(userId, true);
         currentUser.getUser().observe(this, new Observer<User>() {
-
             @Override
             public void onChanged(@Nullable User user) {
                 if (user != null) {
@@ -278,10 +277,12 @@ public class MainActivity extends AppCompatActivity
                 new FirebaseModel.FirebaseCallback<Bitmap>() {
                     @Override
                     public void onComplete(Bitmap data) {
-                        if (data != null)
+                        try {
                             profilePic.setImageBitmap(data);
-                        else
+                        }
+                        catch (Exception e) {
                             profilePic.setImageResource(R.drawable.outalk_logo);
+                        }
                     }
 
                     @Override
@@ -406,7 +407,7 @@ public class MainActivity extends AppCompatActivity
         public View getView(int i, View view, ViewGroup viewGroup) {
 
             if (view == null) {
-                view = getLayoutInflater().inflate(R.layout.records_list_row, null);
+                view = getLayoutInflater().inflate(R.layout.records_list_row, viewGroup, false);
             }
             if (i < eventsList.size()) {
                 Event event = eventsList.get(i);

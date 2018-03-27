@@ -94,9 +94,11 @@
 //}
 package com.example.malicteam.projectxclient.Activity;
 
+import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -133,17 +135,30 @@ public class NewEventActivity extends AppCompatActivity {
     private ImageButton fab;
     private Event event;
     private String invitedPpl;
-    boolean IsInEventinvites = false;
+    boolean thereIsParti = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         UsersInvites = " ";
         invitedPpl = new String(" ");
         // _currectUser = (User) getIntent().getSerializableExtra("CurrectUser");
-        event = new Event(null, null, null, null, null, null, null);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_event);
+
         userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
+        currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
+        currentUser.init(userId, true);
+        currentUser.getUser().observe(this, new Observer<User>() {
+            @Override
+            public void onChanged(@Nullable User user) {
+                if (user != null) {
+                    //update details
+                    userId = user.getId();
+                } else {
+                    finish();
+                }
+            }
+        });
         currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
         //currentUser.init(userId);
         startRecord = (Button) findViewById(R.id.new_event_start);
@@ -158,6 +173,7 @@ public class NewEventActivity extends AppCompatActivity {
         startRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                boolean valid = true;
                 EditText _name = findViewById(R.id.new_event_title);
                 EditText _desc = findViewById(R.id.new_event_description);
                 EditText _part = findViewById(R.id.new_event_participants);
@@ -166,29 +182,58 @@ public class NewEventActivity extends AppCompatActivity {
                 String title = _name.getText().toString();
                 String parti = _part.getText().toString();
 
-                Time time = new Time();
-                time.setToNow();
-//                event.setTitle(title);
-//                event.setDescription(description);
-//                event.setAdminId(_currectUser.getId());
+                if (title == null || title.equals("")) {
+                    Toast.makeText(NewEventActivity.this, "Enter Title", Toast.LENGTH_SHORT).show();
+                    valid = false;
+                }
+                else if (description == null || description.equals("")) {
+                    Toast.makeText(NewEventActivity.this, "Enter Descriptio", Toast.LENGTH_SHORT).show();
+                    valid = false;
+                }
+                else if (!thereIsParti){
+                    Toast.makeText(NewEventActivity.this, "You cant Record alone!", Toast.LENGTH_SHORT).show();
+                    valid = false;
+                }
 
-//                event.setDate(time.hour + ":" + time.minute + ":" + time.second);
-                event = new Event(null, title, UsersInvites, description, "" + userId, time.hour + ":" + time.minute + ":" + time.second, null);
-                sendInvites("" + event.getId());
-                Repository.instance.addEvent(event);
-                Intent intent = new Intent(getApplicationContext(), RecordingActivity.class);
-                intent.putExtra("sendNewEvent", event);
-                intent.putExtra("currectuser", userId);
-                int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
-                intent.putExtra(Consts.USER_ID, id);
-                startActivity(intent);
-                finish();
+                else if(valid) {
+                    Time time = new Time();
+                    time.setToNow();
+                    event = new Event(null, title, UsersInvites, description, "" + userId, time.hour + ":" + time.minute + ":" + time.second, null);
+                    sendInvites("" + event.getId());
+                    Repository.instance.addEvent(event);
+                    Intent intent = new Intent(NewEventActivity.this, RecordingActivity.class);
+                    intent.putExtra("sendNewEvent", event);
+                    intent.putExtra("currectuser", userId);
+                    int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+                    intent.putExtra(Consts.USER_ID, id);
+
+                    try {
+                        currentUser.getUser().getValue().addEventToList(Integer.valueOf(event.getId()));
+                        //update the userDatabase
+                        Repository.instance.setEventList(currentUser.getUser().getValue(), new FirebaseModel.FirebaseCallback() {
+                            @Override
+                            public void onComplete(Object data) {
+                                startActivity(intent);
+                                finish();
+                            }
+
+                            @Override
+                            public void onCancel() {
+
+                            }
+                        });
+                    }catch (Exception e){
+                        Log.d("sdf", "afdasdf");
+                    }
+
+                }
             }
         });
-        fab = (ImageButton)findViewById(R.id.addInviteButton);
 
+        fab = (ImageButton) findViewById(R.id.addInviteButton);
         fab.setOnClickListener(new View.OnClickListener() {
             User user;
+
             @Override
             public void onClick(View v) {
                 String parti = _part.getText().toString();
@@ -196,19 +241,19 @@ public class NewEventActivity extends AppCompatActivity {
                 FirebaseModel.isExistUser(User.generateId(parti), new FirebaseModel.FirebaseCallback<Integer>() {
                     @Override
                     public void onComplete(Integer id) {
-                        if (id >0) {// if found user
-                            Log.d("TAG","Found id,");
+                        if (id > 0) {// if found user
+                            Log.d("TAG", "Found id,");
                             Repository.instance.getUserById(id, new FirebaseModel.FirebaseCallback<List<User>>() {
                                 @Override
                                 public void onComplete(List<User> data) {
-                                    Log.d("TAG","data size=,"+data.size());
-                                    if (data.size()>0)
-                                   user=data.get(0);
-                                    Toast.makeText(getApplication(), "Sending invite to" + user.getFirstName(), Toast.LENGTH_SHORT).show();
+                                    Log.d("TAG", "data size=," + data.size());
+                                    if (data.size() > 0)
+                                        user = data.get(0);
+                                    Toast.makeText(NewEventActivity.this, "Sending invite to" + user.getFirstName(), Toast.LENGTH_SHORT).show();
                                     if (invitedPpl.equals(" ")) { // if empty
-                                        invitedPpl =  user.getFirstName();
+                                        invitedPpl = user.getFirstName();
                                     } else {
-                                        invitedPpl = invitedPpl + "," +  user.getFirstName();
+                                        invitedPpl = invitedPpl + "," + user.getFirstName();
                                     }
                                     InviteTextViewEdit();
 
@@ -225,10 +270,7 @@ public class NewEventActivity extends AppCompatActivity {
                             });
 
 
-
-
-                        }
-                        else
+                        } else
                             Toast.makeText(getApplication(), "Cant find user," + parti, Toast.LENGTH_SHORT).show();
                     }
 
@@ -241,7 +283,6 @@ public class NewEventActivity extends AppCompatActivity {
         });
 
     }
-
 
 
     public void onRadioButtonClicked(View view) {
@@ -262,6 +303,7 @@ public class NewEventActivity extends AppCompatActivity {
     }
 
     public void InviteTextViewEdit() {
+        thereIsParti = true;
         TextView _invites = findViewById(R.id.newEvent_Invites);
 
         _invites.setText("Participats:" + invitedPpl);
@@ -279,18 +321,18 @@ public class NewEventActivity extends AppCompatActivity {
 
     public void sendInvites(String eventId) {
 
-        Log.d("TAG","usrinvites="+UsersInvites);
+        Log.d("TAG", "usrinvites=" + UsersInvites);
         String invites = UsersInvites;
         String[] items = invites.split(",");
         for (String item : items) {
             // Log.d("TAG","Myemail:"+Mymail);
             ///  Model.Invite invite= new Model.Invite(eventId,item,Mymail);
             ///     Model.Invite
-            Invite invite= new Invite(eventId,item,""+userId);
+            Invite invite = new Invite(eventId, item, "" + userId);
             Repository.instance.addNewInvite(invite, new FirebaseModel.FirebaseCallback<Invite>() {
                 @Override
                 public void onComplete(Invite invite) {
-                    Log.d("TAG","succeed adding new invite.");
+                    Log.d("TAG", "succeed adding new invite.");
                 }
 
                 @Override

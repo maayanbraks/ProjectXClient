@@ -383,16 +383,20 @@ public class FirebaseModel {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Map<String, Object> value = (Map<String, Object>) dataSnapshot.getValue();
-                String eventId = (String) value.get("ID");
-                String eventName = (String) value.get("Title");
-                String desc = (String) value.get("Description");
-                String admin = (String) value.get("adminId");
-                String Date = (String) value.get("Date");
-                String usersList = (String) value.get("UsersList");
-                Event event = new Event(null, eventName, usersList, desc, admin, Date, eventId, null);
-                String RecordingStatus = (String) value.get("RecordingStatus");
-                userList.add(event);
-                callback.onComplete(userList);
+                if (dataSnapshot.getValue() != null) {
+                    String eventId = (String) value.get("ID");
+                    String eventName = (String) value.get("Title");
+                    String desc = (String) value.get("Description");
+                    String admin = (String) value.get("adminId");
+                    String Date = (String) value.get("Date");
+                    String usersList = (String) value.get("UsersList");
+                    Event event = new Event(null, eventName, usersList, desc, admin, Date, eventId, null);
+                    String RecordingStatus = (String) value.get("RecordingStatus");
+                    userList.add(event);
+                    callback.onComplete(userList);
+                }
+                else
+                    callback.onCancel();
             }
 
             @Override
