@@ -33,9 +33,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/progress_friendDetails">
 
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+
 
             <TextView
                 android:id="@+id/firstName_friendDetails"
@@ -46,12 +44,7 @@
                 android:text="FirstName"
                 android:textSize="24dp" />
 
-        </android.support.design.widget.TextInputLayout>
 
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/lastName_friendDetails"
@@ -63,11 +56,7 @@
                 android:text="Last Name"
                 android:textSize="24dp" />
 
-        </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/email_friendDetails"
@@ -79,11 +68,6 @@
                 android:text="Email"
                 android:textSize="18dp" />
 
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
 
             <TextView
                 android:id="@+id/phoneNumber_friendDetails"
@@ -94,7 +78,6 @@
                 android:inputType="phone"
                 android:text="Phone"
                 android:textSize="18dp" />
-        </android.support.design.widget.TextInputLayout>
     </LinearLayout>
 
 

@@ -4,56 +4,49 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.malicteam.projectxclient.Activity.EventDetails"
-    android:background="@color/appBackground">
+    android:background="@color/appBackground"
+    tools:context="com.example.malicteam.projectxclient.Activity.EventDetails">
 
-    <RelativeLayout
+
+    <LinearLayout
+        android:id="@+id/detailsLinearLayout_friendDetails"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/progress_friendDetails">
 
         <TextView
             android:id="@+id/event_title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
+            android:layout_marginTop="24dp"
+            android:ems="10"
             android:text="event_title"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            tools:layout_editor_absoluteX="154dp"
-            tools:layout_editor_absoluteY="25dp" />
-
+            android:textSize="24dp" />
 
         <TextView
             android:id="@+id/details_date"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/event_title"
+            android:layout_marginTop="24dp"
+            android:ems="10"
             android:text="TextView"
-            tools:layout_editor_absoluteX="16dp"
-            tools:layout_editor_absoluteY="52dp" />
+            android:textSize="24dp" />
 
         <TextView
             android:id="@+id/details_descp"
-            android:layout_width="wrap_content"
-            android:layout_height="17dp"
-
-            android:layout_alignParentStart="true"
-            android:layout_alignTop="@+id/details_date"
-            android:layout_marginTop="27dp"
-            android:text="Descripton:" />
-
-        <TextView
-            android:id="@+id/details_partici"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@+id/details_descp"
-            android:layout_marginTop="35dp"
-            android:text="Participats:" />
+            android:layout_marginTop="10dp"
+            android:ems="10"
+            android:inputType="phone"
+            android:text="Descripton:"
+            android:textSize="18dp" />
 
         <Button
             android:id="@+id/details_open"
@@ -64,7 +57,16 @@
             android:layout_marginBottom="80dp"
             android:text="open  conversetion" />
 
+        <TextView
+            android:id="@+id/details_partici"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@+id/details_descp"
+            android:layout_marginTop="35dp"
+            android:text="Participats:" />
 
-    </RelativeLayout>
+    </LinearLayout>
+
 
 </android.support.constraint.ConstraintLayout>

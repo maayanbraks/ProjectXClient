@@ -1,7 +1,5 @@
 package com.example.malicteam.projectxclient.Activity;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -9,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.telecom.Call;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -22,128 +19,130 @@ import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Model;
 import com.example.malicteam.projectxclient.Model.Repository;
-import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.R;
 
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 
 import android.Manifest;
 
-
-//public class RecordingActivity extends AppCompatActivity {
-//    private boolean recordingBoolean = false;
-//    String eventIdTogetIn;
-//    ImageButton pauseButton;
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_recording);
-//
-//        pauseButton = (ImageButton) findViewById(R.id.pause_button);
-//        Intent intent = getIntent();
-//        TextView eventTitle = (TextView) findViewById(R.id.title_recording);
-//        eventIdTogetIn= getIntent().getStringExtra("eventidToGetIn");
-//        if (eventIdTogetIn!=null) {
-//            eventTitle.setText("Title from invitation");
-//        }
-//
-//        TextView description = (TextView)findViewById((R.id.description_recording));
-//        try {
-//            eventTitle.setText(intent.getStringExtra(Consts.EVENT_TITLE));
-//            description.setText(intent.getStringExtra(Consts.EVENT_DESCRIPTION));
-//        }catch (Exception e)
-//        {
-//            Log.d("taggg","asdfa");
-//        }
-//        //Date & time
-//        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-//        Date date = new Date();
-//        String time[] = dateFormat.format(date).split(" "); //16/01/2018 12:08
-//        TextView startTime = findViewById(R.id.startTime_recording);
-//        TextView startDate = findViewById(R.id.date_recording);
-//        startTime.setText(time[1]);
-//        startDate.setText(time[0]);
-//
-//        playOrPause();
-//
-//        pauseButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                //TODO pause recording service - possible to save data also
-//                playOrPause();
-//            }
-//        });
-//
-//        ImageButton saveButton = (ImageButton) findViewById(R.id.save_button);
-//        saveButton.setOnClickListener(new View.OnClickListener() {
-//            public void onClick(View v) {
-//                StopRecording();
-//            }
-//        });
-//
-//    }
-//
-//    private void playOrPause(){
-//
-//        //Sisso's Recored
-//        TextView onAir = findViewById(R.id.onAir_recording);
-//        if(!recordingBoolean){//if not -> start record
-//            Toast.makeText(getApplicationContext(), "Start record", Toast.LENGTH_SHORT).show();
-//            pauseButton.setImageResource(android.R.drawable.ic_media_pause);
-//            onAir.setVisibility(View.VISIBLE);
-//            recordingBoolean = true;
-//        }
-//        else{
-//            Toast.makeText(getApplicationContext(), "Pause Record", Toast.LENGTH_SHORT).show();
-//            pauseButton.setImageResource(android.R.drawable.ic_media_play);
-//            onAir.setVisibility(View.INVISIBLE);
-//            recordingBoolean = false;
-//        }
-//    }
-//
-//    private void StopRecording(){
-//        //Sisso's Records
-//        //TODO send content data and decode it to text
-//        Toast.makeText(getApplicationContext(), "Stop Recording", Toast.LENGTH_SHORT).show();
-//        finish();
-//    }
-//}
-
-
 public class RecordingActivity extends AppCompatActivity {
 
-    //    private static final String LOG_TAG = "AudioRecordTest";
-//    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
-//    private static String mFileName = null;
-//
-//    private RecordButton mRecordButton = null;
-//    private MediaRecorder mRecorder = null;
-//
-//    private PlayButton   mPlayButton = null;
-//    private MediaPlayer mPlayer = null;
-//    private boolean permissionToRecordAccepted = false;
-    boolean mStartPlaying = true;
-    String eventIdTogetIn;
-    private Button StartRecording;
-    boolean mStartRecording = true;
+    private boolean mStartPlaying = true;
+    private String eventIdTogetIn;
+    private ImageButton recordingButton;
+    private boolean mStartRecording = true;
     private static final String LOG_TAG = "AudioRecordTest";
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private static String mFileName = null;
+    private ImageButton playingButton;
 
     private MediaRecorder mRecorder = null;
     private Event event;
     private MediaPlayer mPlayer = null;
-    private String invitedPpl;
     private int userId;
-    // Requesting permission to RECORD_AUDIO
     private boolean permissionToRecordAccepted = false;
     private String[] permissions = {Manifest.permission.RECORD_AUDIO};
 
-    private boolean recordingBoolean = false;
-    ImageButton pauseButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_recording);
+
+        eventIdTogetIn = " ";
+        userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
+        mFileName = getExternalCacheDir().getAbsolutePath();
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
+
+        TextView backButton = (TextView) findViewById(R.id.back_btn_recording);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(!mStartPlaying)
+                    stopPlaying();
+                if(!mStartRecording)
+                    recordOrSave();
+
+                finish();
+            }
+        });
+
+        recordingButton = (ImageButton) findViewById(R.id.btnStop);
+        // Set layout only if admin or not
+        recordingButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (CheckMeAdmin()) {
+                    recordOrSave();
+                }
+            }
+        });
+
+        playingButton = (ImageButton) findViewById(R.id.btnStart);
+        playingButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (mStartPlaying && CheckMeAdmin()) {
+                            playOrPause();
+                        }
+                    }
+                });
+
+        if (getIntent().getSerializableExtra("sendNewEvent") != null) {
+            event = (Event) getIntent().getSerializableExtra("sendNewEvent");
+        }
+        if (getIntent().getSerializableExtra("eventidToGetIn") != null) {
+            eventIdTogetIn = getIntent().getStringExtra("eventidToGetIn");
+        }
+        //
+        if (!(eventIdTogetIn.equals(" "))) //means got enter by invite
+        {
+            SetEventFromInvitation(eventIdTogetIn);
+        } else {// entered this activity from Creating new one(NewEventActivity)
+            SetEventFromNewActivity();
+        }
+    }
+
+
+    private void playOrPause() {
+        //Sisso's Recored
+        /*
+        //Maayan Note: I added && mStartRecording for prevent play and hear together.
+         */
+        if (mStartPlaying && mStartRecording) {//if to start playing
+            playingButton.setImageResource(android.R.drawable.ic_media_pause);
+            mStartPlaying = false;
+            startPlaying();
+        } else{
+            recordingButton.setImageResource(android.R.drawable.ic_media_play);
+            mStartPlaying = true;
+            stopPlaying();
+        }
+    }
+
+    private void recordOrSave() {
+        //Sisso's Recored
+        TextView onAir = findViewById(R.id.onAir_recording);
+        if (mStartRecording) {//if to start record
+            recordingButton.setImageResource(android.R.drawable.ic_menu_save);
+            onAir.setVisibility(View.VISIBLE);
+            mStartRecording = false;
+            playingButton.setImageResource(android.R.drawable.ic_media_play);
+            playingButton.setClickable(false);
+            playingButton.setVisibility(View.INVISIBLE);
+            startRecording();
+        } else {
+            recordingButton.setImageResource(android.R.drawable.ic_btn_speak_now);
+            mStartRecording = true;
+            stopRecording();
+            onAir.setVisibility(View.INVISIBLE);
+            playingButton.setClickable(true);
+            playingButton.setVisibility(View.VISIBLE);
+            uploadFile();
+        }
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -154,8 +153,8 @@ public class RecordingActivity extends AppCompatActivity {
                 break;
         }
         if (!permissionToRecordAccepted) finish();
-
     }
+
 
     private void onRecord(boolean start) {
         if (start) {
@@ -172,6 +171,7 @@ public class RecordingActivity extends AppCompatActivity {
             stopPlaying();
         }
     }
+
 
     private void startPlaying() {
         mPlayer = new MediaPlayer();
@@ -220,80 +220,6 @@ public class RecordingActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_recording);
-        eventIdTogetIn = " ";
-        userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
-        mFileName = getExternalCacheDir().getAbsolutePath();
-        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
-        StartRecording = findViewById(R.id.btnStart);
-        if (getIntent().getSerializableExtra("sendNewEvent") != null) {
-            event = (Event) getIntent().getSerializableExtra("sendNewEvent");
-        }
-        if (getIntent().getSerializableExtra("eventidToGetIn") != null) {
-            eventIdTogetIn = getIntent().getStringExtra("eventidToGetIn");
-        }
-        //
-        if (!(eventIdTogetIn.equals(" "))) //means got enter by invite
-        {
-            SetEventFromInvitation(eventIdTogetIn);
-        } else {// entered this activity from Creating new one(NewEventActivity)
-            SetEventFromNewActivity();
-        }
-
-//         mFileName += "/outalk" + event.getId() + ".3gp";
-
-        invitedPpl = getIntent().getStringExtra("participatsbyName");
-        // LinearLayout ll = new LinearLayout(this);
-        // mRecordButton = new RecordButton(this);
-
-        // Set layout if admin or not/
-
-
-        StartRecording.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onRecord(mStartRecording);
-                if (CheckMeAdmin()) {
-                    if ((mStartRecording)) {
-                        StartRecording.setText("Stop recording");
-                        uploadFile();
-
-                    } else {
-                        StartRecording.setText("Start recording");
-                    }
-                    mStartRecording = !mStartRecording;
-                }
-            }
-        });
-        Button PlayRecording = findViewById(R.id.btnStop);
-        PlayRecording.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onPlay(mStartPlaying);
-                if ((mStartPlaying) && (CheckMeAdmin())) {
-                    PlayRecording.setText("Stop playing");
-                } else {
-                    PlayRecording.setText("Start playing");
-                }
-                mStartPlaying = !mStartPlaying;
-            }
-        });
-        //
-
-
-        TextView _eventTitle = findViewById(R.id.recording_title);
-        TextView Date = findViewById(R.id.recording_date);
-        TextView partici = findViewById(R.id.parti);
-//        _eventTitle.setText(event.getTitle());
-//        Date.setText(event.getDate());
-//        partici.setText("Participats:" + event.getUsersIds());
-
-
-    }
 
     private void StopRecording() {
         //TODO stop service of recording
@@ -318,12 +244,6 @@ public class RecordingActivity extends AppCompatActivity {
         return false;
     }
 
-    private void StartRecordAll() {
-        onRecord(mStartRecording);
-        mStartRecording = !mStartRecording;
-
-    }
-
     private void uploadFile() {
         Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
         Repository.instance.saveRecord(String.valueOf(userId), mFileName, "" + event.getId(), new Model.SaveAudioListener() {
@@ -337,17 +257,6 @@ public class RecordingActivity extends AppCompatActivity {
             public void fail() {
                 Toast.makeText(getApplication(), "Upload failed.", Toast.LENGTH_SHORT).show();
             }
-//            @Override
-//            public void complete(String url) {
-//                Toast.makeText(getApplication(), "Upload as succeed" , Toast.LENGTH_SHORT).show();
-//                event.setRecordURL(url);
-//            }
-//
-//            @Override
-//            public void fail() {
-//                Toast.makeText(getApplication(), "Upload failed." , Toast.LENGTH_SHORT).show();
-//            }
-//        }),new FirebaseModel.Callback<asd>();
         }, new FirebaseModel.FirebaseCallback<Boolean>() {
             @Override
             public void onComplete(Boolean data) {
@@ -404,32 +313,25 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
     public void SetActivity() {
-        Button PlayRecording = findViewById(R.id.btnStop);
-        TextView _eventTitle = findViewById(R.id.recording_title);
-        TextView Date = findViewById(R.id.recording_date);
-        TextView partici = findViewById(R.id.parti);
-        StartRecording = findViewById(R.id.btnStart);
-        _eventTitle.setText(event.getTitle());
-        Date.setText(event.getDate());
-        Date.setFocusable(false);
-        Date.setEnabled(false);
-        Date.setClickable(false);
-        Date.setFocusableInTouchMode(false);
+        recordingButton = (ImageButton) findViewById(R.id.btnStop);
+        TextView eventTitle = findViewById(R.id.recording_title);
+        TextView partici = findViewById(R.id.participants_recording);
+        playingButton = findViewById(R.id.btnStart);
+        eventTitle.setText(event.getTitle());
+        String time[] = event.getDate().split(" "); //16/01/2018 12:08
+        TextView startTime = findViewById(R.id.recording_date);
+        TextView startDate = findViewById(R.id.recording_time);
+        startTime.setText(time[1]);
+        startDate.setText(time[0]);
         partici.setText(event.getUsersIds());
-        //Log.d("TAG","eventid="+event.getId());
-        //  String setfilename="/outalk"+String.valueOf(event.getId()+"/");
-        //   setfilename+=userId;
-        // mFileName += setfilename+".3gp";
-        // Log.d("TAG",mFileName);
         mFileName += "/outalk" + event.getId() + ".3gp";
 
         if (!(CheckMeAdmin())) {
-            StartRecording.setText("Recording...");
-            StartRecording.setClickable(false);
-            PlayRecording.setClickable(false);
+            recordingButton.setClickable(false);
+            playingButton.setClickable(false);
 
         }
-        StartRecordAll();
+        recordOrSave();
 
     }
 
@@ -441,12 +343,8 @@ public class RecordingActivity extends AppCompatActivity {
     public void StopRecordingByAdmin() {
         //notify user about that
         Toast.makeText(getApplication(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
-        StartRecording = findViewById(R.id.btnStart);
-        StartRecording.setText("Record has stop");
+        playOrPause();
         //stop recording...
-        stopRecording();
-        mStartRecording = !mStartRecording;
-        uploadFile();
     }
 
     public void CheckRecordingStatus() {

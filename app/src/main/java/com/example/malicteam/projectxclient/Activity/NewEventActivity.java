@@ -105,6 +105,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -129,9 +130,9 @@ public class NewEventActivity extends AppCompatActivity {
     private UserViewModel currentUser = null;
     String UsersInvites;
     private Button startRecord;
-    FloatingActionButton fab;
-    Event event;
-    String invitedPpl;
+    private ImageButton fab;
+    private Event event;
+    private String invitedPpl;
     boolean IsInEventinvites = false;
 
     @Override
@@ -181,9 +182,10 @@ public class NewEventActivity extends AppCompatActivity {
                 int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
                 intent.putExtra(Consts.USER_ID, id);
                 startActivity(intent);
+                finish();
             }
         });
-        fab = findViewById(R.id.fab);
+        fab = (ImageButton)findViewById(R.id.addInviteButton);
 
         fab.setOnClickListener(new View.OnClickListener() {
             User user;
