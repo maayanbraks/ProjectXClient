@@ -173,9 +173,8 @@ public class Repository {
             }
         });
     }
-    public void getEvents(int eventid, FirebaseModel.FirebaseCallback<List<Event>> firebaseCallback) {
+    public void getEvents(int userId, FirebaseModel.FirebaseCallback<List<Event>> firebaseCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
-        int userId = User.generateId(auth.getCurrentUser().getEmail());
         FirebaseModel.getEvents(userId, new FirebaseModel.FirebaseCallback<List<Event>>() {
             @Override
             public void onComplete(List<Event> data) {

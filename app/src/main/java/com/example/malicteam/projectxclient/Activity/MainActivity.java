@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity
     private UserViewModel currentUser = null;
     private int userId;
     private EventAdapter adapter;
+    private View headerLayout;
 
     //private User myuser;
 
@@ -67,10 +68,53 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        final ListView eventListView = (ListView) findViewById(R.id._listOfEvents);
+        ListView eventListView = (ListView) findViewById(R.id._listOfEvents);
         adapter = new EventAdapter();
         eventListView.setAdapter(adapter);
         userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
+
+        //invitation code:
+        Repository.instance.getInvite("" + userId, new FirebaseModel.FirebaseCallback<Invite>() {
+            @Override
+            public void onComplete(Invite invite) {
+                Invitation(invite);
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        }, new FirebaseModel.GetInvitation() {
+            @Override
+            public void onComplete(Invite invite) {
+                Invitation(invite);
+            }
+        });
+        //End of - invitation code
+
+        //Get Events
+        Repository.instance.getEvents(userId, new FirebaseModel.FirebaseCallback<List<Event>>() {
+            @Override
+            public void onComplete(List<Event> data) {
+                eventsList = data;
+                if (adapter != null)
+                    adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancel() {
+            }
+        });
+
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        headerLayout = navigationView.getHeaderView(0);
+        userNameHeader = (TextView) (headerLayout.findViewById(R.id.userName_head));
+        userEmailHeader = (TextView) (headerLayout.findViewById(R.id.userMail_head));
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
         currentUser.init(userId, true);
         currentUser.getUser().observe(this, new Observer<User>() {
@@ -91,15 +135,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        View headerLayout = navigationView.getHeaderView(0);
-        userNameHeader = (TextView) (headerLayout.findViewById(R.id.userName_head));
-        userEmailHeader = (TextView) (headerLayout.findViewById(R.id.userMail_head));
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         //Permission
         boolean hasPermission = (ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
@@ -108,28 +143,6 @@ public class MainActivity extends AppCompatActivity
             ActivityCompat.requestPermissions(this, new String[]{
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, Consts.REQUEST_WRITE_STORAGE);
         }
-
-//invitation code:
-        Repository.instance.getInvite("" + userId, new FirebaseModel.FirebaseCallback<Invite>() {
-            @Override
-            public void onComplete(Invite invite) {
-                Invitation(invite);
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-        }, new FirebaseModel.GetInvitation() {
-            @Override
-            public void onComplete(Invite invite) {
-                Invitation(invite);
-            }
-        });
-        //End of - invitation code
-
-        //Get Events
-        refreshList();
 
         eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -281,7 +294,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void updateProfilePicture(String url) {
-        ImageView profilePic = findViewById(R.id.userPic_head);
+        ImageView profilePic = (ImageView)headerLayout.findViewById(R.id.userPic_head);
         Repository.instance.getProfilePicture(
                 new FirebaseModel.FirebaseCallback<Bitmap>() {
                     @Override

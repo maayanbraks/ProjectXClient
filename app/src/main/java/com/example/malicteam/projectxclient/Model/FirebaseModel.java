@@ -113,6 +113,7 @@ public class FirebaseModel {
             }
         });
     }
+
     public static void addUser(User user, FirebaseCallback<User> firebaseCallback) {
         try {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -140,7 +141,7 @@ public class FirebaseModel {
 
     public static void setRecordingStatus(String eventId, FirebaseCallback<Boolean> firebaseCallback) {
         try {
-            Log.d("TAG","In setrecordingstatus func");
+            Log.d("TAG", "In setrecordingstatus func");
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference("Events").child(eventId).child("RecordingStatus");
             Map<String, Object> value = new HashMap<>();
@@ -190,7 +191,6 @@ public class FirebaseModel {
         myRef.removeValue();
         callback.onComplete(null);
     }
-
 
 
     //User Setters
@@ -293,6 +293,63 @@ public class FirebaseModel {
         });
     }
 
+    public static void getEvents(int userId, final FirebaseCallback<List<Event>> firebaseCallback) {
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId)).child("EventsList");
+        final List<Integer>[] ids = new List[]{new LinkedList<Integer>()};
+        idsListRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getValue() == null)
+                    ids[0] = new LinkedList<Integer>();
+                else {
+                    ids[0] = decodeListFromString((String) dataSnapshot.getValue());
+
+                    DatabaseReference myRef = database.getReference("Events");
+                    myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            List<Event> finalList = new LinkedList<>();
+                            for (DataSnapshot snap : dataSnapshot.getChildren()) {
+                                Map<String, Object> value = (Map<String, Object>) snap.getValue();
+                                int id = 0;
+                                try {
+                                    id = Integer.parseInt(snap.getKey());
+                                }catch (Exception e){
+                                    //this is invites
+                                }
+
+                                if (ids[0] != null && ids[0].size() > 0 && ids[0].contains(id)) {
+                                    String eventName = (String) value.get("Title");
+                                    String desc = (String) value.get("Description");
+                                    String admin = (String) value.get("adminId");
+                                    String Date = (String) value.get("Date");
+                                    String usersList = (String) value.get("UsersList");
+
+                                    String RecordingStatus = (String) value.get("RecordingStatus");
+
+                                    finalList.add(new Event(null, eventName, usersList, desc, admin, Date, id, null));
+                                }
+                            }
+                            firebaseCallback.onComplete(finalList);
+                        }
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                            firebaseCallback.onCancel();
+                        }
+                    });
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                firebaseCallback.onCancel();
+            }
+        });
+    }
+
+
     public static void getFriends(int userId, final FirebaseCallback<List<User>> firebaseCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId)).child("FriendsList");
@@ -382,22 +439,18 @@ public class FirebaseModel {
         idsListRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                try {
-                    Map<String, Object> value = (Map<String, Object>) dataSnapshot.getValue();
-                    String eventId = (String) value.get("ID");
-                    String eventName = (String) value.get("Title");
-                    String desc = (String) value.get("Description");
-                    String admin = (String) value.get("adminId");
-                    String Date = (String) value.get("Date");
-                    String usersList = (String) value.get("UsersList");
-                    Event event = new Event(null, eventName, usersList, desc, admin, Date, eventId, null);
-                    String RecordingStatus = (String) value.get("RecordingStatus");
-                    userList.add(event);
-                    callback.onComplete(userList);
-                }
-                catch (Exception e) {
-                    callback.onCancel();
-                }
+                Map<String, Object> value = (Map<String, Object>) dataSnapshot.getValue();
+                String eventId = (String) value.get("ID");
+                String eventName = (String) value.get("Title");
+                String desc = (String) value.get("Description");
+                String admin = (String) value.get("adminId");
+                String Date = (String) value.get("Date");
+                String usersList = (String) value.get("UsersList");
+                Event event = new Event(null, eventName, usersList, desc, admin, Date, eventId, null);
+                String RecordingStatus = (String) value.get("RecordingStatus");
+                userList.add(event);
+                callback.onComplete(userList);
+
 
             }
 
@@ -417,8 +470,7 @@ public class FirebaseModel {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Map<String, Object> value = (Map<String, Object>) dataSnapshot.getValue();
                 String recordingStatus = (String) value.get("RecordingStatus");
-                if (recordingStatus.equals("false"))
-                {
+                if (recordingStatus.equals("false")) {
                     checkStatus.add(false);
                     callback.onComplete(checkStatus);
                 }
@@ -544,15 +596,14 @@ public class FirebaseModel {
         // value.put("ContentUrl", event.getContentUrl());
         value.put("AdminId", event.getAdminId());
         value.put("UsersList", event.getUsersIds());
-        if (event.isRecording()==true) {
-            value.put("RecordingStatus","true");
+        if (event.isRecording() == true) {
+            value.put("RecordingStatus", "true");
 
-        }else
-            value.put("RecordingStatus","false");
+        } else
+            value.put("RecordingStatus", "false");
 
         myRef.setValue(value);
     }
-
 
 
     public static void getEventsAndObserve(int userId, final FirebaseCallback<List<Event>> firebaseCallback) {
@@ -634,44 +685,6 @@ public class FirebaseModel {
         str += "}";
         return str;
     }
-    public static void getEvents(int userId, final FirebaseCallback<List<Event>> firebaseCallback) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId)).child("EventsList");
-        final List<Integer>[] ids = new List[]{new LinkedList<Integer>()};
-        idsListRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getValue() == null)
-                    ids[0] = new LinkedList<Integer>();
-                else {
-                    List<Integer> listofevnets = decodeListFromString((String) dataSnapshot.getValue());
-                    //List<Integer> listofevnets=ids[0];
-                    List<Event>finalList = new LinkedList<>();
-                    for (int i=0;i<listofevnets.size();i++)
-                    {
-                        getEventById(listofevnets.get(i), new FirebaseCallback<List<Event>>() {
-                            @Override
-                            public void onComplete(List<Event> data) {
-                                finalList.add(data.get(0));
-                            }
-
-                            @Override
-                            public void onCancel() {
-
-                            }
-                        });
-                    }
-                    firebaseCallback.onComplete(finalList);
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                firebaseCallback.onCancel();
-            }
-        });
-    }
 
     public static void setEventList(User user, FirebaseCallback<Boolean> callback) {
         try {
@@ -688,7 +701,8 @@ public class FirebaseModel {
     public static void saveRecord(String Path, String eventId, final Model.SaveAudioListener listener, final FirebaseCallback callback) {
         StorageReference storageRef = _storage.getReference("Record").child(eventId);
     }
-    public static void saveRecord(String userId,String Path,String eventId,final Model.SaveAudioListener listener,FirebaseCallback callback) {
+
+    public static void saveRecord(String userId, String Path, String eventId, final Model.SaveAudioListener listener, FirebaseCallback callback) {
         StorageReference storageRef = _storage.getReference("Record").child(eventId).child(userId);
         // File or Blob
         Uri file;
