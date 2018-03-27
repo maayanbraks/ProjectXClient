@@ -30,6 +30,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Consts;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity
     //    private EventsViewModel eventsData = null;
     private UserViewModel currentUser = null;
     private int userId;
+    private EventAdapter adapter;
 
     //private User myuser;
 
@@ -66,7 +68,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
 
         final ListView eventListView = (ListView) findViewById(R.id._listOfEvents);
-        EventAdapter adapter = new EventAdapter();
+        adapter = new EventAdapter();
         eventListView.setAdapter(adapter);
         userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
         currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
@@ -80,6 +82,7 @@ public class MainActivity extends AppCompatActivity
                     userNameHeader.setText(user.getFirstName() + " " + user.getLastName());
                     userEmailHeader.setText(user.getEmail());
                     userId = user.getId();
+                    refreshList();
                 } else {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);
@@ -126,18 +129,7 @@ public class MainActivity extends AppCompatActivity
         //End of - invitation code
 
         //Get Events
-        Repository.instance.getEvents(userId, new FirebaseModel.FirebaseCallback<List<Event>>() {
-            @Override
-            public void onComplete(List<Event> data) {
-                eventsList = data;
-                if (adapter != null)
-                    adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancel() {
-            }
-        });
+        refreshList();
 
         eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -171,9 +163,26 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+
+    private void refreshList(){
+        Repository.instance.getEvents(userId, new FirebaseModel.FirebaseCallback<List<Event>>() {
+            @Override
+            public void onComplete(List<Event> data) {
+                eventsList = data;
+                if (adapter != null)
+                    adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancel() {
+            }
+        });
+    }
+
     @Override
     protected void onResume() { //after creating new event.
         super.onResume();
+        refreshList();
     }
 
     @Override

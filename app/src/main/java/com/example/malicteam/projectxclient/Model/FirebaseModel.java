@@ -382,8 +382,8 @@ public class FirebaseModel {
         idsListRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Map<String, Object> value = (Map<String, Object>) dataSnapshot.getValue();
-                if (dataSnapshot.getValue() != null) {
+                try {
+                    Map<String, Object> value = (Map<String, Object>) dataSnapshot.getValue();
                     String eventId = (String) value.get("ID");
                     String eventName = (String) value.get("Title");
                     String desc = (String) value.get("Description");
@@ -395,8 +395,10 @@ public class FirebaseModel {
                     userList.add(event);
                     callback.onComplete(userList);
                 }
-                else
+                catch (Exception e) {
                     callback.onCancel();
+                }
+
             }
 
             @Override
@@ -642,12 +644,24 @@ public class FirebaseModel {
                 if (dataSnapshot.getValue() == null)
                     ids[0] = new LinkedList<Integer>();
                 else {
-                    ids[0] = decodeListFromString((String) dataSnapshot.getValue());
-                    List<Integer> listofevnets=ids[0];
+                    List<Integer> listofevnets = decodeListFromString((String) dataSnapshot.getValue());
+                    //List<Integer> listofevnets=ids[0];
+                    List<Event>finalList = new LinkedList<>();
                     for (int i=0;i<listofevnets.size();i++)
                     {
-                        getEventById(listofevnets.get(i),firebaseCallback);
+                        getEventById(listofevnets.get(i), new FirebaseCallback<List<Event>>() {
+                            @Override
+                            public void onComplete(List<Event> data) {
+                                finalList.add(data.get(0));
+                            }
+
+                            @Override
+                            public void onCancel() {
+
+                            }
+                        });
                     }
+                    firebaseCallback.onComplete(finalList);
 
                 }
             }

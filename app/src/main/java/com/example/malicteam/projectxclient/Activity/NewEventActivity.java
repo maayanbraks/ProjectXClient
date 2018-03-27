@@ -124,6 +124,9 @@ import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 
@@ -196,9 +199,9 @@ public class NewEventActivity extends AppCompatActivity {
                 }
 
                 else if(valid) {
-                    Time time = new Time();
-                    time.setToNow();
-                    event = new Event(null, title, UsersInvites, description, "" + userId, time.hour + ":" + time.minute + ":" + time.second, null);
+                    DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                    Date date = new Date();
+                    event = new Event(null, title, UsersInvites, description, "" + userId, dateFormat.format(date), null);
                     sendInvites("" + event.getId());
                     Repository.instance.addEvent(event);
                     Intent intent = new Intent(NewEventActivity.this, RecordingActivity.class);
