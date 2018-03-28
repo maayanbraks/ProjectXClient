@@ -343,7 +343,7 @@ public class RecordingActivity extends AppCompatActivity {
     public void StopRecordingByAdmin() {
         //notify user about that
         Toast.makeText(getApplication(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
-        playOrPause();
+        recordOrSave();
         //stop recording...
     }
 
