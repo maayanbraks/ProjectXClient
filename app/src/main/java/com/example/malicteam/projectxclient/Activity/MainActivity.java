@@ -30,9 +30,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.Consts;
+import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Invite;
 import com.example.malicteam.projectxclient.R;
@@ -407,7 +406,7 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
-    //Adapter class
+    //Adapter class - uses eventList
     class EventAdapter extends BaseAdapter {
 
         @Override

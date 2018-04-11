@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -64,10 +65,10 @@ public class FirebaseModel {
                 List<Integer> friends = new LinkedList<Integer>();
                 String friendsString = (String) value.get("FriendsList");
                 if (friendsString != null)
-                    friends = decodeListFromString(friendsString);
+                    friends = ProductTypeConverters.toList(friendsString);
                 List<Integer> events = new LinkedList<Integer>();
                 if (value.get("EventsList") != null)
-                    events = decodeListFromString((String) value.get("EventsList"));
+                    events = ProductTypeConverters.toList((String) value.get("EventsList"));
 
                 _currentUser = (new User(firstName, lastName, phone, email, friends, events, pictureUrl));
                 firebaseCallback.onComplete(_currentUser);
@@ -98,10 +99,10 @@ public class FirebaseModel {
                 List<Integer> friends = new LinkedList<Integer>();
                 String friendsString = (String) value.get("FriendsList");
                 if (friendsString != null)
-                    friends = decodeListFromString(friendsString);
+                    friends = ProductTypeConverters.toList(friendsString);
                 List<Integer> events = new LinkedList<Integer>();
                 if (value.get("EventsList") != null)
-                    events = decodeListFromString((String) value.get("EventsList"));
+                    events = ProductTypeConverters.toList((String) value.get("EventsList"));
 
                 user = (new User(firstName, lastName, phone, email, friends, events, pictureUrl));
                 firebaseCallback.onComplete(user);
@@ -127,8 +128,8 @@ public class FirebaseModel {
             value.put("Mail", user.getEmail());
             value.put("Phone", user.getPhoneNumber());
             value.put("PictureUrl", user.getPictureUrl());
-            value.put("FriendsList", generateStringFromList(user.getFriendsIdsAsList()));
-            value.put("EventsList", generateStringFromList(user.getEventsIdsAsList()));
+            value.put("FriendsList", ProductTypeConverters.toString(user.getFriendsIdsAsList()));
+            value.put("EventsList", ProductTypeConverters.toString(user.getEventsIdsAsList()));
             value.put("admin", false);
 
             myRef.setValue(value);
@@ -248,7 +249,7 @@ public class FirebaseModel {
             for (User u : friends) {
                 ids.add(u.getId());
             }
-            myRef.setValue(generateStringFromList(ids));
+            myRef.setValue(ProductTypeConverters.toString(ids));
             callback.onComplete(true);
         } catch (Exception e) {
             callback.onCancel();
@@ -303,7 +304,7 @@ public class FirebaseModel {
                 if (dataSnapshot.getValue() == null)
                     ids[0] = new LinkedList<Integer>();
                 else {
-                    ids[0] = decodeListFromString((String) dataSnapshot.getValue());
+                    ids[0] = ProductTypeConverters.toList((String) dataSnapshot.getValue());
 
                     DatabaseReference myRef = database.getReference("Events");
                     myRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -360,7 +361,7 @@ public class FirebaseModel {
                 if (dataSnapshot.getValue() == null)
                     ids[0] = new LinkedList<Integer>();
                 else {
-                    ids[0] = decodeListFromString((String) dataSnapshot.getValue());
+                    ids[0] = ProductTypeConverters.toList((String) dataSnapshot.getValue());
 
                     DatabaseReference myRef = database.getReference("Users");
                     myRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -380,10 +381,10 @@ public class FirebaseModel {
                                     //----WE dont need it for now----
                                     List<Integer> friends = new LinkedList<Integer>();
                                     if (value.get("FriendsList") != null)
-                                        friends = decodeListFromString((String) value.get("FriendsList"));
+                                        friends = ProductTypeConverters.toList((String) value.get("FriendsList"));
                                     List<Integer> events = new LinkedList<Integer>();
                                     if (value.get("EventsList") != null)
-                                        events = decodeListFromString((String) value.get("EventsList"));
+                                        events = ProductTypeConverters.toList((String) value.get("EventsList"));
 
                                     finalList.add(new User(firstName, lastName, phone, email, friends, events, pictureUrl));
                                 }
@@ -616,7 +617,7 @@ public class FirebaseModel {
                 if (dataSnapshot.getValue() == null)
                     ids[0] = new LinkedList<Integer>();
                 else {
-                    ids[0] = decodeListFromString((String) dataSnapshot.getValue());
+                    ids[0] = ProductTypeConverters.toList((String) dataSnapshot.getValue());
                 }
             }
 
@@ -642,8 +643,8 @@ public class FirebaseModel {
                         int adminId = (int) value.get("AdminId");
                         List<Integer> users = new LinkedList<Integer>();
                         if (value.get("UsersList") != null)
-                            users = decodeListFromString((String) value.get("UsersList"));
-                        events.add(new Event(contentUrl, title, generateStringFromList(users), description, "" + adminId, "" + date, id, null));
+                            users = ProductTypeConverters.toList((String) value.get("UsersList"));
+                        events.add(new Event(contentUrl, title, ProductTypeConverters.toString(users), description, "" + adminId, "" + date, id, null));
                     }
                 }
                 firebaseCallback.onComplete(events);
@@ -665,32 +666,32 @@ public class FirebaseModel {
     }
 
 
-    //Help Methods
-    public static LinkedList<Integer> decodeListFromString(String list) {
-        list = list.replace("{", "").replace("}", "").replace(" ", "");
-        String[] ids = list.split(",");
-        LinkedList<Integer> finalList = new LinkedList<>();
-        for (String s : ids) {
-            if (s != null && s != "")
-                finalList.add(Integer.parseInt(s));
-        }
-        return finalList;
-    }
-
-    public static String generateStringFromList(List<Integer> list) {
-        String str = "{ ";
-        for (int id : list) {
-            str += id + ", ";
-        }
-        str += "}";
-        return str;
-    }
+//    //Help Methods
+//    public static LinkedList<Integer> decodeListFromString(String list) {
+//        list = list.replace("{", "").replace("}", "").replace(" ", "");
+//        String[] ids = list.split(",");
+//        LinkedList<Integer> finalList = new LinkedList<>();
+//        for (String s : ids) {
+//            if (s != null && s != "")
+//                finalList.add(Integer.parseInt(s));
+//        }
+//        return finalList;
+//    }
+//
+//    public static String generateStringFromList(List<Integer> list) {
+//        String str = "{ ";
+//        for (int id : list) {
+//            str += id + ", ";
+//        }
+//        str += "}";
+//        return str;
+//    }
 
     public static void setEventList(User user, FirebaseCallback<Boolean> callback) {
         try {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference("Users").child(Integer.toString(user.getId())).child("EventsList");
-            myRef.setValue(generateStringFromList(user.getEventsIdsAsList()));
+            myRef.setValue(ProductTypeConverters.toString(user.getEventsIdsAsList()));
             callback.onComplete(true);
         } catch (Exception e) {
             callback.onCancel();

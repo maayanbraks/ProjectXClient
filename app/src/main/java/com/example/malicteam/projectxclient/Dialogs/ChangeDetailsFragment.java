@@ -7,7 +7,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.Consts;
+import com.example.malicteam.projectxclient.Common.Consts;
 
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Repository;

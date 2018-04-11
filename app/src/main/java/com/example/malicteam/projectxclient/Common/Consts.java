@@ -1,4 +1,4 @@
-package com.example.malicteam.projectxclient;
+package com.example.malicteam.projectxclient.Common;
 
 /**
  * Created by Maayan on 12-Mar-18.

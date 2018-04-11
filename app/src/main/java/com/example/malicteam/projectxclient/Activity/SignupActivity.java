@@ -15,7 +15,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.Consts;
+import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Dialogs.PictureDialogFragment;
 import com.example.malicteam.projectxclient.R;
 import com.google.android.gms.tasks.OnCompleteListener;

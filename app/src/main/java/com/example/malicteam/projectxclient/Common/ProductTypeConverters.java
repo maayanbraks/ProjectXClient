@@ -1,4 +1,4 @@
-package com.example.malicteam.projectxclient.Model;
+package com.example.malicteam.projectxclient.Common;
 
 import android.arch.persistence.room.TypeConverter;
 
@@ -15,11 +15,12 @@ public class ProductTypeConverters {
     public static LinkedList<Integer> toList(String list) {
         list = list.replace("{", "").replace("}", "").replace(" ", "");
         String[] ids = list.split(",");
-        LinkedList<Integer> friendsList = new LinkedList<>();
+        LinkedList<Integer> finalList = new LinkedList<>();
         for (String s : ids) {
-            friendsList.add(Integer.parseInt(s));
+            if (s != null && s != "")
+                finalList.add(Integer.parseInt(s));
         }
-        return friendsList;
+        return finalList;
     }
 
     @TypeConverter

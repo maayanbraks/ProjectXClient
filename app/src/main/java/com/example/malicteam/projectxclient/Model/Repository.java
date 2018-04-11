@@ -12,6 +12,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.webkit.URLUtil;
 
+import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.File;
@@ -38,6 +39,7 @@ public class Repository {
     private List<User>friends = null;//holds local users
 
     public static final Repository instance = new Repository();
+    private LocalStorageManager localStorage = new LocalStorageManager();
 
 
 
@@ -64,7 +66,7 @@ public class Repository {
 
     public LiveData<User> getSomeUser(int id) {
         synchronized (this) {
-            //check if exist
+            //check if exist in our list
             if (someUser != null) {
                 for (MutableLiveData<User> u : someUser) {
                     if (u.getValue().getId() == id)
@@ -136,7 +138,7 @@ public class Repository {
                                     newList.add(u.getId());
                                 }
                                 newList.add(friendId);
-                                FirebaseModel.setFriends(userId, FirebaseModel.generateStringFromList(newList), firebaseCallback);
+                                FirebaseModel.setFriends(userId, ProductTypeConverters.toString(newList), firebaseCallback);
                             } else
                                 firebaseCallback.onCancel();
                         }
@@ -328,7 +330,7 @@ public class Repository {
         } else {
             //check if image exsist localy
             String fileName = URLUtil.guessFileName(url, null, null);
-            Bitmap image = loadImageFromFile(fileName);
+            Bitmap image = localStorage.loadImageFromFile(fileName);
 
             if (image != null) {
                 firebaseCallback.onComplete(image);
@@ -356,7 +358,7 @@ public class Repository {
         } else {
             //check if image exsist localy
             String fileName = URLUtil.guessFileName(url, null, null);
-            Bitmap image = loadImageFromFile(fileName);
+            Bitmap image = localStorage.loadImageFromFile(fileName);
 
             if (image != null) {
                 firebaseCallback.onComplete(image);
@@ -382,7 +384,7 @@ public class Repository {
             @Override
             public void complete(String url) {
                 String fileName = URLUtil.guessFileName(url, null, null);
-                saveImageToFile(bitmap, fileName);
+                localStorage.saveImageToFile(bitmap, fileName);
                 firebaseCallback.onComplete(url);
                 Log.d("sad", "profile pic saved locally & onFirebase & added to gallery");
             }
@@ -394,52 +396,9 @@ public class Repository {
         });
     }
 
-    private void saveImageToFile(Bitmap imageBitmap, String imageFileName) {
-        try {
-            File dir = Environment.getExternalStoragePublicDirectory(
-                    Environment.DIRECTORY_PICTURES);
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
-            File imageFile = new File(dir, imageFileName);
-            imageFile.createNewFile();
-            OutputStream out = new FileOutputStream(imageFile);
-            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            out.close();
-            addPictureToGallery(imageFile);
-            Log.d("QQQQQQQQ", "ProfilePicture saved locally ");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
-    private void addPictureToGallery(File imageFile) {
-//add the picture to the gallery so we dont need to manage the cache size
-        Intent mediaScanIntent = new
-                Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-        Uri contentUri = Uri.fromFile(imageFile);
-        mediaScanIntent.setData(contentUri);
-        MyApp.getContext().sendBroadcast(mediaScanIntent);
-        Log.d("MyApp.getContectx-OK", "MyApp.getContectx-OK---");
-    }
 
-    private Bitmap loadImageFromFile(String imageFileName) {
-        Bitmap bitmap = null;
-        try {
-            File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-            File imageFile = new File(dir, imageFileName);
-            InputStream inputStream = new FileInputStream(imageFile);
-            bitmap = BitmapFactory.decodeStream(inputStream);
-            Log.d("GotImageFromMSgtag", "got image from cache: " + imageFileName);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return bitmap;
-    }
+
     //END of Image (Profile Picture)
 
     //Events

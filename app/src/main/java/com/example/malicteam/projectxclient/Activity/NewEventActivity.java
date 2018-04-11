@@ -12,7 +12,7 @@
 //import android.widget.RadioButton;
 //import android.widget.RadioGroup;
 //
-//import com.example.malicteam.projectxclient.Consts;
+//import com.example.malicteam.projectxclient.Common.Consts;
 //import com.example.malicteam.projectxclient.Model.Repository;
 //import com.example.malicteam.projectxclient.R;
 //
@@ -97,12 +97,9 @@ package com.example.malicteam.projectxclient.Activity;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -113,7 +110,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.Consts;
+import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Invite;
@@ -124,11 +121,8 @@ import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 

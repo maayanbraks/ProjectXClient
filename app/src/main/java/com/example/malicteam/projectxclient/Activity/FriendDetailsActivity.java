@@ -15,14 +15,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.Consts;
+import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.R;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
-
-import java.util.List;
 
 public class FriendDetailsActivity extends AppCompatActivity {
 

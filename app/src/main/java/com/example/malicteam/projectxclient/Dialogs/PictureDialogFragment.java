@@ -8,7 +8,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
-import static com.example.malicteam.projectxclient.Consts.REQUEST_IMAGE_CAPTURE;
+import static com.example.malicteam.projectxclient.Common.Consts.REQUEST_IMAGE_CAPTURE;
 
 public class PictureDialogFragment extends DialogFragment {
 
