@@ -444,8 +444,6 @@ public class FirebaseModel {
                 String RecordingStatus = (String) value.get("RecordingStatus");
                 userList.add(event);
                 callback.onComplete(userList);
-
-
             }
 
             @Override

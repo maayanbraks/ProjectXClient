@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static android.content.Context.MODE_PRIVATE;
+
 /**
  * Created by Maayan on 11-Mar-18.
  */
@@ -27,11 +28,10 @@ public class Repository {
     //private MutableLiveData<List<Event>> eventsData;
     //private MutableLiveData<List<User>> friendsLiveData;
 
-    private List<User>friends = null;//holds local users
+    private List<User> friends = null;//holds local users
 
     public static final Repository instance = new Repository();
     private LocalStorageManager localStorage = new LocalStorageManager();
-
 
 
     public LiveData<User> getUser(int id) {
@@ -84,21 +84,16 @@ public class Repository {
         return someUser.get(someUser.size() - 1);
     }
 
-
     public void getUserById(int id, final CloudManager.CloudCallback<List<User>> callback) {
-
         FirebaseModel.getUserById(id, callback);
-
     }
 
     public void getEventById(int id, final CloudManager.CloudCallback<List<Event>> callback) {
-
         FirebaseModel.getEventById(id, callback);
-
     }
-    public void getEventRecordingStatus(int id, CloudManager.CloudCallback<List<Boolean>> callback){
 
-        FirebaseModel.getEventRecordingStatus(id,callback);
+    public void getEventRecordingStatus(int id, CloudManager.CloudCallback<List<Boolean>> callback) {
+        FirebaseModel.getEventRecordingStatus(id, callback);
     }
 
     public void addFriend(String email, final CloudManager.CloudCallback<Boolean> cloudCallback) {
@@ -161,7 +156,7 @@ public class Repository {
                 long lastUpdateDate = 0;
                 try {
                     lastUpdateDate = MyApp.getContext().getSharedPreferences("TAG", MODE_PRIVATE).getLong("lastUpdateDate", 0);
-                }catch (Exception e){
+                } catch (Exception e) {
 
                 }
 
@@ -188,6 +183,7 @@ public class Repository {
             public void onComplete(List<Event> data) {
                 cloudCallback.onComplete(data);
             }
+
             @Override
             public void onCancel() {
                 cloudCallback.onCancel();
@@ -195,8 +191,7 @@ public class Repository {
         });
     }
 
-    private void updateFriendsDataInLocalStorage(List<User> data)
-    {
+    private void updateFriendsDataInLocalStorage(List<User> data) {
         MyTask task = new MyTask();
         task.execute(data);
     }
@@ -266,9 +261,9 @@ public class Repository {
     public void saveRecord(String Path, String eventId, final Model.SaveAudioListener listener, CloudManager.CloudCallback callback) {
         FirebaseModel.saveRecord(Path, eventId, listener, callback);
     }
-    public void saveRecord(String userId,String Path,String eventId,final Model.SaveAudioListener listener,CloudManager.CloudCallback callback)
-    {
-    FirebaseModel.saveRecord(userId,Path,eventId,listener,callback);
+
+    public void saveRecord(String userId, String Path, String eventId, final Model.SaveAudioListener listener, CloudManager.CloudCallback callback) {
+        FirebaseModel.saveRecord(userId, Path, eventId, listener, callback);
     }
 
     public void removeAccount(final CloudManager.CloudCallback<Boolean> cloudCallback) {
@@ -292,12 +287,14 @@ public class Repository {
         FirebaseModel.getInvite(id, invitation);
 
     }
-    public void setEventList(User user,CloudManager.CloudCallback callback) {
-        FirebaseModel.setEventList(user,callback);
+
+    public void setEventList(User user, CloudManager.CloudCallback callback) {
+        FirebaseModel.setEventList(user, callback);
 
     }
-    public void setRecodrdingStatus(String eventId,CloudManager.CloudCallback callback) {
-        FirebaseModel.setRecordingStatus(eventId,callback);
+
+    public void setRecodrdingStatus(String eventId, CloudManager.CloudCallback callback) {
+        FirebaseModel.setRecordingStatus(eventId, callback);
 
     }
 
@@ -387,8 +384,6 @@ public class Repository {
     }
 
 
-
-
     //END of Image (Profile Picture)
 
     //Events
@@ -430,12 +425,11 @@ public class Repository {
 //    }
 
 
-
     //CLASSES
-    class MyTask extends AsyncTask<List<User>,String,List<User>> {
+    class MyTask extends AsyncTask<List<User>, String, List<User>> {
         @Override
         protected List<User> doInBackground(List<User>[] lists) {
-            Log.d("TAG","starting updateEmployeeDataInLocalStorage in thread");
+            Log.d("TAG", "starting updateEmployeeDataInLocalStorage in thread");
             if (lists.length > 0) {
                 List<User> data = lists[0];
                 long lastUpdateDate = 0;
@@ -451,8 +445,7 @@ public class Repository {
                     for (User u : data) {
                         try {
                             AppLocalStoreDb.getLocalDatabase(MyApp.getContext()).UserDao().saveUser(u);
-                        }catch (Exception e)
-                        {
+                        } catch (Exception e) {
                             Log.d("TAG", e.getMessage());
                         }
 
