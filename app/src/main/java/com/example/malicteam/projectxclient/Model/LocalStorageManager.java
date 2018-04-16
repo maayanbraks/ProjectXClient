@@ -7,6 +7,8 @@ import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
+import com.example.malicteam.projectxclient.Common.MyApp;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

@@ -40,16 +40,9 @@ public class FirebaseModel {
     private static FirebaseStorage _storage = FirebaseStorage.getInstance();
 
 
-    //Interfaces
-    public interface FirebaseCallback<T> {
-        void onComplete(T data);
-
-        void onCancel();
-    }
-
     //Firebase Methods
     //Users
-    public static void getUserAndObserve(String id, final FirebaseCallback<User> firebaseCallback) {
+    public static void getUserAndObserve(String id, final CloudManager.CloudCallback<User> cloudCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Users").child(id);
 
@@ -71,17 +64,17 @@ public class FirebaseModel {
                     events = ProductTypeConverters.toList((String) value.get("EventsList"));
 
                 _currentUser = (new User(firstName, lastName, phone, email, friends, events, pictureUrl));
-                firebaseCallback.onComplete(_currentUser);
+                cloudCallback.onComplete(_currentUser);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                firebaseCallback.onCancel();
+                cloudCallback.onCancel();
             }
         });
     }
 
-    public static void getSomeUserAndObserve(String id, final FirebaseCallback<User> firebaseCallback) {
+    public static void getSomeUserAndObserve(String id, final CloudManager.CloudCallback<User> cloudCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Users").child(id);
 
@@ -105,17 +98,17 @@ public class FirebaseModel {
                     events = ProductTypeConverters.toList((String) value.get("EventsList"));
 
                 user = (new User(firstName, lastName, phone, email, friends, events, pictureUrl));
-                firebaseCallback.onComplete(user);
+                cloudCallback.onComplete(user);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                firebaseCallback.onCancel();
+                cloudCallback.onCancel();
             }
         });
     }
 
-    public static void addUser(User user, FirebaseCallback<User> firebaseCallback) {
+    public static void addUser(User user, CloudManager.CloudCallback<User> cloudCallback) {
         try {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference("Users").child(Integer.toString(user.getId()));
@@ -134,29 +127,29 @@ public class FirebaseModel {
 
             myRef.setValue(value);
 
-            firebaseCallback.onComplete(user);
+            cloudCallback.onComplete(user);
         } catch (Exception e) {
-            firebaseCallback.onCancel();
+            cloudCallback.onCancel();
         }
     }
 
-    public static void setRecordingStatus(String eventId, FirebaseCallback<Boolean> firebaseCallback) {
+    public static void setRecordingStatus(String eventId, CloudManager.CloudCallback<Boolean> cloudCallback) {
         try {
             Log.d("TAG", "In setrecordingstatus func");
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference("Events").child(eventId).child("RecordingStatus");
             Map<String, Object> value = new HashMap<>();
             myRef.setValue("false");
-            firebaseCallback.onComplete(false);
+            cloudCallback.onComplete(false);
         } catch (Exception e) {
-            firebaseCallback.onCancel();
+            cloudCallback.onCancel();
         }
     }
 
     /*
     remove current user - from DB & Google Auth
      */
-    public static void removeAccount(final FirebaseCallback<Boolean> firebaseCallback) {
+    public static void removeAccount(final CloudManager.CloudCallback<Boolean> cloudCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         boolean success = false;
@@ -175,15 +168,15 @@ public class FirebaseModel {
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
                                 myRef.removeValue();
-                                firebaseCallback.onComplete(true);
+                                cloudCallback.onComplete(true);
                             } else
-                                firebaseCallback.onCancel();
+                                cloudCallback.onCancel();
                         }
                     });
         }
     }
 
-    public static void removeInvite(final FirebaseCallback<Boolean> callback, Invite invite) {
+    public static void removeInvite(final CloudManager.CloudCallback<Boolean> callback, Invite invite) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         boolean success = false;
         //Delete from DB
@@ -222,26 +215,26 @@ public class FirebaseModel {
     /*
     get Picture and change the profile picture of user <id>
      */
-    public static void setPictureUrl(int id, Bitmap bitmap, final FirebaseCallback<Boolean> firebaseCallback) {
+    public static void setPictureUrl(int id, Bitmap bitmap, final CloudManager.CloudCallback<Boolean> cloudCallback) {
         saveImage(bitmap, id, new Model.SaveImageListener() {
             @Override
             public void complete(String url) {
                 FirebaseDatabase database = FirebaseDatabase.getInstance();
                 DatabaseReference myRef = database.getReference("Users").child(Integer.toString(id)).child("PictureUrl");
                 myRef.setValue(url);
-                firebaseCallback.onComplete(true);
+                cloudCallback.onComplete(true);
             }
 
             @Override
             public void fail() {
-                firebaseCallback.onCancel();
+                cloudCallback.onCancel();
             }
         });
 
 
     }
 
-    public static void setFriends(int userId, List<User> friends, final FirebaseCallback callback) {
+    public static void setFriends(int userId, List<User> friends, final CloudManager.CloudCallback callback) {
         try {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference("Users").child(Integer.toString(userId)).child("FriendsList");
@@ -256,7 +249,7 @@ public class FirebaseModel {
         }
     }
 
-    public static void setFriends(int userId, String friends, final FirebaseCallback<Boolean> callback) {
+    public static void setFriends(int userId, String friends, final CloudManager.CloudCallback<Boolean> callback) {
         try {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference("Users").child(Integer.toString(userId)).child("FriendsList");
@@ -294,7 +287,7 @@ public class FirebaseModel {
         });
     }
 
-    public static void getEvents(int userId, final FirebaseCallback<List<Event>> firebaseCallback) {
+    public static void getEvents(int userId, final CloudManager.CloudCallback<List<Event>> cloudCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId)).child("EventsList");
         final List<Integer>[] ids = new List[]{new LinkedList<Integer>()};
@@ -332,11 +325,11 @@ public class FirebaseModel {
                                     finalList.add(new Event(null, eventName, usersList, desc, admin, Date, id, null));
                                 }
                             }
-                            firebaseCallback.onComplete(finalList);
+                            cloudCallback.onComplete(finalList);
                         }
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-                            firebaseCallback.onCancel();
+                            cloudCallback.onCancel();
                         }
                     });
 
@@ -345,13 +338,13 @@ public class FirebaseModel {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                firebaseCallback.onCancel();
+                cloudCallback.onCancel();
             }
         });
     }
 
 
-    public static void getFriends(int userId, final FirebaseCallback<List<User>> firebaseCallback) {
+    public static void getFriends(int userId, final CloudManager.CloudCallback<List<User>> cloudCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId)).child("FriendsList");
         final List<Integer>[] ids = new List[]{new LinkedList<Integer>()};
@@ -389,13 +382,13 @@ public class FirebaseModel {
                                     finalList.add(new User(firstName, lastName, phone, email, friends, events, pictureUrl));
                                 }
                             }
-                            firebaseCallback.onComplete(finalList);
+                            cloudCallback.onComplete(finalList);
 
                         }
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-                            firebaseCallback.onCancel();
+                            cloudCallback.onCancel();
                         }
                     });
                 }
@@ -403,13 +396,13 @@ public class FirebaseModel {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                firebaseCallback.onComplete(null);
+                cloudCallback.onComplete(null);
             }
         });
 
     }
 
-    public static void getUserById(int userId, final FirebaseCallback<List<User>> callback) {
+    public static void getUserById(int userId, final CloudManager.CloudCallback<List<User>> callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId));
         List<User> userList = new LinkedList<>();
@@ -433,7 +426,7 @@ public class FirebaseModel {
         });
     }
 
-    public static void getEventById(int eventId, final FirebaseCallback<List<Event>> callback) {
+    public static void getEventById(int eventId, final CloudManager.CloudCallback<List<Event>> callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference idsListRef = database.getReference("Events").child(Integer.toString(eventId));
         List<Event> userList = new LinkedList<>();
@@ -462,7 +455,7 @@ public class FirebaseModel {
         });
     }
 
-    public static void getEventRecordingStatus(int eventId, final FirebaseCallback<List<Boolean>> callback) {
+    public static void getEventRecordingStatus(int eventId, final CloudManager.CloudCallback<List<Boolean>> callback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference idsListRef = database.getReference("Events").child(Integer.toString(eventId));
         List<Boolean> checkStatus = new LinkedList<>();
@@ -485,7 +478,7 @@ public class FirebaseModel {
         });
     }
 
-    public static void isExistUser(int id, final FirebaseCallback firebaseCallback) {
+    public static void isExistUser(int id, final CloudManager.CloudCallback cloudCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference("Users").child(Integer.toString(id));
 
@@ -493,14 +486,14 @@ public class FirebaseModel {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists())
-                    firebaseCallback.onComplete(id);
+                    cloudCallback.onComplete(id);
                 else
-                    firebaseCallback.onComplete(-1);
+                    cloudCallback.onComplete(-1);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                firebaseCallback.onComplete(null);
+                cloudCallback.onComplete(null);
             }
         });
 
@@ -508,9 +501,9 @@ public class FirebaseModel {
     //END of Users
 
     /*
-    Get url & firebaseCallback return Image from Firebase.
+    Get url & cloudCallback return Image from Firebase.
      */
-    public static void getImage(String url, final FirebaseCallback<Bitmap> firebaseCallback) {
+    public static void getImage(String url, final CloudManager.CloudCallback<Bitmap> cloudCallback) {
         if (url != null) {
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference httpsReference = storage.getReferenceFromUrl(url);
@@ -520,7 +513,7 @@ public class FirebaseModel {
                 public void onSuccess(byte[] bytes) {
                     try {
                         Bitmap image = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-                        firebaseCallback.onComplete(image);
+                        cloudCallback.onComplete(image);
                     } catch (Exception e) {
                         Log.d("tag", "asdf");
                     }
@@ -528,7 +521,7 @@ public class FirebaseModel {
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(Exception exception) {
-                    firebaseCallback.onComplete(null);
+                    cloudCallback.onComplete(null);
                 }
             });
         }
@@ -607,7 +600,7 @@ public class FirebaseModel {
     }
 
 
-    public static void getEventsAndObserve(int userId, final FirebaseCallback<List<Event>> firebaseCallback) {
+    public static void getEventsAndObserve(int userId, final CloudManager.CloudCallback<List<Event>> cloudCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId)).child("EventsList");
         final List<Integer>[] ids = new List[]{new LinkedList<Integer>()};
@@ -623,7 +616,7 @@ public class FirebaseModel {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                firebaseCallback.onComplete(null);
+                cloudCallback.onComplete(null);
             }
         });
 
@@ -647,13 +640,13 @@ public class FirebaseModel {
                         events.add(new Event(contentUrl, title, ProductTypeConverters.toString(users), description, "" + adminId, "" + date, id, null));
                     }
                 }
-                firebaseCallback.onComplete(events);
+                cloudCallback.onComplete(events);
 
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                firebaseCallback.onComplete(null);
+                cloudCallback.onComplete(null);
             }
         });
     }
@@ -687,7 +680,7 @@ public class FirebaseModel {
 //        return str;
 //    }
 
-    public static void setEventList(User user, FirebaseCallback<Boolean> callback) {
+    public static void setEventList(User user, CloudManager.CloudCallback<Boolean> callback) {
         try {
             FirebaseDatabase database = FirebaseDatabase.getInstance();
             DatabaseReference myRef = database.getReference("Users").child(Integer.toString(user.getId())).child("EventsList");
@@ -699,11 +692,11 @@ public class FirebaseModel {
     }
 
 
-    public static void saveRecord(String Path, String eventId, final Model.SaveAudioListener listener, final FirebaseCallback callback) {
+    public static void saveRecord(String Path, String eventId, final Model.SaveAudioListener listener, final CloudManager.CloudCallback callback) {
         StorageReference storageRef = _storage.getReference("Record").child(eventId);
     }
 
-    public static void saveRecord(String userId, String Path, String eventId, final Model.SaveAudioListener listener, FirebaseCallback callback) {
+    public static void saveRecord(String userId, String Path, String eventId, final Model.SaveAudioListener listener, CloudManager.CloudCallback callback) {
         StorageReference storageRef = _storage.getReference("Record").child(eventId).child(userId);
         // File or Blob
         Uri file;

@@ -111,6 +111,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Common.Consts;
+import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Invite;
@@ -210,7 +211,7 @@ public class NewEventActivity extends AppCompatActivity {
                     try {
                         currentUser.getUser().getValue().addEventToList(Integer.valueOf(event.getId()));
                         //update the userDatabase
-                        Repository.instance.setEventList(currentUser.getUser().getValue(), new FirebaseModel.FirebaseCallback() {
+                        Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudCallback() {
                             @Override
                             public void onComplete(Object data) {
                                 startActivity(intent);
@@ -238,12 +239,12 @@ public class NewEventActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String parti = _part.getText().toString();
 
-                FirebaseModel.isExistUser(User.generateId(parti), new FirebaseModel.FirebaseCallback<Integer>() {
+                FirebaseModel.isExistUser(User.generateId(parti), new CloudManager.CloudCallback<Integer>() {
                     @Override
                     public void onComplete(Integer id) {
                         if (id > 0) {// if found user
                             Log.d("TAG", "Found id,");
-                            Repository.instance.getUserById(id, new FirebaseModel.FirebaseCallback<List<User>>() {
+                            Repository.instance.getUserById(id, new CloudManager.CloudCallback<List<User>>() {
                                 @Override
                                 public void onComplete(List<User> data) {
                                     Log.d("TAG", "data size=," + data.size());
@@ -329,7 +330,7 @@ public class NewEventActivity extends AppCompatActivity {
             ///  Model.Invite invite= new Model.Invite(eventId,item,Mymail);
             ///     Model.Invite
             Invite invite = new Invite(eventId, item, "" + userId);
-            Repository.instance.addNewInvite(invite, new FirebaseModel.FirebaseCallback<Invite>() {
+            Repository.instance.addNewInvite(invite, new CloudManager.CloudCallback<Invite>() {
                 @Override
                 public void onComplete(Invite invite) {
                     Log.d("TAG", "succeed adding new invite.");

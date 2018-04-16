@@ -174,7 +174,7 @@
 //    private void updateProfilePicture(String url) {
 //        ImageView profilePic = (ImageView)(headerLayout.findViewById(R.id.userPic_head));
 //        Repository.instance.getProfilePicture(
-//                new FirebaseModel.FirebaseCallback<Bitmap>() {
+//                new FirebaseModel.CloudCallback<Bitmap>() {
 //                    @Override
 //                    public void onComplete(Bitmap data) {
 //                        if (data != null)

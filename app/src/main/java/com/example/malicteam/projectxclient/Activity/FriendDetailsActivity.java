@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Common.Consts;
+import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
@@ -24,9 +25,9 @@ import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
 public class FriendDetailsActivity extends AppCompatActivity {
 
-    private UserViewModel viewModel = null;
-    private int userId;
-
+    //private UserViewModel viewModel = null;
+    //private int userId;
+    private User user = null;
     private ImageView profilePicture;
     private Bitmap bitmap = null;
 
@@ -41,29 +42,29 @@ public class FriendDetailsActivity extends AppCompatActivity {
         pb.setVisibility(View.VISIBLE);
 
         //User Details
-        userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
-        viewModel = ViewModelProviders.of(this).get(UserViewModel.class);
-        viewModel.init(userId, false);
-        viewModel.getUser().observe(this, new Observer<User>() {
-            @Override
-            public void onChanged(@Nullable User user) {
-                pb.setVisibility(View.INVISIBLE);
-                initDetails(user);
-            }
-        });
+        user = (User)getIntent().getSerializableExtra(Consts.USER);
+//        viewModel = ViewModelProviders.of(this).get(UserViewModel.class);
+//        viewModel.init(userId, false);
+//        viewModel.getUser().observe(this, new Observer<User>() {
+//            @Override
+//            public void onChanged(@Nullable User user) {
+//                pb.setVisibility(View.INVISIBLE);
+//                initDetails(user);
+//            }
+//        });
 
         Button deleteButton  =(Button)findViewById(R.id.deleteFriendButton_friendDetails);
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (viewModel.getUser() != null) {
+                if (user != null) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(FriendDetailsActivity.this);
                     builder.setTitle("Delete Friend");
-                    builder.setMessage("Are you sure you wand delete " + viewModel.getUser().getValue().getFirstName() + " " + viewModel.getUser().getValue().getLastName() + " from your friends?");
+                    builder.setMessage("Are you sure you wand delete " + user.getFirstName() + " " + user.getLastName() + " from your friends?");
                     builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Repository.instance.deleteFromFriends(viewModel.getUser().getValue().getId(), new FirebaseModel.FirebaseCallback<Boolean>() {
+                            Repository.instance.deleteFromFriends(user.getId(), new CloudManager.CloudCallback<Boolean>() {
                                 @Override
                                 public void onComplete(Boolean data) {
                                     if (data) {
@@ -107,7 +108,7 @@ public class FriendDetailsActivity extends AppCompatActivity {
 
         //Profile Picture
         Repository.instance.getProfilePicture(user.getPictureUrl(),
-                new FirebaseModel.FirebaseCallback<Bitmap>() {
+                new CloudManager.CloudCallback<Bitmap>() {
                     @Override
                     public void onComplete(Bitmap data) {
                         if (data != null) {

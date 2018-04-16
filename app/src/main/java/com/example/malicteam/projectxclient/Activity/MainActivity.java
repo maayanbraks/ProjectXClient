@@ -32,6 +32,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.malicteam.projectxclient.Common.Consts;
+import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Invite;
 import com.example.malicteam.projectxclient.R;
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity
         userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
 
         //invitation code:
-        Repository.instance.getInvite("" + userId, new FirebaseModel.FirebaseCallback<Invite>() {
+        Repository.instance.getInvite("" + userId, new CloudManager.CloudCallback<Invite>() {
             @Override
             public void onComplete(Invite invite) {
                 Invitation(invite);
@@ -92,7 +93,7 @@ public class MainActivity extends AppCompatActivity
         //End of - invitation code
 
         //Get Events
-        Repository.instance.getEvents(userId, new FirebaseModel.FirebaseCallback<List<Event>>() {
+        Repository.instance.getEvents(userId, new CloudManager.CloudCallback<List<Event>>() {
             @Override
             public void onComplete(List<Event> data) {
                 eventsList = data;
@@ -177,7 +178,7 @@ public class MainActivity extends AppCompatActivity
 
 
     private void refreshList(){
-        Repository.instance.getEvents(userId, new FirebaseModel.FirebaseCallback<List<Event>>() {
+        Repository.instance.getEvents(userId, new CloudManager.CloudCallback<List<Event>>() {
             @Override
             public void onComplete(List<Event> data) {
                 eventsList = data;
@@ -295,7 +296,7 @@ public class MainActivity extends AppCompatActivity
     private void updateProfilePicture(String url) {
         ImageView profilePic = (ImageView)headerLayout.findViewById(R.id.userPic_head);
         Repository.instance.getProfilePicture(
-                new FirebaseModel.FirebaseCallback<Bitmap>() {
+                new CloudManager.CloudCallback<Bitmap>() {
                     @Override
                     public void onComplete(Bitmap data) {
                         try {
@@ -367,7 +368,7 @@ public class MainActivity extends AppCompatActivity
         Log.d("TAG", "invitegetevnetid=" + invite.getEventId());
         currentUser.getUser().getValue().addEventToList(Integer.valueOf(invite.getEventId()));
         //update the userDatabase
-        Repository.instance.setEventList(currentUser.getUser().getValue(), new FirebaseModel.FirebaseCallback() {
+        Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudCallback() {
             @Override
             public void onComplete(Object data) {
 
@@ -383,7 +384,7 @@ public class MainActivity extends AppCompatActivity
     public void declineToInvite(Invite invite) {
         //TODO
         //delete from invite DB
-        Repository.instance.removeInvite(new FirebaseModel.FirebaseCallback<Boolean>() {
+        Repository.instance.removeInvite(new CloudManager.CloudCallback<Boolean>() {
             @Override
             public void onComplete(Boolean data) {
             }

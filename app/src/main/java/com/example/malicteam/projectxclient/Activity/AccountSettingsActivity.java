@@ -21,6 +21,7 @@ import com.example.malicteam.projectxclient.Dialogs.LogoutDialogFragment;
 import com.example.malicteam.projectxclient.Dialogs.PictureDialogFragment;
 import com.example.malicteam.projectxclient.Dialogs.RemoveAccountDialogFragment;
 import com.example.malicteam.projectxclient.Dialogs.ResetPasswordDialogFragment;
+import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.R;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
@@ -50,7 +51,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
         profilePicture = (ImageView) findViewById(R.id.userPic_editAccount);
 
         Repository.instance.getProfilePicture(
-                new FirebaseModel.FirebaseCallback<Bitmap>() {
+                new CloudManager.CloudCallback<Bitmap>() {
                     @Override
                     public void onComplete(Bitmap data) {
                         if (data != null) {
@@ -118,7 +119,7 @@ public class AccountSettingsActivity extends AppCompatActivity {
             ImageView profilePic = (ImageView) findViewById(R.id.userPic_editAccount);
             if (user.getPictureUrl() != null) {
                 Repository.instance.getProfilePicture(
-                        new FirebaseModel.FirebaseCallback<Bitmap>() {
+                        new CloudManager.CloudCallback<Bitmap>() {
                             @Override
                             public void onComplete(Bitmap data) {
                                 if (data != null) {
@@ -214,11 +215,11 @@ public class AccountSettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (bitmap != null) {
-                    Repository.instance.saveProfilePicture(bitmap, viewModel.getUser().getValue().getEmail(), new FirebaseModel.FirebaseCallback<String>() {
+                    Repository.instance.saveProfilePicture(bitmap, viewModel.getUser().getValue().getEmail(), new CloudManager.CloudCallback<String>() {
                         @Override
                         public void onComplete(String url) {
                             if (url != null)
-                                Repository.instance.setPictureUrl(bitmap, new FirebaseModel.FirebaseCallback<Boolean>() {
+                                Repository.instance.setPictureUrl(bitmap, new CloudManager.CloudCallback<Boolean>() {
                                     @Override
                                     public void onComplete(Boolean data) {
                                         if (data == true) {

@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Common.Consts;
 
+import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Repository;
 
@@ -39,7 +40,7 @@ public class ChangeDetailsFragment extends DialogFragment {
         builder.setMessage(str)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Repository.instance.changeUserDetails(_first, _last, _email, _phone, new FirebaseModel.FirebaseCallback<String>() {
+                        Repository.instance.changeUserDetails(_first, _last, _email, _phone, new CloudManager.CloudCallback<String>() {
                             @Override
                             public void onComplete(String data) {
                                 if (data != null && data != "")

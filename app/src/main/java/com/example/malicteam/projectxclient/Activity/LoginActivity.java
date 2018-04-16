@@ -111,6 +111,8 @@ public class LoginActivity extends Activity {
                             }
                         } else {
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+                            intent.putExtra(Consts.USER_ID, id);
                             startActivity(intent);
                             finish();
                         }

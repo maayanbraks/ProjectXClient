@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Activity.LoginActivity;
+import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Repository;
 
@@ -23,7 +24,7 @@ public class RemoveAccountDialogFragment extends DialogFragment{
         builder.setMessage("Are you sure you want be removed???\n")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Repository.instance.removeAccount(new FirebaseModel.FirebaseCallback<Boolean>() {
+                        Repository.instance.removeAccount(new CloudManager.CloudCallback<Boolean>() {
                             @Override
                             public void onComplete(Boolean data) {
                                 if(data != null) {

@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Common.Consts;
+import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Model;
@@ -256,7 +257,7 @@ public class RecordingActivity extends AppCompatActivity {
             public void fail() {
                 Toast.makeText(getApplication(), "Upload failed.", Toast.LENGTH_SHORT).show();
             }
-        }, new FirebaseModel.FirebaseCallback<Boolean>() {
+        }, new CloudManager.CloudCallback<Boolean>() {
             @Override
             public void onComplete(Boolean data) {
 
@@ -270,7 +271,7 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
     public void SetEventFromInvitation(String eventid) {
-        Repository.instance.getEventById(Integer.valueOf(eventid), new FirebaseModel.FirebaseCallback<List<Event>>() {
+        Repository.instance.getEventById(Integer.valueOf(eventid), new CloudManager.CloudCallback<List<Event>>() {
 
             @Override
             public void onComplete(List<Event> EventList) {
@@ -347,7 +348,7 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
     public void CheckRecordingStatus() {
-        Repository.instance.getEventRecordingStatus(event.getId(), new FirebaseModel.FirebaseCallback<List<Boolean>>() {
+        Repository.instance.getEventRecordingStatus(event.getId(), new CloudManager.CloudCallback<List<Boolean>>() {
             @Override
             public void onComplete(List<Boolean> data) {
                 if ((data.get(0) == false) && (!(CheckMeAdmin()))) {
@@ -365,7 +366,7 @@ public class RecordingActivity extends AppCompatActivity {
 
     public void setRecordingStatus() {
         Log.d("TAG", "SetRecordingStatus func in recordingacitivty");
-        Repository.instance.setRecodrdingStatus(String.valueOf(event.getId()), new FirebaseModel.FirebaseCallback() {
+        Repository.instance.setRecodrdingStatus(String.valueOf(event.getId()), new CloudManager.CloudCallback() {
             @Override
             public void onComplete(Object data) {
 

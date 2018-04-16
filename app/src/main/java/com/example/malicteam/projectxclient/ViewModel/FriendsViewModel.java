@@ -12,15 +12,15 @@ import com.example.malicteam.projectxclient.Model.User;
  * Created by Maayan on 12-Mar-18.
  */
 
-//public class FriendsViewModel extends ViewModel {
-//    private int userId;
-//    private LiveData<List<User>> friends;
-//
-//    public void init(int userId) {
-//        this.userId = userId;
-//        friends = Repository.instance.getFriends();
-//    }
-//    public LiveData<List<User>> getFriends() {
-//        return friends;
-//    }
-//}
+public class FriendsViewModel extends ViewModel {
+    private int userId;
+    private LiveData<List<User>> friends;
+
+    public void init(int userId) {
+        this.userId = userId;
+        friends = Repository.instance.getFriends(userId);
+    }
+    public LiveData<List<User>> getFriends() {
+        return friends;
+    }
+}
