@@ -9,10 +9,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
@@ -31,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
@@ -49,7 +54,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener {
 
     private List<Event> eventsList = new LinkedList<>();
     private TextView userNameHeader;
@@ -60,6 +65,7 @@ public class MainActivity extends AppCompatActivity
     private int userId;
     private EventAdapter adapter;
     private View headerLayout;
+    private DrawerLayout mDrawer;
 
     //private User myuser;
 
@@ -67,10 +73,10 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        ListView eventListView = (ListView) findViewById(R.id._listOfEvents);
-        adapter = new EventAdapter();
-        eventListView.setAdapter(adapter);
+//
+//        ListView eventListView = (ListView) findViewById(R.id._listOfEvents);
+//        adapter = new EventAdapter();
+//        eventListView.setAdapter(adapter);
         userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
 
         //invitation code:
@@ -93,18 +99,18 @@ public class MainActivity extends AppCompatActivity
         //End of - invitation code
 
         //Get Events
-        Repository.instance.getEvents(userId, new CloudManager.CloudCallback<List<Event>>() {
-            @Override
-            public void onComplete(List<Event> data) {
-                eventsList = data;
-                if (adapter != null)
-                    adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancel() {
-            }
-        });
+//        Repository.instance.getEvents(userId, new CloudManager.CloudCallback<List<Event>>() {
+//            @Override
+//            public void onComplete(List<Event> data) {
+//                eventsList = data;
+//                if (adapter != null)
+//                    adapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//            }
+//        });
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -126,7 +132,7 @@ public class MainActivity extends AppCompatActivity
                     userNameHeader.setText(user.getFirstName() + " " + user.getLastName());
                     userEmailHeader.setText(user.getEmail());
                     userId = user.getId();
-                    refreshList();
+//                    refreshList();
                 } else {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);
@@ -144,15 +150,16 @@ public class MainActivity extends AppCompatActivity
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, Consts.REQUEST_WRITE_STORAGE);
         }
 
-        eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Event event = eventsList.get(position);
-                Intent intent = new Intent(getApplicationContext(), EventDetails.class);
-                intent.putExtra(Consts.SEND_EVENT, event);
-                startActivity(intent);
-            }
-        });
+//        eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(Adapte
+// rView<?> parent, View view, int position, long id) {
+//                Event event = eventsList.get(position);
+//                Intent intent = new Intent(getApplicationContext(), EventDetails.class);
+//                intent.putExtra(Consts.SEND_EVENT, event);
+//                startActivity(intent);
+//            }
+//        });
 
         //End of
         //Floating add button
@@ -168,16 +175,16 @@ public class MainActivity extends AppCompatActivity
         });
 
         //Draw
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
+                this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawer.addDrawerListener(toggle);
         toggle.syncState();
 
     }
 
 
-    private void refreshList(){
+    private void refreshList() {
         Repository.instance.getEvents(userId, new CloudManager.CloudCallback<List<Event>>() {
             @Override
             public void onComplete(List<Event> data) {
@@ -228,81 +235,118 @@ public class MainActivity extends AppCompatActivity
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
         }
-
         return super.onOptionsItemSelected(item);
     }
 
+    //OLD NAVIGATION
+//    @SuppressWarnings("StatementWithEmptyBody")
+//    @Override
+//    public boolean onNavigationItemSelected(MenuItem item) {
+//        int id = item.getItemId();
+//        Intent intent;
+//
+//        switch (id) {
+//            case R.id.nav_events_list:
+//                if (!this.getClass().getName().equals(MainActivity.class.getName())) {
+//                    intent = new Intent(this, MainActivity.class);
+//                    startActivity(intent);
+//                }
+//                break;
+//            case R.id.nav_events_new:
+//                if (!this.getClass().getName().equals(NewEventActivity.class.getName())) {
+//                    intent = new Intent(getApplicationContext(), NewEventActivity.class);
+//                    startActivity(intent);
+//                }
+//                break;
+//            case R.id.nav_friends_list:
+//                if (!this.getClass().getName().equals(FriendsListActivity.class.getName())) {
+//                    intent = new Intent(this, FriendsListActivity.class);
+//                    intent.putExtra(Consts.USER_ID, userId);
+//                    startActivity(intent);
+//                }
+//                break;
+//            case R.id.nav_settings_account:
+//                if (!this.getClass().getName().equals(AccountSettingsActivity.class.getName())) {
+//                    intent = new Intent(this, AccountSettingsActivity.class);
+//                    intent.putExtra(Consts.USER_ID, userId);
+//                    startActivity(intent);
+//                }
+//                break;
+//            case R.id.nav_signup:
+//                if (!this.getClass().getName().equals(SignupActivity.class.getName())) {
+//                    intent = new Intent(this, SignupActivity.class);
+//                    startActivity(intent);
+//                }
+//                break;
+//            case R.id.nav_logout:
+//                Repository.instance.logout();
+//                Intent loginIntent = new Intent(this, LoginActivity.class);
+//                startActivity(loginIntent);
+//                finish();
+//                break;
+//
+//            default:
+//                intent = new Intent(this, MainActivity.class);
+//                startActivity(intent);
+//                finish();
+//                break;
+//        }
+//
+//        if (this.getClass() != MainActivity.class)
+//            finish();
+//
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        drawer.closeDrawer(GravityCompat.START);
+//        return true;
+//    }
+
+    //NEW NAVIGATION
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        Intent intent;
-
+    public boolean onNavigationItemSelected(MenuItem menuItem) {
+        Fragment fragment = null;
+        Class fragmentClass = null;
+        int id = menuItem.getItemId();
         switch (id) {
-            case R.id.nav_events_list:
-                if (!this.getClass().getName().equals(MainActivity.class.getName())) {
-                    intent = new Intent(this, MainActivity.class);
-                    startActivity(intent);
-                }
-                break;
-            case R.id.nav_events_new:
-                if (!this.getClass().getName().equals(NewEventActivity.class.getName())) {
-                    intent = new Intent(getApplicationContext(), NewEventActivity.class);
-                    startActivity(intent);
-                }
-                break;
-            case R.id.nav_friends_list:
-                if (!this.getClass().getName().equals(FriendsListActivity.class.getName())) {
-                    intent = new Intent(this, FriendsListActivity.class);
-                    intent.putExtra(Consts.USER_ID, userId);
-                    startActivity(intent);
-                }
-                break;
             case R.id.nav_settings_account:
-                if (!this.getClass().getName().equals(AccountSettingsActivity.class.getName())) {
-                    intent = new Intent(this, AccountSettingsActivity.class);
-                    intent.putExtra(Consts.USER_ID, userId);
-                    startActivity(intent);
-                }
-                break;
-            case R.id.nav_signup:
-                if (!this.getClass().getName().equals(SignupActivity.class.getName())) {
-                    intent = new Intent(this, SignupActivity.class);
-                    startActivity(intent);
-                }
-                break;
-            case R.id.nav_logout:
-                Repository.instance.logout();
-                Intent loginIntent = new Intent(this, LoginActivity.class);
-                startActivity(loginIntent);
-                finish();
+                fragmentClass = AccountSettingsFragment.class;
                 break;
 
             default:
-                intent = new Intent(this, MainActivity.class);
-                startActivity(intent);
-                finish();
                 break;
         }
 
-        if (this.getClass() != MainActivity.class)
-            finish();
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // Insert the fragment by replacing any existing fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        //fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+        FragmentTransaction tran = fragmentManager.beginTransaction();
+        tran.add(R.id.flContent, fragment);
+        tran.commit();
+
+        // Highlight the selected item has been done by NavigationView
+        menuItem.setChecked(true);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
+
     private void updateProfilePicture(String url) {
-        ImageView profilePic = (ImageView)headerLayout.findViewById(R.id.userPic_head);
+        ImageView profilePic = (ImageView) headerLayout.findViewById(R.id.userPic_head);
         Repository.instance.getProfilePicture(
                 new CloudManager.CloudCallback<Bitmap>() {
                     @Override
                     public void onComplete(Bitmap data) {
                         try {
                             profilePic.setImageBitmap(data);
-                        }
-                        catch (Exception e) {
+                        } catch (Exception e) {
                             profilePic.setImageResource(R.drawable.outalk_logo);
                         }
                     }
@@ -316,7 +360,7 @@ public class MainActivity extends AppCompatActivity
         );
     }
 
-
+    /////////////////////////////////////////////////////////////////////////
     public void Invitation(final Invite invite) {
         final Context context = this;
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
@@ -405,6 +449,11 @@ public class MainActivity extends AppCompatActivity
         intent.putExtra(Consts.USER_ID, id);
         // Log.d("Tag","eventID="+eventId);
         startActivity(intent);
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+        //TODO: Acoount
     }
 
     //Adapter class - uses eventList

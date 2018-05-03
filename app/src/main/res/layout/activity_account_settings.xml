@@ -9,7 +9,7 @@
     android:background="@color/appBackground"
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
-
+<!--
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -194,4 +194,5 @@
 
 
     </android.support.constraint.ConstraintLayout>
+    -->
 </android.support.v4.widget.DrawerLayout>

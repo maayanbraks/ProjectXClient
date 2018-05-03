@@ -30,18 +30,14 @@ import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
 
 public class AccountSettingsActivity extends AppCompatActivity {
-
-
     private UserViewModel viewModel = null;
     private int userId;
-
-    String newFirstName = null;
-    String newLastName = null;
-    String newEmail = null;
-    String newPhone = null;
+    private String newFirstName = null;
+    private String newLastName = null;
+    private String newEmail = null;
+    private String newPhone = null;
     private ImageView profilePicture;
     private Bitmap bitmap = null;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
