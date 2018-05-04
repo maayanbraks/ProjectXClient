@@ -31,7 +31,7 @@ import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 public class AccountSettingsFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private UserViewModel viewModel = null;
-    private int userId;
+    private int _userId;
     private String newFirstName = null;
     private String newLastName = null;
     private String newEmail = null;
@@ -43,20 +43,6 @@ public class AccountSettingsFragment extends Fragment {
         // Required empty public constructor
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        //Init User(then Init details) & Buttons Listeners
-        super.onCreate(savedInstanceState);
-
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param userId Parameter 1.
-     * @return A new instance of fragment AccountSettingsFragment.
-     */
     public static AccountSettingsFragment newInstance(int userId) {
         AccountSettingsFragment fragment = new AccountSettingsFragment();
         Bundle args = new Bundle();
@@ -66,13 +52,18 @@ public class AccountSettingsFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_account_settings, container, false);
         if (getArguments() != null) {
-            this.userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
+            this._userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
             viewModel = ViewModelProviders.of(this).get(UserViewModel.class);
-            viewModel.init(userId, true);
+            viewModel.init(_userId, true);
             viewModel.getUser().observe(this, new Observer<User>() {
                 @Override
                 public void onChanged(@Nullable User user) {

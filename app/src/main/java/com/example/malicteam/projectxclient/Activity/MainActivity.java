@@ -42,6 +42,7 @@ import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Invite;
 import com.example.malicteam.projectxclient.R;
 //import com.example.malicteam.projectxclient.ViewModel.EventsViewModel;
+import com.example.malicteam.projectxclient.View.EventsListFragment;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
 import java.util.LinkedList;
@@ -54,16 +55,17 @@ import com.google.firebase.auth.FirebaseAuth;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.OnFragmentInteractionListener{
 
-    private List<Event> eventsList = new LinkedList<>();
+//    private List<Event> eventsList = new LinkedList<>();
+//Navigation Header
     private TextView userNameHeader;
     private TextView userEmailHeader;
     private NavigationView navigationView;
     //    private EventsViewModel eventsData = null;
     private UserViewModel currentUser = null;
     private int userId;
-    private EventAdapter adapter;
+//    private EventAdapter adapter;
     private View headerLayout;
     private DrawerLayout mDrawer;
 
@@ -181,28 +183,46 @@ public class MainActivity extends AppCompatActivity
         mDrawer.addDrawerListener(toggle);
         toggle.syncState();
 
+        //Show Events list as main screen
+        loadMainFragmnet();
     }
 
-
-    private void refreshList() {
-        Repository.instance.getEvents(userId, new CloudManager.CloudCallback<List<Event>>() {
-            @Override
-            public void onComplete(List<Event> data) {
-                eventsList = data;
-                if (adapter != null)
-                    adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancel() {
-            }
-        });
+    private void loadMainFragmnet(){
+        Bundle bundle = new Bundle();
+        bundle.putInt(Consts.USER_ID, userId);
+        Class mainFragmentClass = EventsListFragment.class;
+        EventsListFragment mainFragment = null;
+        try {
+             mainFragment = (EventsListFragment) EventsListFragment.class.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        mainFragment.setArguments(bundle);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        //fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+        FragmentTransaction tran = fragmentManager.beginTransaction();
+        tran.add(R.id.flContent, mainFragment);
+        tran.commit();
     }
+
+//    private void refreshList() {
+//        Repository.instance.getEvents(userId, new CloudManager.CloudCallback<List<Event>>() {
+//            @Override
+//            public void onComplete(List<Event> data) {
+//                eventsList = data;
+//                if (adapter != null)
+//                    adapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//            }
+//        });
+//    }
 
     @Override
     protected void onResume() { //after creating new event.
         super.onResume();
-        refreshList();
     }
 
     @Override
@@ -306,9 +326,11 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem menuItem) {
         Fragment fragment = null;
         Class fragmentClass = null;
+        Bundle bundle = new Bundle();
         int id = menuItem.getItemId();
         switch (id) {
             case R.id.nav_settings_account:
+                bundle.putInt(Consts.USER_ID, userId);
                 fragmentClass = AccountSettingsFragment.class;
                 break;
 
@@ -321,7 +343,7 @@ public class MainActivity extends AppCompatActivity
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+        fragment.setArguments(bundle);
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
         //fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
@@ -456,42 +478,6 @@ public class MainActivity extends AppCompatActivity
         //TODO: Acoount
     }
 
-    //Adapter class - uses eventList
-    class EventAdapter extends BaseAdapter {
 
-        @Override
-        public int getCount() {
-            return eventsList.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-
-            if (view == null) {
-                view = getLayoutInflater().inflate(R.layout.records_list_row, viewGroup, false);
-            }
-            if (i < eventsList.size()) {
-                Event event = eventsList.get(i);
-
-                TextView _nameEvent = view.findViewById(R.id._nameEvent);
-                TextView _date = view.findViewById(R.id._date);
-
-                _nameEvent.setText(event.getTitle());
-                _date.setText(event.getDate());
-            }
-
-            return view;
-        }
-    }
 
 }
