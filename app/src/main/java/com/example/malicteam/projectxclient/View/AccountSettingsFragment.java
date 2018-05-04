@@ -43,10 +43,9 @@ public class AccountSettingsFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static AccountSettingsFragment newInstance(int userId) {
+    public static AccountSettingsFragment newInstance() {
         AccountSettingsFragment fragment = new AccountSettingsFragment();
         Bundle args = new Bundle();
-        args.putInt(Consts.USER_ID, userId);
         fragment.setArguments(args);
         return fragment;
     }
@@ -61,6 +60,8 @@ public class AccountSettingsFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_account_settings, container, false);
         if (getArguments() != null) {
+            profilePicture = (ImageView) view.findViewById(R.id.userPic_editAccount);
+
             this._userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
             viewModel = ViewModelProviders.of(this).get(UserViewModel.class);
             viewModel.init(_userId, true);

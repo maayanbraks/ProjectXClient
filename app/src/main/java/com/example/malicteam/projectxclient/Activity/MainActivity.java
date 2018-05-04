@@ -43,6 +43,7 @@ import com.example.malicteam.projectxclient.Model.Invite;
 import com.example.malicteam.projectxclient.R;
 //import com.example.malicteam.projectxclient.ViewModel.EventsViewModel;
 import com.example.malicteam.projectxclient.View.EventsListFragment;
+import com.example.malicteam.projectxclient.View.FriendsListFragment;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
 import java.util.LinkedList;
@@ -55,7 +56,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.OnFragmentInteractionListener, FriendsListFragment.OnFragmentInteractionListener{
 
 //    private List<Event> eventsList = new LinkedList<>();
 //Navigation Header
@@ -333,6 +334,14 @@ public class MainActivity extends AppCompatActivity
                 bundle.putInt(Consts.USER_ID, userId);
                 fragmentClass = AccountSettingsFragment.class;
                 break;
+            case R.id.nav_events_list:
+                bundle.putInt(Consts.USER_ID, userId);
+                fragmentClass = EventsListFragment.class;
+                break;
+            case R.id.nav_friends_list:
+                bundle.putInt(Consts.USER_ID, userId);
+                fragmentClass = FriendsListFragment.class;
+                break;
 
             default:
                 break;
@@ -346,12 +355,15 @@ public class MainActivity extends AppCompatActivity
         fragment.setArguments(bundle);
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
-        //fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
-        FragmentTransaction tran = fragmentManager.beginTransaction();
-        tran.add(R.id.flContent, fragment);
-        tran.commit();
+
+        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+//OR ==> (3 lines)
+//        FragmentTransaction tran = fragmentManager.beginTransaction();
+//        tran.add(R.id.flContent, fragment);
+//        tran.commit();
 
         // Highlight the selected item has been done by NavigationView
+
         menuItem.setChecked(true);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

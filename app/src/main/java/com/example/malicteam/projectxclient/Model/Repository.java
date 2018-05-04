@@ -147,34 +147,50 @@ public class Repository {
         });
     }
 
-    public LiveData<List<User>> getFriends(int userId) {
-        synchronized (this) {
-            if (FriendsLiveData == null) {
-                FriendsLiveData = new MutableLiveData<List<User>>();
+//    public LiveData<List<User>> getFriends(int userId) {
+//        synchronized (this) {
+//            if (FriendsLiveData == null) {
+//                FriendsLiveData = new MutableLiveData<List<User>>();
+//
+//                //1. get the last update date
+//                long lastUpdateDate = 0;
+//                try {
+//                    lastUpdateDate = MyApp.getContext().getSharedPreferences("TAG", MODE_PRIVATE).getLong("lastUpdateDate", 0);
+//                } catch (Exception e) {
+//
+//                }
+//
+//                //2. get all students records that where updated since last update date
+//                FirebaseModel.getFriends(userId, new CloudManager.CloudCallback<List<User>>() {
+//                    @Override
+//                    public void onComplete(List<User> data) {
+//                        updateFriendsDataInLocalStorage(data);
+//                    }
+//
+//                    @Override
+//                    public void onCancel() {
+//                    }
+//                });
+//            }
+//        }
+//        return FriendsLiveData;
+//    }
 
-                //1. get the last update date
-                long lastUpdateDate = 0;
-                try {
-                    lastUpdateDate = MyApp.getContext().getSharedPreferences("TAG", MODE_PRIVATE).getLong("lastUpdateDate", 0);
-                } catch (Exception e) {
-
-                }
-
-                //2. get all students records that where updated since last update date
-                FirebaseModel.getFriends(userId, new CloudManager.CloudCallback<List<User>>() {
-                    @Override
-                    public void onComplete(List<User> data) {
-                        updateFriendsDataInLocalStorage(data);
-                    }
-
-                    @Override
-                    public void onCancel() {
-                    }
-                });
+    public void getFriends(int userId, final CloudManager.CloudCallback<List<User>> firebaseCallback) {
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseModel.getFriends(userId, new CloudManager.CloudCallback<List<User>>() {
+            @Override
+            public void onComplete(List<User> data) {
+                updateFriendsDataInLocalStorage(data);
+                firebaseCallback.onComplete(data);
             }
-        }
-        return FriendsLiveData;
+            @Override
+            public void onCancel() {
+                firebaseCallback.onComplete(friends);
+            }
+        });
     }
+
 
     public void getEvents(int userId, CloudManager.CloudCallback<List<Event>> cloudCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
