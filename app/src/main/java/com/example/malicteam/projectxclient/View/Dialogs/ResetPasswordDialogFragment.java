@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -53,9 +54,9 @@ public class ResetPasswordDialogFragment extends DialogFragment {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(getActivity(), "Check Your Email.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(MyApp.getContext(), "Check Your Email.", Toast.LENGTH_LONG).show();
                         } else {
-                            Toast.makeText(getActivity(), "Failed to send reset email!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MyApp.getContext(), "Failed to send reset email!", Toast.LENGTH_SHORT).show();
                         }
                         progressBar.setVisibility(View.GONE);
                     }

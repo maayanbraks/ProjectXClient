@@ -9,6 +9,13 @@
     tools:openDrawer="start"
     android:background="@color/appBackground">
 
+    <ProgressBar
+        android:id="@+id/mainProgressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
     <FrameLayout
         android:id="@+id/flContent"
         android:layout_width="match_parent"

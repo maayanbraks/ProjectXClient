@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -28,14 +29,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.Common.NewEventFragment;
+import com.example.malicteam.projectxclient.View.NewEventFragment;
 import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Model.CloudManager;
@@ -47,34 +46,32 @@ import com.example.malicteam.projectxclient.View.EventDetailsFragment;
 import com.example.malicteam.projectxclient.View.EventsListFragment;
 import com.example.malicteam.projectxclient.View.FriendDetailsFragment;
 import com.example.malicteam.projectxclient.View.FriendsListFragment;
+import com.example.malicteam.projectxclient.View.ResetPasswordFragment;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
-
-import java.util.LinkedList;
-import java.util.List;
 
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.Model.Repository;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.EvenetListListener,
-        FriendsListFragment.OnFriendSelected, NewEventFragment.OnFragmentInteractionListener, FriendDetailsFragment.OnFragmentInteractionListener, EventDetailsFragment.OnFragmentInteractionListener{
+        FriendsListFragment.OnFriendSelected, NewEventFragment.OnFragmentInteractionListener, FriendDetailsFragment.OnFragmentInteractionListener, EventDetailsFragment.OnFragmentInteractionListener,
+        ResetPasswordFragment.ResetPasswordListener {
 
-//    private List<Event> eventsList = new LinkedList<>();
+    //    private List<Event> eventsList = new LinkedList<>();
 //Navigation Header
     private TextView userNameHeader;
     private TextView userEmailHeader;
     private NavigationView navigationView;
-    //    private EventsViewModel eventsData = null;
+    private MenuItem currentItem = null;//holds the current item that checked (for un checked it a
     private UserViewModel currentUser = null;
     private int userId;
-//    private EventAdapter adapter;
     private View headerLayout;
     private DrawerLayout mDrawer;
-
-    //private User myuser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -203,13 +200,13 @@ public class MainActivity extends AppCompatActivity
         loadMainFragmnet();
     }
 
-    private void loadMainFragmnet(){
+    private void loadMainFragmnet() {
         Bundle bundle = new Bundle();
         bundle.putInt(Consts.USER_ID, userId);
         Class mainFragmentClass = EventsListFragment.class;
         EventsListFragment mainFragment = null;
         try {
-             mainFragment = (EventsListFragment) EventsListFragment.class.newInstance();
+            mainFragment = (EventsListFragment) EventsListFragment.class.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -350,16 +347,13 @@ public class MainActivity extends AppCompatActivity
         fragment.setArguments(bundle);
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
-
         fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
-//OR ==> (3 lines)
-//        FragmentTransaction tran = fragmentManager.beginTransaction();
-//        tran.add(R.id.flContent, fragment);
-//        tran.commit();
 
-        // Highlight the selected item has been done by NavigationView
-
+        if (this.currentItem != null) {
+            this.currentItem.setChecked(false);
+        }
         menuItem.setChecked(true);
+        this.currentItem = menuItem;
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -493,8 +487,6 @@ public class MainActivity extends AppCompatActivity
         FriendDetailsFragment fragment = FriendDetailsFragment.newInstance();
         Bundle bundle = new Bundle();
         bundle.putSerializable(Consts.USER, user);
-        Class fragmentClass = null;
-        fragmentClass = NewEventFragment.class;
         fragment.setArguments(bundle);
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -507,12 +499,41 @@ public class MainActivity extends AppCompatActivity
         EventDetailsFragment fragment = EventDetailsFragment.newInstance();
         Bundle bundle = new Bundle();
         bundle.putSerializable(Consts.SEND_EVENT, event);
-        Class fragmentClass = null;
-        fragmentClass = NewEventFragment.class;
         fragment.setArguments(bundle);
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
-
         fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+    }
+
+    //ResetPassword Listener
+    @Override
+    public void onBackButtonClick() {
+        AccountSettingsFragment fragment = AccountSettingsFragment.newInstance();
+        Bundle bundle = new Bundle();
+        bundle.putInt(Consts.USER_ID, userId);
+        fragment.setArguments(bundle);
+        // Insert the fragment by replacing any existing fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+    }
+
+    @Override
+    public void sendResetPassword(String email) {
+        ProgressBar progressBar = (ProgressBar) findViewById(R.id.mainProgressBar);
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        auth.sendPasswordResetEmail(email)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(MainActivity.this, "We have sent you instructions to reset your password!", Toast.LENGTH_SHORT).show();
+                            finish();
+                        } else {
+                            Toast.makeText(MainActivity.this, "Failed to send reset email!", Toast.LENGTH_SHORT).show();
+                        }
+
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
     }
 }

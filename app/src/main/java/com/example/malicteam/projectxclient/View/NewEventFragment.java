@@ -1,4 +1,4 @@
-package com.example.malicteam.projectxclient.Common;
+package com.example.malicteam.projectxclient.View;
 
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
@@ -21,6 +21,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Activity.RecordingActivity;
+import com.example.malicteam.projectxclient.Common.Consts;
+import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
