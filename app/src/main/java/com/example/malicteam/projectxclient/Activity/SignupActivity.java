@@ -16,7 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Common.Consts;
-import com.example.malicteam.projectxclient.Dialogs.PictureDialogFragment;
+import com.example.malicteam.projectxclient.View.Dialogs.PictureDialogFragment;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -27,8 +27,6 @@ import com.google.firebase.auth.FirebaseAuth;
 
 
 import java.util.LinkedList;
-
-import com.example.malicteam.projectxclient.Model.FirebaseModel;
 
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;

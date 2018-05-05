@@ -17,11 +17,11 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Common.Consts;
-import com.example.malicteam.projectxclient.Dialogs.ChangeDetailsFragment;
-import com.example.malicteam.projectxclient.Dialogs.LogoutDialogFragment;
-import com.example.malicteam.projectxclient.Dialogs.PictureDialogFragment;
-import com.example.malicteam.projectxclient.Dialogs.RemoveAccountDialogFragment;
-import com.example.malicteam.projectxclient.Dialogs.ResetPasswordDialogFragment;
+import com.example.malicteam.projectxclient.View.Dialogs.ChangeDetailsFragment;
+import com.example.malicteam.projectxclient.View.Dialogs.LogoutDialogFragment;
+import com.example.malicteam.projectxclient.View.Dialogs.PictureDialogFragment;
+import com.example.malicteam.projectxclient.View.Dialogs.RemoveAccountDialogFragment;
+import com.example.malicteam.projectxclient.View.Dialogs.ResetPasswordDialogFragment;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;

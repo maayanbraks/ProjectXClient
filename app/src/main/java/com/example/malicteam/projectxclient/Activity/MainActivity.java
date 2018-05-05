@@ -35,6 +35,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.example.malicteam.projectxclient.Common.NewEventFragment;
 import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Model.CloudManager;
@@ -43,6 +44,7 @@ import com.example.malicteam.projectxclient.Model.Invite;
 import com.example.malicteam.projectxclient.R;
 //import com.example.malicteam.projectxclient.ViewModel.EventsViewModel;
 import com.example.malicteam.projectxclient.View.EventsListFragment;
+import com.example.malicteam.projectxclient.View.FriendDetailsFragment;
 import com.example.malicteam.projectxclient.View.FriendsListFragment;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
@@ -56,7 +58,8 @@ import com.google.firebase.auth.FirebaseAuth;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.OnFragmentInteractionListener, FriendsListFragment.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.OnFragmentInteractionListener,
+        FriendsListFragment.OnFriendSelected, NewEventFragment.OnFragmentInteractionListener, FriendDetailsFragment.OnFragmentInteractionListener{
 
 //    private List<Event> eventsList = new LinkedList<>();
 //Navigation Header
@@ -170,10 +173,21 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), NewEventActivity.class);
-                int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
-                intent.putExtra(Consts.USER_ID, id);
-                startActivity(intent);
+                Fragment fragment = null;
+                Bundle bundle = new Bundle();
+                bundle.putInt(Consts.USER_ID, userId);
+                Class fragmentClass = null;
+                fragmentClass = NewEventFragment.class;
+                try {
+                    fragment = (Fragment) fragmentClass.newInstance();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                fragment.setArguments(bundle);
+                // Insert the fragment by replacing any existing fragment
+                FragmentManager fragmentManager = getSupportFragmentManager();
+
+                fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
             }
         });
 
@@ -206,26 +220,6 @@ public class MainActivity extends AppCompatActivity
         tran.commit();
     }
 
-//    private void refreshList() {
-//        Repository.instance.getEvents(userId, new CloudManager.CloudCallback<List<Event>>() {
-//            @Override
-//            public void onComplete(List<Event> data) {
-//                eventsList = data;
-//                if (adapter != null)
-//                    adapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//            }
-//        });
-//    }
-
-    @Override
-    protected void onResume() { //after creating new event.
-        super.onResume();
-    }
-
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -245,11 +239,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         if (id == R.id.logout_actionMenu) {
             Repository.instance.logout();
@@ -341,6 +331,10 @@ public class MainActivity extends AppCompatActivity
             case R.id.nav_friends_list:
                 bundle.putInt(Consts.USER_ID, userId);
                 fragmentClass = FriendsListFragment.class;
+                break;
+            case R.id.nav_events_new:
+                bundle.putInt(Consts.USER_ID, userId);
+                fragmentClass = NewEventFragment.class;
                 break;
 
             default:
@@ -485,11 +479,24 @@ public class MainActivity extends AppCompatActivity
         startActivity(intent);
     }
 
+
+    //Fragments Interaction
     @Override
     public void onFragmentInteraction(Uri uri) {
         //TODO: Acoount
     }
 
+    @Override
+    public void showFriendDetails(User user) {
+        FriendDetailsFragment fragment = FriendDetailsFragment.newInstance();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(Consts.USER, user);
+        Class fragmentClass = null;
+        fragmentClass = NewEventFragment.class;
+        fragment.setArguments(bundle);
+        // Insert the fragment by replacing any existing fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
 
-
+        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+    }
 }

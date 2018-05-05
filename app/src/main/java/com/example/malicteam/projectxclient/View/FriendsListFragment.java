@@ -1,28 +1,20 @@
 package com.example.malicteam.projectxclient.View;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.Activity.FriendDetailsActivity;
-import com.example.malicteam.projectxclient.Activity.FriendsListActivity;
+
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Model.CloudManager;
@@ -36,7 +28,7 @@ import java.util.List;
 
 
 public class FriendsListFragment extends Fragment {
-    private OnFragmentInteractionListener mListener;
+    private OnFriendSelected mListener;
     private int userId;
     private List<User> friendsList = new LinkedList<>();
     private MyAdapter adapter = null;
@@ -101,17 +93,11 @@ public class FriendsListFragment extends Fragment {
         return view;
     }
 
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnFriendSelected) {
+            mListener = (OnFriendSelected) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -133,9 +119,8 @@ public class FriendsListFragment extends Fragment {
     }
 
 
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    public interface OnFriendSelected {
+        void showFriendDetails(User user);
     }
 
     private void refreshList() {
@@ -256,14 +241,12 @@ public class FriendsListFragment extends Fragment {
             User friend = friendsList.get(i);
 
             //Friend Details - onClick
-//  TODO          view.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    Intent intent = new Intent(FriendsListActivity.this, FriendDetailsActivity.class);
-//                    intent.putExtra(Consts.USER, friend);
-//                    startActivity(intent);
-//                }
-//            });
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.showFriendDetails(friend);
+                }
+            });
 
             //Delete Friend - Button (X button) of every friend on th list
             ImageButton deleteButton = (ImageButton) view.findViewById(R.id.deleteFriendButton_friendRowList);

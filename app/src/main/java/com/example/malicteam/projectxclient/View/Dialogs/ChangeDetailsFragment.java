@@ -1,4 +1,4 @@
-package com.example.malicteam.projectxclient.Dialogs;
+package com.example.malicteam.projectxclient.View.Dialogs;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -10,7 +10,6 @@ import android.widget.Toast;
 import com.example.malicteam.projectxclient.Common.Consts;
 
 import com.example.malicteam.projectxclient.Model.CloudManager;
-import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Repository;
 
 public class ChangeDetailsFragment extends DialogFragment {
