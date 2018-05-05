@@ -43,6 +43,7 @@ import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Invite;
 import com.example.malicteam.projectxclient.R;
 //import com.example.malicteam.projectxclient.ViewModel.EventsViewModel;
+import com.example.malicteam.projectxclient.View.EventDetailsFragment;
 import com.example.malicteam.projectxclient.View.EventsListFragment;
 import com.example.malicteam.projectxclient.View.FriendDetailsFragment;
 import com.example.malicteam.projectxclient.View.FriendsListFragment;
@@ -58,8 +59,8 @@ import com.google.firebase.auth.FirebaseAuth;
 
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.OnFragmentInteractionListener,
-        FriendsListFragment.OnFriendSelected, NewEventFragment.OnFragmentInteractionListener, FriendDetailsFragment.OnFragmentInteractionListener{
+        implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.EvenetListListener,
+        FriendsListFragment.OnFriendSelected, NewEventFragment.OnFragmentInteractionListener, FriendDetailsFragment.OnFragmentInteractionListener, EventDetailsFragment.OnFragmentInteractionListener{
 
 //    private List<Event> eventsList = new LinkedList<>();
 //Navigation Header
@@ -486,11 +487,26 @@ public class MainActivity extends AppCompatActivity
         //TODO: Acoount
     }
 
+    //FriendsList interface
     @Override
     public void showFriendDetails(User user) {
         FriendDetailsFragment fragment = FriendDetailsFragment.newInstance();
         Bundle bundle = new Bundle();
         bundle.putSerializable(Consts.USER, user);
+        Class fragmentClass = null;
+        fragmentClass = NewEventFragment.class;
+        fragment.setArguments(bundle);
+        // Insert the fragment by replacing any existing fragment
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+    }
+
+    @Override
+    public void onEventSelected(Event event) {
+        EventDetailsFragment fragment = EventDetailsFragment.newInstance();
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(Consts.SEND_EVENT, event);
         Class fragmentClass = null;
         fragmentClass = NewEventFragment.class;
         fragment.setArguments(bundle);

@@ -17,7 +17,7 @@
             android:layout_gravity="center"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="100dp"
             android:layout_weight="1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -30,11 +30,11 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/progress_friendDetails">
+            app:layout_constraintTop_toBottomOf="@+id/userPic__friendDetails">
 
             <TextView
                 android:id="@+id/firstName_friendDetails"
@@ -46,7 +46,6 @@
                 android:textSize="24dp" />
 
 
-
             <TextView
                 android:id="@+id/lastName_friendDetails"
                 android:layout_width="match_parent"
@@ -56,7 +55,6 @@
                 android:inputType="textPersonName"
                 android:text="Last Name"
                 android:textSize="24dp" />
-
 
 
             <TextView
@@ -116,18 +114,6 @@
                 android:text="Events List"
                 android:textStyle="bold" />
         </LinearLayout>
-
-        <ProgressBar
-            android:id="@+id/progress_friendDetails"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/userPic__friendDetails" />
 
     </android.support.constraint.ConstraintLayout>
 

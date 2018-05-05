@@ -32,7 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class EventsListFragment extends Fragment {
-    private OnFragmentInteractionListener mListener;
+    private EvenetListListener mListener;
     private List<Event> eventsList = new LinkedList<>();
     private UserViewModel currentUser = null;
     private int _userId;
@@ -58,7 +58,7 @@ public class EventsListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_events_list, container, false);
-        if(getArguments()!= null){
+        if (getArguments() != null) {
             ListView eventListView = (ListView) view.findViewById(R.id._listOfEvents);
             adapter = new EventAdapter();
             eventListView.setAdapter(adapter);
@@ -71,6 +71,7 @@ public class EventsListFragment extends Fragment {
                     if (adapter != null)
                         adapter.notifyDataSetChanged();
                 }
+
                 @Override
                 public void onCancel() {
                 }
@@ -93,19 +94,11 @@ public class EventsListFragment extends Fragment {
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof EvenetListListener) {
+            mListener = (EvenetListListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -141,19 +134,8 @@ public class EventsListFragment extends Fragment {
         });
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    public interface EvenetListListener {
+        void onEventSelected(Event event);
     }
 
 
@@ -183,7 +165,12 @@ public class EventsListFragment extends Fragment {
             }
             if (i < eventsList.size()) {
                 Event event = eventsList.get(i);
-
+                view.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mListener.onEventSelected(event);
+                    }
+                });
                 TextView _nameEvent = view.findViewById(R.id._nameEvent);
                 TextView _date = view.findViewById(R.id._date);
 
