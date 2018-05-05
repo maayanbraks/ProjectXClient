@@ -1,4 +1,4 @@
-package com.example.malicteam.projectxclient.Model;
+package com.example.malicteam.projectxclient.Common;
 
 import android.app.Application;
 import android.content.Context;

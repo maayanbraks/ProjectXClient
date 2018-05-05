@@ -12,7 +12,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.Consts;
+import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -111,6 +111,8 @@ public class LoginActivity extends Activity {
                             }
                         } else {
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+                            intent.putExtra(Consts.USER_ID, id);
                             startActivity(intent);
                             finish();
                         }
