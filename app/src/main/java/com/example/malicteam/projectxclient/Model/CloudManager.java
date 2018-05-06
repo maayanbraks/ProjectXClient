@@ -28,7 +28,7 @@ import java.net.URISyntaxException;
  */
 
 public class CloudManager {
-    CloudManagerCallback<ResponseData> localCallbackCloudManager;
+    CloudCallback<ResponseData> localCallbackCloudManager;
     private static Gson gson = new Gson();
     private Socket socket;
     static final int PORT = 8888;
@@ -43,8 +43,8 @@ public class CloudManager {
 
     }
 
-    public interface CloudManagerCallback<ResponseData> {
-        void onComplete(ResponseData data);
+    public interface CloudCallback<T> {
+        void onComplete(T data);
 
         void onCancel();
     }
@@ -153,7 +153,7 @@ public class CloudManager {
         return gson.toJson(obj);
     }
 
-    public void sendToServer(String event, Object obj, final CloudManager.CloudManagerCallback<ResponseData> cloudManagercallback) {
+    public void sendToServer(String event, Object obj, final CloudCallback<ResponseData> cloudManagercallback) {
         // TODO Auto-generated method stub
         localCallbackCloudManager = cloudManagercallback;
         String jsonString = getStringFromObject(obj);

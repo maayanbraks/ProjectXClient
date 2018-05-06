@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatDelegate;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -12,9 +13,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.Consts;
-import com.example.malicteam.projectxclient.Model.CloudManager;
-import com.example.malicteam.projectxclient.Model.FirebaseModel;
+import com.example.malicteam.projectxclient.Common.Consts;
+
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -23,11 +23,6 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 import com.example.malicteam.projectxclient.Model.User;
-
-import Enums.ResponseType;
-import Responses.ErrorResponseData;
-import Responses.ResponseData;
-import okhttp3.Response;
 
 
 public class LoginActivity extends Activity {
@@ -62,7 +57,6 @@ public class LoginActivity extends Activity {
 
 
 
-        Log.d("tagLogin", "login finish on create");
         btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -70,22 +64,18 @@ public class LoginActivity extends Activity {
                 finish();
             }
         });
-        Log.d("tagLogin", "login finish on create");
         btnReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
             }
         });
-        Log.d("tagLogin", "login finish on create");
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 tryLogin();
             }
         });
-
-        Log.d("tagLogin", "login finish on create");
     }
 
     private void tryLogin(){

@@ -36,16 +36,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.Consts;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.View.NewEventFragment;
 import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
 import com.example.malicteam.projectxclient.Common.Consts;
-import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Invite;
 import com.example.malicteam.projectxclient.R;
-//import com.example.malicteam.projectxclient.ViewModel.EventsViewModel;
 import com.example.malicteam.projectxclient.View.EventDetailsFragment;
 import com.example.malicteam.projectxclient.View.EventsListFragment;
 import com.example.malicteam.projectxclient.View.FriendDetailsFragment;
@@ -54,8 +51,6 @@ import com.example.malicteam.projectxclient.View.ResetPasswordFragment;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
 import java.net.URISyntaxException;
-import java.util.LinkedList;
-import java.util.List;
 
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.User;

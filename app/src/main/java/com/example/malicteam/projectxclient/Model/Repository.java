@@ -1,18 +1,17 @@
 package com.example.malicteam.projectxclient.Model;
-import Enums.ErrorType;
 import Requests.*;
 import Responses.ErrorResponseData;
 import Responses.*;
-import okhttp3.Response;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.icu.text.IDNA;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.util.Log;
 import android.webkit.URLUtil;
 
@@ -23,10 +22,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,7 +40,6 @@ public class Repository {
     //private MutableLiveData<List<Event>> eventsData;
     //private MutableLiveData<List<User>> friendsLiveData;
 
-    private List<User> friends = null;//holds local users
     CloudManager CM;
     private List<User> friends = null;//holds local users
 
@@ -72,7 +67,7 @@ public class Repository {
             if (userLiveData == null) {
                 userLiveData = new MutableLiveData<User>();
                 FirebaseAuth auth = FirebaseAuth.getInstance();
-                FirebaseModel.getUserAndObserve(Integer.toString(id), new FirebaseModel.FirebaseCallback<User>() {
+                FirebaseModel.getUserAndObserve(Integer.toString(id), new CloudManager.CloudCallback<User>() {
                     @Override
                     public void onComplete(User data) {
                         if (data != null)
@@ -209,19 +204,18 @@ public class Repository {
 //        return FriendsLiveData;
 //    }
 
-    public void getFriends(int userId, final CloudManager.CloudCallback<List<User>> firebaseCallback) {
 
-    public void getFriends(int userId, final FirebaseModel.FirebaseCallback<List<User>> firebaseCallback) {
+    public void getFriends(int userId, final CloudManager.CloudCallback<List<User>> callback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseModel.getFriends(userId, new CloudManager.CloudCallback<List<User>>() {
             @Override
             public void onComplete(List<User> data) {
                 updateFriendsDataInLocalStorage(data);
-                firebaseCallback.onComplete(data);
+                callback.onComplete(data);
             }
             @Override
             public void onCancel() {
-                firebaseCallback.onComplete(friends);
+                callback.onComplete(friends);
             }
         });
     }
@@ -366,7 +360,7 @@ public class Repository {
 //    }
     public void logIn(String username,String password,final RepositoryCallback callback) {
        LoginRequestData loginRequestData=new LoginRequestData(username,password);
-        CM.sendToServer("Request",loginRequestData, new CloudManager.CloudManagerCallback<ResponseData>() {
+        CM.sendToServer("Request",loginRequestData, new CloudManager.CloudCallback<ResponseData>() {
             @Override
             public void onComplete(ResponseData responseData) {
                 switch (responseData.getType())
