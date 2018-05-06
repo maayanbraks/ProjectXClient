@@ -4,6 +4,8 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 
+import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
+
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -45,12 +47,12 @@ public class User implements Serializable {
         this.lastUpdated = lastUpdated;
 
         if (friendsIds != null)
-            this.friendsIds = FirebaseModel.generateStringFromList(friendsIds);
+            this.friendsIds = ProductTypeConverters.toString(friendsIds);
         else
             this.friendsIds = "{}";
 
         if (eventsIds != null)
-            this.eventsIds = FirebaseModel.generateStringFromList(eventsIds);
+            this.eventsIds = ProductTypeConverters.toString(eventsIds);
         else
             this.eventsIds = "{}";
     }
@@ -68,12 +70,12 @@ public class User implements Serializable {
         //this.eventsIds = new LinkedList<Integer>();
 
         if (friendsIds != null)
-            this.friendsIds = FirebaseModel.generateStringFromList(friendsIds);
+            this.friendsIds = ProductTypeConverters.toString(friendsIds);
         else
             this.friendsIds = "{}";
 
         if (eventsIds != null)
-            this.eventsIds = FirebaseModel.generateStringFromList(eventsIds);
+            this.eventsIds = ProductTypeConverters.toString(eventsIds);
         else
             this.eventsIds = "{}";
     }
@@ -113,12 +115,12 @@ public class User implements Serializable {
         this.lastUpdated = date.getTime();
 
         if (friendsIds != null)
-            this.friendsIds = FirebaseModel.generateStringFromList(friendsIds);
+            this.friendsIds = ProductTypeConverters.toString(friendsIds);
         else
             this.friendsIds = "{}";
 
         if (eventsIds != null)
-            this.eventsIds = FirebaseModel.generateStringFromList(eventsIds);
+            this.eventsIds = ProductTypeConverters.toString(eventsIds);
         else
             this.eventsIds = "{}";
     }
@@ -136,12 +138,12 @@ public class User implements Serializable {
         this.lastUpdated = date.getTime();
 
         if (friendsIds != null)
-            this.friendsIds = FirebaseModel.generateStringFromList(friendsIds);
+            this.friendsIds = ProductTypeConverters.toString(friendsIds);
         else
             this.friendsIds = "{}";
 
         if (eventsIds != null)
-            this.eventsIds = FirebaseModel.generateStringFromList(eventsIds);
+            this.eventsIds = ProductTypeConverters.toString(eventsIds);
         else
             this.eventsIds = "{}";
     }
@@ -149,21 +151,21 @@ public class User implements Serializable {
 
 
     public void addEventToList(int event) {
-        List<Integer> list = FirebaseModel.decodeListFromString(this.eventsIds);
+        List<Integer> list = ProductTypeConverters.toList(this.eventsIds);
         list.add(event);
-        this.eventsIds = FirebaseModel.generateStringFromList(list);
+        this.eventsIds = ProductTypeConverters.toString(list);
     }
 
     public void deleteEventFromList(int event) {
         int index = 0;
         if (eventsIds.contains(Integer.toString(event))) {
-            List<Integer> list = FirebaseModel.decodeListFromString(this.eventsIds);
+            List<Integer> list = ProductTypeConverters.toList(this.eventsIds);
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i) == event)
                     index = list.get(i);
             }
             list.remove(index);
-            this.eventsIds = FirebaseModel.generateStringFromList(list);
+            this.eventsIds = ProductTypeConverters.toString(list);
         }
     }
 
@@ -177,11 +179,11 @@ public class User implements Serializable {
 
 
     public void setEventsIds(List<Integer> eventsIds) {
-        this.eventsIds = FirebaseModel.generateStringFromList(eventsIds);
+        this.eventsIds = ProductTypeConverters.toString(eventsIds);
     }
 
     public void setFriendsIds(List<Integer> friendsIds) {
-        this.friendsIds = FirebaseModel.generateStringFromList(friendsIds);
+        this.friendsIds = ProductTypeConverters.toString(friendsIds);
     }
 
     public void setId(@NonNull int id) {
@@ -253,7 +255,7 @@ public class User implements Serializable {
     }
 
     public List<Integer> getFriendsIdsAsList() {
-        return FirebaseModel.decodeListFromString(friendsIds);
+        return ProductTypeConverters.toList(friendsIds);
     }
 
     public String getFriendsIds() {
@@ -261,14 +263,14 @@ public class User implements Serializable {
     }
 
     public void addFriend(int id) {
-        List<Integer> list = FirebaseModel.decodeListFromString(friendsIds);
+        List<Integer> list = ProductTypeConverters.toList(friendsIds);
         list.add(id);
-        friendsIds = FirebaseModel.generateStringFromList(list);
+        friendsIds = ProductTypeConverters.toString(list);
     }
 
 
     public List<Integer> getEventsIdsAsList() {
-        return FirebaseModel.decodeListFromString(eventsIds);
+        return ProductTypeConverters.toList(eventsIds);
     }
 
 
@@ -277,9 +279,9 @@ public class User implements Serializable {
     }
 
     public void addEvent(int id) {
-        List<Integer> list = FirebaseModel.decodeListFromString(eventsIds);
+        List<Integer> list = ProductTypeConverters.toList(eventsIds);
         list.add(id);
-        eventsIds = FirebaseModel.generateStringFromList(list);
+        eventsIds = ProductTypeConverters.toString(list);
     }
 
     public void setFriendsIds(String friendsIds) {

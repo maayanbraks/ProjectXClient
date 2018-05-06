@@ -1,6 +1,5 @@
-package com.example.malicteam.projectxclient.Dialogs;
+package com.example.malicteam.projectxclient.View.Dialogs;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;

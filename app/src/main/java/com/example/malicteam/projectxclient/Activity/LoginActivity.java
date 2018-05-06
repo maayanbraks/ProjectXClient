@@ -1,11 +1,9 @@
 package com.example.malicteam.projectxclient.Activity;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatDelegate;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -64,6 +62,7 @@ public class LoginActivity extends Activity {
 
 
 
+        Log.d("tagLogin", "login finish on create");
         btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,13 +70,14 @@ public class LoginActivity extends Activity {
                 finish();
             }
         });
+        Log.d("tagLogin", "login finish on create");
         btnReset.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
             }
         });
-
+        Log.d("tagLogin", "login finish on create");
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -85,12 +85,9 @@ public class LoginActivity extends Activity {
             }
         });
 
+        Log.d("tagLogin", "login finish on create");
     }
-       // @Override
-//        protected void attachBaseContext(Context base) {
-//            super.attachBaseContext(base);
-//            MultiDex.install(this);
-//        }
+
     private void tryLogin(){
         FirebaseAuth auth = FirebaseAuth.getInstance();
 
@@ -159,6 +156,8 @@ public class LoginActivity extends Activity {
                             }
                         } else {
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+                            intent.putExtra(Consts.USER_ID, id);
                             startActivity(intent);
                             finish();
                         }

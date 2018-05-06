@@ -15,8 +15,9 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.Consts;
-import com.example.malicteam.projectxclient.Dialogs.PictureDialogFragment;
+import com.example.malicteam.projectxclient.Common.Consts;
+import com.example.malicteam.projectxclient.View.Dialogs.PictureDialogFragment;
+import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -26,8 +27,6 @@ import com.google.firebase.auth.FirebaseAuth;
 
 
 import java.util.LinkedList;
-
-import com.example.malicteam.projectxclient.Model.FirebaseModel;
 
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
@@ -109,7 +108,7 @@ public class SignupActivity extends AppCompatActivity {
                                     Toast.makeText(SignupActivity.this, "Thank you for registering", Toast.LENGTH_SHORT).show();
 
                                     if (bitmap != null) {
-                                        Repository.instance.saveProfilePicture(bitmap, email, new FirebaseModel.FirebaseCallback<String>() {
+                                        Repository.instance.saveProfilePicture(bitmap, email, new CloudManager.CloudCallback<String>() {
                                             @Override
                                             public void onComplete(String url) {
                                                 User newUser;
@@ -120,7 +119,7 @@ public class SignupActivity extends AppCompatActivity {
                                                     newUser = new User(firstName.getText().toString(), lastName.getText().toString(), phone.getText().toString(), inputEmail.getText().toString(),
                                                             new LinkedList<Integer>(), new LinkedList<Integer>());
 
-                                                Repository.instance.addNewUserToDB(newUser, new FirebaseModel.FirebaseCallback<User>() {
+                                                Repository.instance.addNewUserToDB(newUser, new CloudManager.CloudCallback<User>() {
                                                     @Override
                                                     public void onComplete(User data) {
 
@@ -150,7 +149,7 @@ public class SignupActivity extends AppCompatActivity {
                                         });
                                     } else {
                                         Repository.instance.addNewUserToDB(new User(firstName.getText().toString(), lastName.getText().toString(), phone.getText().toString(), inputEmail.getText().toString(),
-                                                new LinkedList<Integer>(), new LinkedList<Integer>()), new FirebaseModel.FirebaseCallback<User>() {
+                                                new LinkedList<Integer>(), new LinkedList<Integer>()), new CloudManager.CloudCallback<User>() {
                                             @Override
                                             public void onComplete(User data) {
                                                 if (data == null)

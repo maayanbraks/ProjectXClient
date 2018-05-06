@@ -1,4 +1,4 @@
-package com.example.malicteam.projectxclient.Dialogs;
+package com.example.malicteam.projectxclient.View.Dialogs;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -7,9 +7,9 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.Consts;
+import com.example.malicteam.projectxclient.Common.Consts;
 
-import com.example.malicteam.projectxclient.Model.FirebaseModel;
+import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Repository;
 
 public class ChangeDetailsFragment extends DialogFragment {
@@ -39,7 +39,7 @@ public class ChangeDetailsFragment extends DialogFragment {
         builder.setMessage(str)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Repository.instance.changeUserDetails(_first, _last, _email, _phone, new FirebaseModel.FirebaseCallback<String>() {
+                        Repository.instance.changeUserDetails(_first, _last, _email, _phone, new CloudManager.CloudCallback<String>() {
                             @Override
                             public void onComplete(String data) {
                                 if (data != null && data != "")

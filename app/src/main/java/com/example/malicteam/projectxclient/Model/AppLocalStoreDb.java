@@ -6,7 +6,7 @@ import android.arch.persistence.room.RoomDatabase;
 import android.arch.persistence.room.TypeConverters;
 import android.content.Context;
 
-import static com.example.malicteam.projectxclient.Model.MyApp.getContext;
+import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 
 /**
  * Created by Maayan on 12-Mar-18.
