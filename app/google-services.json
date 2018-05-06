@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "865970650630-1l4v5ppsstab97maal66m41v0g4a2fo6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.malicteam.projectxclient",
+            "certificate_hash": "7c0430f8263659705125711047ea070c480154ca"
+          }
+        },
+        {
           "client_id": "865970650630-dv37135r4r8ujvhab9coe7nln4uojdbo.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

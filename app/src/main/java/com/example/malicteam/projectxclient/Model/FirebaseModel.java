@@ -318,7 +318,6 @@ public class FirebaseModel {
                                 }catch (Exception e){
                                     //this is invites
                                 }
-
                                 if (ids[0] != null && ids[0].size() > 0 && ids[0].contains(id)) {
                                     String eventName = (String) value.get("Title");
                                     String desc = (String) value.get("Description");

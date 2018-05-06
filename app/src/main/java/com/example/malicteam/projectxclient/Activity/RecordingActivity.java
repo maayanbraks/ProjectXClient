@@ -53,7 +53,7 @@ public class RecordingActivity extends AppCompatActivity {
         eventIdTogetIn = " ";
         userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
         mFileName = getExternalCacheDir().getAbsolutePath();
-        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
+        //ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
 
         TextView backButton = (TextView) findViewById(R.id.back_btn_recording);
         backButton.setOnClickListener(new View.OnClickListener() {

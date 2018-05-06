@@ -9,9 +9,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
@@ -33,12 +35,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Consts;
+import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Invite;
 import com.example.malicteam.projectxclient.R;
 //import com.example.malicteam.projectxclient.ViewModel.EventsViewModel;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -91,6 +95,12 @@ public class MainActivity extends AppCompatActivity
             }
         });
         //End of - invitation code
+////////////////////startin testing the socketio
+
+
+
+        ///////////
+
 
         //Get Events
         Repository.instance.getEvents(userId, new FirebaseModel.FirebaseCallback<List<Event>>() {
@@ -105,6 +115,12 @@ public class MainActivity extends AppCompatActivity
             public void onCancel() {
             }
         });
+
+        try {
+            CloudManager cd=new CloudManager();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -225,7 +241,7 @@ public class MainActivity extends AppCompatActivity
         //noinspection SimplifiableIfStatement
         if (id == R.id.logout_actionMenu) {
             Repository.instance.logout();
-            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+           // startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
         }
 
@@ -399,6 +415,7 @@ public class MainActivity extends AppCompatActivity
 
     public void getInEvent(String eventId) {
         Intent intent;
+
         intent = new Intent(getApplicationContext(), RecordingActivity.class);
         intent.putExtra("eventidToGetIn", eventId);
         int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
