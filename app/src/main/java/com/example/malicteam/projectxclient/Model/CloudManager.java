@@ -71,8 +71,20 @@ public class CloudManager {
     }
 
     public void onCreate(Bundle savedInstanceState) throws URISyntaxException {
+//???
+//???
+    }
 
 
+    public boolean connectToServer() throws URISyntaxException {
+        IO.Options opts = new IO.Options();
+        socket = IO.socket("http://192.168.1.16:8080", opts);
+        initListeners();//todo MAYBE - move into the if - why listen if there is no connection?
+
+        socket.connect();
+        if (isConnected)
+            return true;
+        return false;
     }
 
     public void initListeners() { // here we analize all listeners and responses
@@ -130,17 +142,6 @@ public class CloudManager {
         }
     }
 
-    public boolean connectToServer() throws URISyntaxException {
-
-        IO.Options opts = new IO.Options();
-        socket = IO.socket("http://192.168.27.1:8080", opts);
-        initListeners();
-
-        socket.connect();
-        if (isConnected)
-            return true;
-        return false;
-    }
 
     public static <T> T getObjectFromString(String data, Class<T> classOfT) {
         return gson.fromJson(data, classOfT);
@@ -148,7 +149,6 @@ public class CloudManager {
     public static ResponseData getObjectFromString(String data) {
         return gson.fromJson(data, ResponseData.class);
     }
-
     public static String getStringFromObject(Object obj) {
         return gson.toJson(obj);
     }
