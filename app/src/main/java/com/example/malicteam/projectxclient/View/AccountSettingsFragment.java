@@ -64,19 +64,20 @@ public class AccountSettingsFragment extends Fragment {
 
             this._userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
             viewModel = ViewModelProviders.of(this).get(UserViewModel.class);
-            viewModel.init(_userId, true);
-            viewModel.getUser().observe(this, new Observer<User>() {
-                @Override
-                public void onChanged(@Nullable User user) {
-                    initDetails(user, view);
-                }
-            });
+            //viewModel.initUser(_userId, true);
+//            viewModel.getUser().observe(this, new Observer<User>() {
+//                @Override
+//                public void onChanged(@Nullable User user) {
+//                    initDetails(user, view);
+//                }
+//            });
+//        }
+            initButtons(view);
+            // Inflate the layout for this fragment
+            return view;
         }
-        initButtons(view);
-        // Inflate the layout for this fragment
         return view;
     }
-
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {

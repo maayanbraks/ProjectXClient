@@ -84,25 +84,26 @@ public class MainActivity extends AppCompatActivity
 //        ListView eventListView = (ListView) findViewById(R.id._listOfEvents);
 //        adapter = new EventAdapter();
 //        eventListView.setAdapter(adapter);
-        userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
 
+        User myuser = (User) getIntent().getSerializableExtra(Consts.USER);
+        userId =myuser.getId();
         //invitation code:
-        Repository.instance.getInvite("" + userId, new CloudManager.CloudCallback<Invite>() {
-            @Override
-            public void onComplete(Invite invite) {
-                Invitation(invite);
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-        }, new FirebaseModel.GetInvitation() {
-            @Override
-            public void onComplete(Invite invite) {
-                Invitation(invite);
-            }
-        });
+//        Repository.instance.getInvite("" + userId, new CloudManager.CloudCallback<Invite>() {
+//            @Override
+//            public void onComplete(Invite invite) {
+//                Invitation(invite);
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//
+//            }
+//        }, new FirebaseModel.GetInvitation() {
+//            @Override
+//            public void onComplete(Invite invite) {
+//                Invitation(invite);
+//            }
+//        });
         //End of - invitation code
 
         //Get Events
@@ -135,7 +136,7 @@ public class MainActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
-        currentUser.init(userId, true);
+        currentUser.initUser(myuser, true);
         currentUser.getUser().observe(this, new Observer<User>() {
             @Override
             public void onChanged(@Nullable User user) {

@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Common.Consts;
 
+import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -23,6 +24,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 import com.example.malicteam.projectxclient.Model.User;
+
+import Responses.LoginResponseData;
 
 
 public class LoginActivity extends Activity {
@@ -48,13 +51,12 @@ public class LoginActivity extends Activity {
         FirebaseAuth auth = FirebaseAuth.getInstance();
 
         if (auth.getCurrentUser() != null) {
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            //Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
-            intent.putExtra(Consts.USER_ID, id);
-            startActivity(intent);
-            finish();
+            //  intent.putExtra(Consts.USER_ID, id);
+            //  startActivity(intent);
+            //   finish();
         }
-
 
 
         btnSignup.setOnClickListener(new View.OnClickListener() {
@@ -78,7 +80,7 @@ public class LoginActivity extends Activity {
         });
     }
 
-    private void tryLogin(){
+    private void tryLogin() {
         FirebaseAuth auth = FirebaseAuth.getInstance();
 
         //get Inputs
@@ -102,22 +104,33 @@ public class LoginActivity extends Activity {
             @Override
             public void onComplete(Object data) {
                 String respone=data.toString();
+                Log.d("TAG","respone="+respone);
                 switch (respone)
                 {
                     case "TechnicalError":
-                        Toast.makeText(getApplicationContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
+                        Log.d("TAG","In Login-->LoginActivity ---> Technical error");
+                        //Toast.makeText(getApplicationContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
                         break;
                     case "UserIsNotExist":
-                        Toast.makeText(getApplicationContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
+                        Log.d("TAG","In Login-->LoginActivity ---> UserIsNotExist");
+                       // Toast.makeText(getApplicationContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
                         break;
-                    case "True":
-                        Toast.makeText(getApplicationContext(), "logging in", Toast.LENGTH_SHORT).show();
+
+                    case "False":
+                        Log.d("TAG","In Login-->LoginActivity ---> False");
+                       // Toast.makeText(getApplicationContext(), getString(R.string.auth_failed), Toast.LENGTH_SHORT).show();
+                        break;
+                        default:
+                        Log.d("TAG","Login succefull");
+                        //TODO
+                        // toast and then new intent
+                        //  Toast.makeText(getApplication(), "logging in", Toast.LENGTH_SHORT).show();loginResponseData
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        LoginResponseData loginResponseData= CloudManager.getObjectFromString(data.toString(),LoginResponseData.class);
+                        User myuser=new User(loginResponseData.getFirstName(), loginResponseData.getLastName(), loginResponseData.getPhone(), email, null, null,1,loginResponseData.getId());
+                         intent.putExtra(Consts.USER, myuser);
                         startActivity(intent);
                         finish();
-                        break;
-                    case "False":
-                        Toast.makeText(getApplicationContext(), getString(R.string.auth_failed), Toast.LENGTH_SHORT).show();
                         break;
                 }
 
@@ -131,30 +144,33 @@ public class LoginActivity extends Activity {
         });
 
 
-            ////////////////////////////
+        ////////////////////////////
         //authenticate user
-        auth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        progressBar.setVisibility(View.GONE);
-                        if (!task.isSuccessful()) {
-                            if (password.length() < 6) {
-                                inputPassword.setError(getString(R.string.minimum_password));
-                            } else {
-                                Toast.makeText(LoginActivity.this, getString(R.string.auth_failed), Toast.LENGTH_LONG).show();
-                            }
-                        } else {
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
-                            intent.putExtra(Consts.USER_ID, id);
-                            startActivity(intent);
-                            finish();
-                        }
-                    }
-                });
+//        auth.signInWithEmailAndPassword(email, password)
+//                .addOnCompleteListener(LoginActivity.this, new OnCompleteListener<AuthResult>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<AuthResult> task) {
+//                        progressBar.setVisibility(View.GONE);
+//                        if (!task.isSuccessful()) {
+//                            if (password.length() < 6) {
+//                                inputPassword.setError(getString(R.string.minimum_password));
+//                            } else {
+//                                Toast.makeText(LoginActivity.this, getString(R.string.auth_failed), Toast.LENGTH_LONG).show();
+//                            }
+//                        } else {
+//                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//                            int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+//                            User myuser=new User("Eden","Charcon","0545587734","charcn@aa", null, null);
+//
+//                            intent.putExtra(Consts.USER, myuser);
+//                            startActivity(intent);
+//                            finish();
+//                        }
+//                    }
+//                });
 
 
     }
-}
 
+
+}

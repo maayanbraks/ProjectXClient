@@ -2,9 +2,11 @@ package com.example.malicteam.projectxclient.View;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.example.malicteam.projectxclient.Activity.LoginActivity;
+import com.example.malicteam.projectxclient.Activity.MainActivity;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Model.CloudManager;
@@ -25,6 +29,9 @@ import com.example.malicteam.projectxclient.R;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import Responses.ContactsListResponseData;
+import Responses.LoginResponseData;
 
 
 public class FriendsListFragment extends Fragment {
@@ -57,17 +64,16 @@ public class FriendsListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friends_list, container, false);
-        if(getArguments() != null)
-        {
+        if(getArguments() != null) {
             friendsListView = (ListView) view.findViewById(R.id.list_friendsList);
             adapter = new MyAdapter();
             friendsListView.setAdapter(adapter);
             this.userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
-            Repository.instance.getFriends(this.userId, new CloudManager.CloudCallback<List<User>>(){
+            Repository.instance.getFriends(this.userId, new CloudManager.CloudCallback<List<User>>() {
                 @Override
                 public void onComplete(List<User> data) {
                     friendsList = data;
-                    if(adapter!=null){
+                    if (adapter != null) {
                         adapter.notifyDataSetChanged();
                     }
                 }
@@ -76,8 +82,61 @@ public class FriendsListFragment extends Fragment {
                 public void onCancel() {
                 }
             });
+            Repository.instance.getFriends1(new Repository.RepositoryCallback() {
 
-//            friendsViewModel = ViewModelProviders.of(this).get(FriendsViewModel.class);
+
+                                                @Override
+                                                public void onComplete(Object data) {
+                                                    String respone = data.toString();
+                                                    Log.d("TAG", "respone=" + respone);
+                                                    switch (respone) {
+                                                        case "TechnicalError":
+                                                            Log.d("TAG", "In getfriends1-->friendlistFragment ---> Technical error");
+                                                            //Toast.makeText(getApplicationContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
+                                                            break;
+                                                        case "UserMustToLogin":
+                                                            Log.d("TAG", "n getfriends1-->friendlistFragment ---> UserMustToLogin");
+                                                            // Toast.makeText(getApplicationContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
+                                                            break;
+
+                                                        default:
+                                                            ContactsListResponseData contactsListResponseData =CloudManager.getObjectFromString(data.toString(),ContactsListResponseData.class);
+                                                            Log.d("TAG","List= "+CloudManager.getStringFromObject(contactsListResponseData));
+                                                           // friendsList=friendsList.get(0).convertUserDataToUser(((ContactsListResponseData) data).getContacts());
+                                                            User user=new User();
+                                                            friendsList = user.convertUserDataToUser(contactsListResponseData.getContacts());
+
+//                                                            for (User userr:friendsList)
+//                                                            {
+//                                                                Log.d("TAG","a"+userr.getFirstName());
+//                                                            }
+                                                      //     if (adapter != null) {
+//                                                                adapter.notifyDataSetChanged();
+                                                            //}
+                                                            Log.d("TAG", "friend list obtaib sucful");
+
+                                                            //TODO
+                                                            // toast and then new intent
+                                                            //  Toast.makeText(getApplication(), "logging in", Toast.LENGTH_SHORT).show();loginResponseData
+                                                            //Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                                                            //  LoginResponseData loginResponseData= CloudManager.getObjectFromString(data.toString(),LoginResponseData.class);
+                                                            //  User myuser=new User(loginResponseData.getFirstName(), loginResponseData.getLastName(), loginResponseData.getPhone(), email, null, null,1,loginResponseData.getId());
+                                                            // intent.putExtra(Consts.USER, myuser);
+                                                            //  startActivity(intent);
+                                                            //  finish();
+                                                            break;
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancel() {
+
+                                                }
+                                            });
+
+
+
+                                                //            friendsViewModel = ViewModelProviders.of(this).get(FriendsViewModel.class);
 //            friendsViewModel.init(userId);
 //            friendsViewModel.getFriends().observe(this, new Observer<List<User>>() {
 //                @Override
