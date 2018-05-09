@@ -10,7 +10,10 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+
+import ResponsesEntitys.UserData;
 
 /**
  * Created by Maayan on 10-Jan-18.
@@ -56,6 +59,28 @@ public class User implements Serializable {
         else
             this.eventsIds = "{}";
     }
+    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds, long lastUpdated,int id) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.id = id;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = new Date();
+        this.lastLogin = dateFormat.format(date);
+        this.pictureUrl = null;
+        this.lastUpdated = lastUpdated;
+
+        if (friendsIds != null)
+            this.friendsIds = ProductTypeConverters.toString(friendsIds);
+        else
+            this.friendsIds = "{}";
+
+        if (eventsIds != null)
+            this.eventsIds = ProductTypeConverters.toString(eventsIds);
+        else
+            this.eventsIds = "{}";
+    }
 
     public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds, String pictureUrl,long lastUpdated) {
         this.firstName = firstName;
@@ -78,6 +103,27 @@ public class User implements Serializable {
             this.eventsIds = ProductTypeConverters.toString(eventsIds);
         else
             this.eventsIds = "{}";
+    }
+    public User(UserData userdata) { //
+        this.firstName = userdata.getFirstName();
+        this.lastName =  userdata.getLastName();
+        this.phoneNumber =  userdata.getPhone();
+        this.email = userdata.getEmail();
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date date = new Date();
+        this.lastLogin = dateFormat.format(date);
+        this.pictureUrl = userdata.getPictureURL();
+        //this.eventsIds = new LinkedList<Integer>();
+
+//        if (friendsIds != null)
+//            this.friendsIds = ProductTypeConverters.toString(friendsIds);
+//        else
+//            this.friendsIds = "{}";
+//
+//        if (eventsIds != null)
+//            this.eventsIds = ProductTypeConverters.toString(eventsIds);
+//        else
+//            this.eventsIds = "{}";
     }
 
     public User() {
@@ -149,7 +195,19 @@ public class User implements Serializable {
     }
 
 
-
+    public List<User> convertUserDataToUser(List<UserData> userDataList)
+    {
+        if (userDataList.size()<1)
+            return null;
+        List<User> users= new LinkedList<>();
+        for(UserData item : userDataList){
+            int i=0;
+            User user=new User(userDataList.get(i));
+            users.add(user);
+            i++;
+        }
+        return users;
+    }
     public void addEventToList(int event) {
         List<Integer> list = ProductTypeConverters.toList(this.eventsIds);
         list.add(event);
@@ -219,7 +277,7 @@ public class User implements Serializable {
     }
 
     public int getId() {
-        return id;
+        return 123;
     }
 
     public void setId() {
