@@ -82,6 +82,15 @@ public class Repository {
         }
         return userLiveData;
     }
+    public LiveData<User> getUserMain(User user) {
+        synchronized (this) {
+            if (userLiveData == null) {
+                userLiveData = new MutableLiveData<User>();
+                userLiveData.setValue(user);
+            }
+        }
+        return userLiveData;
+    }
 
     public LiveData<User> getSomeUser(int id) {
         synchronized (this) {
@@ -219,6 +228,47 @@ public class Repository {
             }
         });
     }
+    public void getFriends1(final RepositoryCallback callback) {
+        ContactsListRequestData contactsListRequestData=new ContactsListRequestData(userLiveData.getValue().getEmail());
+        CM.sendToServer("Request", contactsListRequestData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String data) {
+                ResponseData responseData=CloudManager.getObjectFromString(data,ResponseData.class);
+                switch (responseData.getType())
+                {
+                    case Error:
+                        ErrorResponseData errorResponseData = CloudManager.getObjectFromString(data,ErrorResponseData.class);
+                        switch (errorResponseData.getErrorType())
+                        {
+                            case TechnicalError:
+                                callback.onComplete("TechnicalError");
+                                return;
+                            case UserMustToLogin:
+                                callback.onComplete("UserMustToLogin");
+                                return;
+                            default:
+                                return;
+                        }
+                    case Contacts:
+                        ContactsListResponseData contactsListResponseData=CloudManager.getObjectFromString(data,ContactsListResponseData.class);
+                            callback.onComplete(data);
+                            return;
+
+
+                    default:
+                        break;
+                }
+
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        });
+
+
+    }
 
 
     public void getEvents(int userId, CloudManager.CloudCallback<List<Event>> cloudCallback) {
@@ -297,6 +347,8 @@ public class Repository {
         cloudCallback.onComplete(str);
     }
 
+
+
     public void setPictureUrl(Bitmap bitmap, final CloudManager.CloudCallback<Boolean> cloudCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         int id = User.generateId(auth.getCurrentUser().getEmail());
@@ -360,31 +412,45 @@ public class Repository {
 //    }
     public void logIn(String username,String password,final RepositoryCallback callback) {
        LoginRequestData loginRequestData=new LoginRequestData(username,password);
-        CM.sendToServer("Request",loginRequestData, new CloudManager.CloudCallback<ResponseData>() {
+        CM.loginRequest(loginRequestData, new CloudManager.CloudCallback<String>() {
             @Override
-            public void onComplete(ResponseData responseData) {
+            public void onComplete(String response) {
+                ResponseData responseData=CloudManager.getObjectFromString(response,ResponseData.class);
+                //Create To ResponseData
+                //Checke type
+                //BY the type -> create refrence ResponseData
                 switch (responseData.getType())
                 {
                     case Error:
-                        switch (((ErrorResponseData)responseData).getErrorType())
+                        ErrorResponseData errorResponseData = CloudManager.getObjectFromString(response,ErrorResponseData.class);
+                        switch (errorResponseData.getErrorType())
                         {
                             case TechnicalError:
                                 callback.onComplete("TechnicalError");
-                                break;
+                                return;
                             case UserIsNotExist:
                                 callback.onComplete("UserIsNotExist");
-                                break;
+                                return;
                             default:
-                                break;
+                                return;
                         }
                     case Boolean:
-                        if (((BooleanResponseData)responseData).getFlag())
-                            callback.onComplete("True");
-                            else
-                            callback.onComplete("False");
+                        BooleanResponseData booleanResponseData=CloudManager.getObjectFromString(response,BooleanResponseData.class);
+                         if (booleanResponseData.getFlag()) {
+                             callback.onComplete("True");
+                             return;
+                         }
+                            else {
+                             callback.onComplete("False");
+                             return;
+                         }
+                    case Login:
+                        LoginResponseData loginResponseData=CloudManager.getObjectFromString(response,LoginResponseData.class);
+                        callback.onComplete(response);
 
                     default:
                         break;
+
 
                 }
 
@@ -392,7 +458,6 @@ public class Repository {
 
             @Override
             public void onCancel() {
-
             }
         });
 

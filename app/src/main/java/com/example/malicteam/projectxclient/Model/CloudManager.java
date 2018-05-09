@@ -28,7 +28,7 @@ import java.net.URISyntaxException;
  */
 
 public class CloudManager {
-    CloudCallback<ResponseData> localCallbackCloudManager;
+    CloudCallback<String> localCallbackCloudManager;
     private static Gson gson = new Gson();
     private Socket socket;
     static final int PORT = 8888;
@@ -40,6 +40,7 @@ public class CloudManager {
     public CloudManager() throws URISyntaxException {
         isConnected = connectToServer();
         if (isConnected) ;
+
 
     }
 
@@ -93,10 +94,10 @@ public class CloudManager {
             @Override
             public void call(Object... objects) {
                 Log.d("TAG", "Connection with server has been establish");
-                RequestData rd = new AddFriendRequestData("test@test.com", "friend@friend.com");
+               // RequestData rd = new AddFriendRequestData("test@test.com", "friend@friend.com");
                 // String jsonString =new Gson().toJson(rd);
-                socket.emit("toServer", "lalalalall");
-                socket.send("test");
+              //  socket.emit("toServer", "lalalalall");
+               // socket.send("test");
                 setConnected(true);
             }
         });
@@ -111,12 +112,16 @@ public class CloudManager {
             @Override
             public void call(Object... args) {
                 if (localCallbackCloudManager != null) {
-                    localCallbackCloudManager.onComplete(getObjectFromString(args[0].toString()));
+                    localCallbackCloudManager.onComplete(args[0].toString());
                 }
-                Log.d("TAG", "Client recievd : " + args[0]);
+                else {
+                    Log.d("TAG","Localcallback is null");
+                }
+                Log.d("TAG", "" + args[0]);
                 //handleLiveData("" + args[0]);
 
             }
+
 
         });
     }
@@ -153,12 +158,19 @@ public class CloudManager {
         return gson.toJson(obj);
     }
 
-    public void sendToServer(String event, Object obj, final CloudCallback<ResponseData> cloudManagercallback) {
+    public void sendToServer(String event, Object obj, final CloudCallback<String> cloudManagercallback) {
         // TODO Auto-generated method stub
         localCallbackCloudManager = cloudManagercallback;
         String jsonString = getStringFromObject(obj);
+        Log.d("TAG","sendEvent "+jsonString);
         socket.emit(event, jsonString);
-        Log.d("TAG", "bolbol" + jsonString);
+    }
+    public void loginRequest(Object obj, final CloudCallback<String> cloudManagercallback) {
+        // TODO Auto-generated method stub
+        localCallbackCloudManager = cloudManagercallback;
+        String jsonString = getStringFromObject(obj);
+        Log.d("TAG","sendEvent "+jsonString);
+        socket.emit("Login", jsonString);
     }
 
 }
