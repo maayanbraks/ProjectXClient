@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Common.Consts;
 
+import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.R;
@@ -109,22 +110,22 @@ public class LoginActivity extends Activity {
                 {
                     case "TechnicalError":
                         Log.d("TAG","In Login-->LoginActivity ---> Technical error");
-                        //Toast.makeText(getApplicationContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MyApp.getContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
                         break;
                     case "UserIsNotExist":
                         Log.d("TAG","In Login-->LoginActivity ---> UserIsNotExist");
-                       // Toast.makeText(getApplicationContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MyApp.getContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
                         break;
 
                     case "False":
                         Log.d("TAG","In Login-->LoginActivity ---> False");
-                       // Toast.makeText(getApplicationContext(), getString(R.string.auth_failed), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), getString(R.string.auth_failed), Toast.LENGTH_SHORT).show();
                         break;
                         default:
                         Log.d("TAG","Login succefull");
                         //TODO
                         // toast and then new intent
-                        //  Toast.makeText(getApplication(), "logging in", Toast.LENGTH_SHORT).show();loginResponseData
+                          Toast.makeText(getApplicationContext(), "logging in", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                         LoginResponseData loginResponseData= CloudManager.getObjectFromString(data.toString(),LoginResponseData.class);
                         User myuser=new User(loginResponseData.getFirstName(), loginResponseData.getLastName(), loginResponseData.getPhone(), email, null, null,1,loginResponseData.getId());
