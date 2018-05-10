@@ -85,7 +85,8 @@ public class MainActivity extends AppCompatActivity
 //        adapter = new EventAdapter();
 //        eventListView.setAdapter(adapter);
 
-        User myuser = (User) getIntent().getSerializableExtra(Consts.USER);
+       // User myuser = (User) getIntent().getSerializableExtra(Consts.USER);
+         User myuser = new User("Eden","Charcon","alkal","Sharkonz@gmail.com",null,null,    1,1);
         userId =myuser.getId();
         //invitation code:
 //        Repository.instance.getInvite("" + userId, new CloudManager.CloudCallback<Invite>() {

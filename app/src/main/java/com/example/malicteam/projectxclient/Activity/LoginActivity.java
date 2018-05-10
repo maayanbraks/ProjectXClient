@@ -82,6 +82,9 @@ public class LoginActivity extends Activity {
     }
 
     private void tryLogin() {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
         FirebaseAuth auth = FirebaseAuth.getInstance();
 
         //get Inputs
@@ -100,7 +103,7 @@ public class LoginActivity extends Activity {
         progressBar.setVisibility(View.VISIBLE);
 
 
-        //CLOUDMANAGER ////////////////////////////////////////////
+        //CLOUDMANAGER ////////////////////////////////////////////]
         Repository.instance.logIn(email,password, new Repository.RepositoryCallback() {
             @Override
             public void onComplete(Object data) {
