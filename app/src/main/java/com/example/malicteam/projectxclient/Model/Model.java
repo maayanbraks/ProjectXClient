@@ -7,7 +7,7 @@ import android.graphics.Bitmap;
  */
 
 public class Model {
-    public final static Model Instace = new Model();
+    public final static Model Instance = new Model();
 
     public interface SaveImageListener {
         void complete(String url);

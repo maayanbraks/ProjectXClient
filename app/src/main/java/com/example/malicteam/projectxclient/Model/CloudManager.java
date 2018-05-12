@@ -1,22 +1,19 @@
 package com.example.malicteam.projectxclient.Model;
 
-import android.os.Bundle;
+import android.animation.TypeConverter;
 import android.util.Log;
 
 //import com.github.nkzawa.emitter.Emitter;
 //import com.github.nkzawa.socketio.client.IO;
 //import com.github.nkzawa.socketio.client.Socket;
 
-import com.google.gson.Gson;
+import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 
 import Notifications.EventCloseNotificationData;
 import Notifications.EventInvitationNotificationData;
 import Notifications.NotificationData;
 import Notifications.UserJoinEventNotification;
 import Notifications.UserLeaveEventNotification;
-import Requests.AddFriendRequestData;
-import Requests.RequestData;
-import Responses.ResponseData;
 import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
@@ -28,68 +25,48 @@ import java.net.URISyntaxException;
  */
 
 public class CloudManager {
-    CloudCallback<String> localCallbackCloudManager;
-    private static Gson gson = new Gson();
+    public interface CloudCallback<T> {
+        void onComplete(T data);
+        void onCancel();
+    }
+    private final String SERVER_ADDRESS = "http://192.168.1.16:8080";
+    private CloudCallback<String> localCallbackCloudManager;
     private Socket socket;
     static final int PORT = 8888;
-
-
     private boolean isConnected;
-
 
     public CloudManager() throws URISyntaxException {
         isConnected = connectToServer();
         if (isConnected) ;
-
-
     }
-
-    public interface CloudCallback<T> {
-        void onComplete(T data);
-
-        void onCancel();
-    }
-
+    //Primitives Methods
     public Socket getSocket() {
         return socket;
     }
-
     public void setSocket(Socket socket) {
         this.socket = socket;
     }
-
     public static int getPORT() {
         return PORT;
     }
-
     public boolean isConnected() {
         return isConnected;
     }
-
     public void setConnected(boolean connected) {
         isConnected = connected;
-
-    }
-
-    public void onCreate(Bundle savedInstanceState) throws URISyntaxException {
-//???
-//???
     }
 
 
     public boolean connectToServer() throws URISyntaxException {
         IO.Options opts = new IO.Options();
-        socket = IO.socket("http://192.168.1.16:8080", opts);
+        socket = IO.socket(SERVER_ADDRESS, opts);
         initListeners();//todo MAYBE - move into the if - why listen if there is no connection?
-
         socket.connect();
         if (isConnected)
             return true;
         return false;
     }
-
     public void initListeners() { // here we analize all listeners and responses
-
         socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... objects) {
@@ -119,28 +96,23 @@ public class CloudManager {
                 }
                 Log.d("TAG", "" + args[0]);
                 //handleLiveData("" + args[0]);
-
             }
-
-
         });
     }
-
     public void handleLiveData(String data) { //here Live data responses (need to send to LiveData!
-
-        NotificationData rs = gson.fromJson(data, NotificationData.class);
+        NotificationData rs = ProductTypeConverters.getObjectFromString(data, NotificationData.class);
         switch (rs.getNotificationType()) {
             case EventInvitation:
-                getObjectFromString(data, EventInvitationNotificationData.class);
+                ProductTypeConverters.getObjectFromString(data, EventInvitationNotificationData.class);
                 return;
             case UserJoinEvent:
-                getObjectFromString(data, UserJoinEventNotification.class);
+                ProductTypeConverters.getObjectFromString(data, UserJoinEventNotification.class);
                 return;
             case UserLeaveEvent:
-                getObjectFromString(data, UserLeaveEventNotification.class);
+                ProductTypeConverters.getObjectFromString(data, UserLeaveEventNotification.class);
                 return;
             case EventClosed:
-                getObjectFromString(data, EventCloseNotificationData.class);
+                ProductTypeConverters.getObjectFromString(data, EventCloseNotificationData.class);
                 return;
             default:
                 return;
@@ -148,27 +120,22 @@ public class CloudManager {
     }
 
 
-    public static <T> T getObjectFromString(String data, Class<T> classOfT) {
-        return gson.fromJson(data, classOfT);
-    }
-    public static ResponseData getObjectFromString(String data) {
-        return gson.fromJson(data, ResponseData.class);
-    }
-    public static String getStringFromObject(Object obj) {
-        return gson.toJson(obj);
+
+//    public static ResponseData getObjectFromString(String data) {
+//        return gson.fromJson(data, ResponseData.class);
+//    }
+//
+
+    public void sendToServer(String serverEvent, Object requestObject, final CloudCallback<String> cloudManagerCallback) {
+        localCallbackCloudManager = cloudManagerCallback;
+        String jsonString = ProductTypeConverters.getStringFromObject(requestObject);
+        Log.d("TAG","sendEvent "+jsonString);
+        socket.emit(serverEvent, jsonString);
     }
 
-    public void sendToServer(String event, Object obj, final CloudCallback<String> cloudManagercallback) {
-        // TODO Auto-generated method stub
-        localCallbackCloudManager = cloudManagercallback;
-        String jsonString = getStringFromObject(obj);
-        Log.d("TAG","sendEvent "+jsonString);
-        socket.emit(event, jsonString);
-    }
-    public void loginRequest(Object obj, final CloudCallback<String> cloudManagercallback) {
-        // TODO Auto-generated method stub
-        localCallbackCloudManager = cloudManagercallback;
-        String jsonString = getStringFromObject(obj);
+    public void loginRequest(Object obj, final CloudCallback<String> cloudManagerCallback) {
+        localCallbackCloudManager = cloudManagerCallback;
+        String jsonString = ProductTypeConverters.getStringFromObject(obj);
         Log.d("TAG","sendEvent "+jsonString);
         socket.emit("Login", jsonString);
     }

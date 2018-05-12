@@ -10,12 +10,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.multidex.MultiDex;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -36,11 +34,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.View.NewEventFragment;
 import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
 import com.example.malicteam.projectxclient.Common.Consts;
-import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Invite;
 import com.example.malicteam.projectxclient.R;
 import com.example.malicteam.projectxclient.View.EventDetailsFragment;
@@ -48,25 +46,26 @@ import com.example.malicteam.projectxclient.View.EventsListFragment;
 import com.example.malicteam.projectxclient.View.FriendDetailsFragment;
 import com.example.malicteam.projectxclient.View.FriendsListFragment;
 import com.example.malicteam.projectxclient.View.ResetPasswordFragment;
-import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
 import java.net.URISyntaxException;
+import java.util.List;
 
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.Model.Repository;
+import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
 
-public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.EvenetListListener,
-        FriendsListFragment.OnFriendSelected, NewEventFragment.OnFragmentInteractionListener, FriendDetailsFragment.OnFragmentInteractionListener, EventDetailsFragment.OnFragmentInteractionListener,
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.EvenetListListener,
+        FriendsListFragment.friendsFragmentInteraction, NewEventFragment.OnFragmentInteractionListener, FriendDetailsFragment.OnFragmentInteractionListener, EventDetailsFragment.OnFragmentInteractionListener,
         ResetPasswordFragment.ResetPasswordListener {
 
-    //    private List<Event> eventsList = new LinkedList<>();
-//Navigation Header
+    private final Class _mainFragmentClass = EventsListFragment.class;
+
+    //    private List<Event> eventsList = new Link
     private TextView userNameHeader;
     private TextView userEmailHeader;
     private NavigationView navigationView;
@@ -75,6 +74,9 @@ public class MainActivity extends AppCompatActivity
     private int userId;
     private View headerLayout;
     private DrawerLayout mDrawer;
+    //New Server
+//    private User mUser = null;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,9 +87,13 @@ public class MainActivity extends AppCompatActivity
 //        adapter = new EventAdapter();
 //        eventListView.setAdapter(adapter);
 
-       // User myuser = (User) getIntent().getSerializableExtra(Consts.USER);
-         User myuser = new User("Eden","Charcon","alkal","Sharkonz@gmail.com",null,null,    1,1);
-        userId =myuser.getId();
+        // User myuser = (User) getIntent().getSerializableExtra(Consts.USER);
+//         User myuser = new User("Eden","Charcon","alkal","Sharkonz@gmail.com",null,null,    1,1);
+
+//        mUser = (User) getIntent().getSerializableExtra(Consts.USER);
+//        userId = mUser.getId();
+
+
         //invitation code:
 //        Repository.instance.getInvite("" + userId, new CloudManager.CloudCallback<Invite>() {
 //            @Override
@@ -122,7 +128,7 @@ public class MainActivity extends AppCompatActivity
 //        });
 
         try {
-            CloudManager cd=new CloudManager();
+            CloudManager cd = new CloudManager();
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -136,8 +142,11 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+//        updateProfilePicture(mUser.getPictureUrl());
+//        userNameHeader.setText(mUser.getFirstName() + " " + mUser.getLastName());
+//        userEmailHeader.setText(mUser.getEmail());
         currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
-        currentUser.initUser(myuser, true);
+        currentUser.initUser((User) getIntent().getSerializableExtra(Consts.USER));
         currentUser.getUser().observe(this, new Observer<User>() {
             @Override
             public void onChanged(@Nullable User user) {
@@ -208,16 +217,15 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         //Show Events list as main screen
-        loadMainFragmnet();
+        loadMainFragment();
     }
 
-    private void loadMainFragmnet() {
+    private void loadMainFragment() {
         Bundle bundle = new Bundle();
         bundle.putInt(Consts.USER_ID, userId);
-        Class mainFragmentClass = EventsListFragment.class;
-        EventsListFragment mainFragment = null;
+        Fragment mainFragment = null;
         try {
-            mainFragment = (EventsListFragment) EventsListFragment.class.newInstance();
+            mainFragment = (EventsListFragment) _mainFragmentClass.newInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -229,15 +237,51 @@ public class MainActivity extends AppCompatActivity
         tran.commit();
     }
 
+    private Class getCurrentShownFragment() {
+        FragmentManager fragmentManager = MainActivity.this.getSupportFragmentManager();
+        List<Fragment> fragments = fragmentManager.getFragments();
+        if (fragments != null) {
+            for (Fragment fragment : fragments) {
+                if (fragment != null && fragment.isVisible())
+                    return fragment.getClass();
+            }
+        }
+        return null;
+    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+        } else if (getCurrentShownFragment() != _mainFragmentClass) {
+            loadMainFragment();
         } else {
-            super.onBackPressed();
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MyApp.getContext());
+            // set title
+            alertDialogBuilder.setTitle("What?! Do you want to exit?");
+            // set dialog message
+            alertDialogBuilder
+                    .setCancelable(false)
+                    .setNegativeButton("No, Stay!!", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    })
+                    .setPositiveButton("Yes :(", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            finish();
+                        }
+
+                    });
+            // create alert dialog
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            // show it
+            alertDialog.show();
         }
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -296,7 +340,7 @@ public class MainActivity extends AppCompatActivity
         fragment.setArguments(bundle);
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.flContent, fragment, fragmentClass.getName()).commit();
 
         if (this.currentItem != null) {
             this.currentItem.setChecked(false);
@@ -466,6 +510,42 @@ public class MainActivity extends AppCompatActivity
         fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
     }
 
+    //DeleteFriendListener - open AlertDialog
+    @Override
+    public void deleteFriend(User friend) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(MyApp.getContext());//Changed from Activity.this
+        builder.setTitle("Delete Friend");
+        builder.setMessage("Are you sure you wand delete " + friend.getFirstName() + " " + friend.getLastName() + " from your friends?");
+        builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //On Click YES - delete him!
+                Repository.instance.deleteFromFriends(friend.getId(), new CloudManager.CloudCallback<Boolean>() {
+                    @Override
+                    public void onComplete(Boolean data) {
+                        if (data) {
+                            Toast.makeText(MyApp.getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                        } else
+                            Toast.makeText(MyApp.getContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        dialog.cancel();
+                    }
+                });
+
+            }
+        })
+                .setNegativeButton("No, Cancel!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+        builder.show();
+    }
+
     @Override
     public void sendResetPassword(String email) {
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.mainProgressBar);
@@ -485,4 +565,6 @@ public class MainActivity extends AppCompatActivity
                     }
                 });
     }
+
+
 }

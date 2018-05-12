@@ -3,6 +3,7 @@ package com.example.malicteam.projectxclient.Model;
 import Requests.*;
 import Responses.ErrorResponseData;
 import Responses.*;
+import ResponsesEntitys.UserData;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
@@ -16,6 +17,9 @@ import android.os.Environment;
 import android.util.Log;
 import android.webkit.URLUtil;
 
+import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.FriendsListCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.LogInCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,15 +37,15 @@ import static android.content.Context.MODE_PRIVATE;
 /**
  * Created by Maayan on 11-Mar-18.
  */
+
 //Singleton
 public class Repository {
     private MutableLiveData<User> userLiveData;
-    private List<MutableLiveData<User>> someUser;
     private MutableLiveData<List<User>> FriendsLiveData;
     //private MutableLiveData<List<Event>> eventsData;
     //private MutableLiveData<List<User>> friendsLiveData;
 
-    CloudManager CM;
+    private CloudManager CM;
     private List<User> friends = null;//holds local users
 
     public static final Repository instance = new Repository();
@@ -55,33 +59,25 @@ public class Repository {
         }
     }
 
-    public interface RepositoryCallback<T> {
-        void onComplete(T data);
-
-        void onCancel();
-    }
-
-
-    public LiveData<User> getUser(int id) {
-        synchronized (this) {
-            if (userLiveData == null) {
-                userLiveData = new MutableLiveData<User>();
-                FirebaseAuth auth = FirebaseAuth.getInstance();
-                FirebaseModel.getUserAndObserve(Integer.toString(id), new CloudManager.CloudCallback<User>() {
-                    @Override
-                    public void onComplete(User data) {
-                        if (data != null)
-                            userLiveData.setValue(data);
-                    }
-
-                    @Override
-                    public void onCancel() {
-                    }
-                });
-            }
-        }
-        return userLiveData;
-    }
+//    public LiveData<User> getUser(int id) {
+//        synchronized (this) {
+//            if (userLiveData == null) {
+//                userLiveData = new MutableLiveData<User>();
+//                FirebaseAuth auth = FirebaseAuth.getInstance();
+//                FirebaseModel.getUserAndObserve(Integer.toString(id), new CloudManager.CloudCallback<User>() {
+//                    @Override
+//                    public void onComplete(User data) {
+//                        if (data != null)
+//                            userLiveData.setValue(data);
+//                    }
+//                    @Override
+//                    public void onCancel() {
+//                    }
+//                });
+//            }
+//        }
+//        return userLiveData;
+//    }
 
     public LiveData<User> getUserMain(User user) {
         synchronized (this) {
@@ -93,34 +89,34 @@ public class Repository {
         return userLiveData;
     }
 
-    public LiveData<User> getSomeUser(int id) {
-        synchronized (this) {
-            //check if exist in our list
-            if (someUser != null) {
-                for (MutableLiveData<User> u : someUser) {
-                    if (u.getValue().getId() == id)
-                        return u;
-                }
-            } else // list is null
-                someUser = new LinkedList<MutableLiveData<User>>();
-
-            someUser.add(new MutableLiveData<>());
-
-            FirebaseAuth auth = FirebaseAuth.getInstance();
-            FirebaseModel.getSomeUserAndObserve(Integer.toString(id), new CloudManager.CloudCallback<User>() {
-                @Override
-                public void onComplete(User data) {
-                    someUser.get(someUser.size() - 1).setValue(data);
-                }
-
-                @Override
-                public void onCancel() {
-                }
-            });
-
-        }
-        return someUser.get(someUser.size() - 1);
-    }
+//    public LiveData<User> getSomeUser(int id) {
+//        synchronized (this) {
+//            //check if exist in our list
+//            if (someUser != null) {
+//                for (MutableLiveData<User> u : someUser) {
+//                    if (u.getValue().getId() == id)
+//                        return u;
+//                }
+//            } else // list is null
+//                someUser = new LinkedList<MutableLiveData<User>>();
+//
+//            someUser.add(new MutableLiveData<>());
+//
+//            FirebaseAuth auth = FirebaseAuth.getInstance();
+//            FirebaseModel.getSomeUserAndObserve(Integer.toString(id), new CloudManager.CloudCallback<User>() {
+//                @Override
+//                public void onComplete(User data) {
+//                    someUser.get(someUser.size() - 1).setValue(data);
+//                }
+//
+//                @Override
+//                public void onCancel() {
+//                }
+//            });
+//
+//        }
+//        return someUser.get(someUser.size() - 1);
+//    }
 
     public void getUserById(int id, final CloudManager.CloudCallback<List<User>> callback) {
         FirebaseModel.getUserById(id, callback);
@@ -184,8 +180,7 @@ public class Repository {
 //            }
 //        });
 //    }
-
-    //    public LiveData<List<User>> getFriends(int userId) {
+//    public LiveData<List<User>> getFriends(int userId) {
 //        synchronized (this) {
 //            if (FriendsLiveData == null) {
 //                FriendsLiveData = new MutableLiveData<List<User>>();
@@ -213,104 +208,23 @@ public class Repository {
 //        }
 //        return FriendsLiveData;
 //    }
-    public void addFriend(String email, RepositoryCallback<String> callback) {
-        AddFriendRequestData addFriendRequestData = new AddFriendRequestData(userLiveData.getValue().getEmail(), email);
-        CM.sendToServer("Request", addFriendRequestData, new CloudManager.CloudCallback<String>() {
-            @Override
-            public void onComplete(String data) {
-                ResponseData responseData = CloudManager.getObjectFromString(data, ResponseData.class);
-                switch (responseData.getType()) {
-                    case Error:
-                        ErrorResponseData errorResponseData = CloudManager.getObjectFromString(data, ErrorResponseData.class);
-                        switch (errorResponseData.getErrorType()) {
-                            case UserIsNotExist:
-                                callback.onComplete("UserIsNotExist");
-                                return;
-                            case FriendIsNotExist:
-                                callback.onComplete("FriendIsNotExist");
-                                return;
-                            case BothUsersEquals:
-                                callback.onComplete("BothUsersEquals");
-                                return;
-                            case AlreadyFriends:
-                                callback.onComplete("AlreadyFriends");
-                                return;
-                            default:
-                                return;
-                        }
-                    case AddFriendResponse:
-                        callback.onComplete(data);
-                        return;
 
+    //    public void getFriends(int userId, final CloudManager.CloudCallback<List<User>> callback) {
+//        FirebaseAuth auth = FirebaseAuth.getInstance();
+//        FirebaseModel.getFriends(userId, new CloudManager.CloudCallback<List<User>>() {
+//            @Override
+//            public void onComplete(List<User> data) {
+//                updateFriendsDataInLocalStorage(data);
+//                callback.onComplete(data);
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//                callback.onComplete(friends);
+//            }
+//        });
+//    }
 
-                    default:
-                        break;
-                }
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-        });
-    }
-
-
-    public void getFriends(int userId, final CloudManager.CloudCallback<List<User>> callback) {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        FirebaseModel.getFriends(userId, new CloudManager.CloudCallback<List<User>>() {
-            @Override
-            public void onComplete(List<User> data) {
-                updateFriendsDataInLocalStorage(data);
-                callback.onComplete(data);
-            }
-
-            @Override
-            public void onCancel() {
-                callback.onComplete(friends);
-            }
-        });
-    }
-
-    public void getFriends1(final RepositoryCallback callback) {
-        ContactsListRequestData contactsListRequestData = new ContactsListRequestData(userLiveData.getValue().getEmail());
-        CM.sendToServer("Request", contactsListRequestData, new CloudManager.CloudCallback<String>() {
-            @Override
-            public void onComplete(String data) {
-                ResponseData responseData = CloudManager.getObjectFromString(data, ResponseData.class);
-                switch (responseData.getType()) {
-                    case Error:
-                        ErrorResponseData errorResponseData = CloudManager.getObjectFromString(data, ErrorResponseData.class);
-                        switch (errorResponseData.getErrorType()) {
-                            case TechnicalError:
-                                callback.onComplete("TechnicalError");
-                                return;
-                            case UserMustToLogin:
-                                callback.onComplete("UserMustToLogin");
-                                return;
-                            default:
-                                return;
-                        }
-                    case Contacts:
-                        ContactsListResponseData contactsListResponseData = CloudManager.getObjectFromString(data, ContactsListResponseData.class);
-                        callback.onComplete(data);
-                        return;
-
-
-                    default:
-                        break;
-                }
-
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-        });
-
-
-    }
 
 
     public void getEvents(int userId, CloudManager.CloudCallback<List<Event>> cloudCallback) {
@@ -333,35 +247,35 @@ public class Repository {
         task.execute(data);
     }
 
-    public void deleteFromFriends(int friendId, final CloudManager.CloudCallback<Boolean> cloudCallback) {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        int userId = User.generateId(auth.getCurrentUser().getEmail());
-        FirebaseModel.getFriends(userId, new CloudManager.CloudCallback<List<User>>() {
-            @Override
-            public void onComplete(List<User> data) {
-                boolean found = false;
-                if (data != null) {//if he has friends
-                    for (int i = 0; i < data.size() && !found; i++) {
-                        if (data.get(i).getId() == friendId) {//if the deleted one exist in the list
-                            User u = data.get(i);
-                            found = true;
-                            data.remove(u);
-                            FirebaseModel.setFriends(userId, data, cloudCallback);
-                        }
-                    }
-                    if (!found)
-                        cloudCallback.onCancel();
-                } else {
-                    cloudCallback.onCancel();
-                }
-            }
-
-            @Override
-            public void onCancel() {
-                cloudCallback.onCancel();
-            }
-        });
-    }
+//    public void deleteFromFriends(int friendId, final CloudManager.CloudCallback<Boolean> cloudCallback) {
+//        FirebaseAuth auth = FirebaseAuth.getInstance();
+//        int userId = User.generateId(auth.getCurrentUser().getEmail());
+//        FirebaseModel.getFriends(userId, new CloudManager.CloudCallback<List<User>>() {
+//            @Override
+//            public void onComplete(List<User> data) {
+//                boolean found = false;
+//                if (data != null) {//if he has friends
+//                    for (int i = 0; i < data.size() && !found; i++) {
+//                        if (data.get(i).getId() == friendId) {//if the deleted one exist in the list
+//                            User u = data.get(i);
+//                            found = true;
+//                            data.remove(u);
+//                            FirebaseModel.setFriends(userId, data, cloudCallback);
+//                        }
+//                    }
+//                    if (!found)
+//                        cloudCallback.onCancel();
+//                } else {
+//                    cloudCallback.onCancel();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//                cloudCallback.onCancel();
+//            }
+//        });
+//    }
 
     public void changeUserDetails(String firstName, String lastName, String email, String phone, final CloudManager.CloudCallback<String> cloudCallback) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -436,7 +350,7 @@ public class Repository {
 
     }
 
-    //    public LiveData<List<User>> getFriends() {
+//    public LiveData<List<User>> getFriends() {
 //        synchronized (this) {
 //            if (friendsLiveData == null) {
 //                friendsLiveData = new MutableLiveData<List<User>>();
@@ -452,67 +366,12 @@ public class Repository {
 //        }
 //        return friendsLiveData;
 //    }
-    public void logIn(String username, String password, final RepositoryCallback callback) {
-        LoginRequestData loginRequestData = new LoginRequestData(username, password);
-        CM.loginRequest(loginRequestData, new CloudManager.CloudCallback<String>() {
-            @Override
-            public void onComplete(String response) {
-                ResponseData responseData = CloudManager.getObjectFromString(response, ResponseData.class);
-                //Create To ResponseData
-                //Checke type
-                //BY the type -> create refrence ResponseData
-                switch (responseData.getType()) {
-                    case Error:
-                        ErrorResponseData errorResponseData = CloudManager.getObjectFromString(response, ErrorResponseData.class);
-                        switch (errorResponseData.getErrorType()) {
-                            case TechnicalError:
-                                callback.onComplete("TechnicalError");
-                                return;
-                            case UserIsNotExist:
-                                callback.onComplete("UserIsNotExist");
-                                return;
-                            default:
-                                return;
-                        }
-                    case Boolean:
-                        BooleanResponseData booleanResponseData = CloudManager.getObjectFromString(response, BooleanResponseData.class);
-                        if (booleanResponseData.getFlag()) {
-                            callback.onComplete("True");
-                            return;
-                        } else {
-                            callback.onComplete("False");
-                            return;
-                        }
-                    case Login:
-                        LoginResponseData loginResponseData = CloudManager.getObjectFromString(response, LoginResponseData.class);
-                        callback.onComplete(response);
 
-                    default:
-                        break;
-
-
-                }
-
-            }
-
-            @Override
-            public void onCancel() {
-            }
-        });
-
-    }
 
     public void logout() {
         userLiveData = null;
         FirebaseAuth auth = FirebaseAuth.getInstance();
         auth.signOut();
-    }
-
-    //Image (Profile Picture)
-    public interface GetImageListener {
-        void onSuccess(Bitmap image);
-
-        void onFail();
     }
 
     public void getProfilePicture(String url, final CloudManager.CloudCallback<Bitmap> cloudCallback) {
@@ -652,7 +511,138 @@ public class Repository {
 //    }
 
 
-    //CLASSES
+
+//New Server Methods
+    public void logIn(String username, String password, final LogInCallback<User> callback) {
+        LoginRequestData loginRequestData = new LoginRequestData(username, password);
+        CM.loginRequest(loginRequestData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String response) {
+                ResponseData responseData = ProductTypeConverters.getObjectFromString(response, ResponseData.class);
+                //Create To ResponseData
+                //Checke type
+                //BY the type -> create refrence ResponseData
+                switch (responseData.getType()) {
+                    case Error:
+                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(response, ErrorResponseData.class);
+                        switch (errorResponseData.getErrorType()) {
+                            case TechnicalError:
+                                callback.technicalError();
+                                return;
+                            case UserIsNotExist:
+                                callback.userIsNotExist();
+                                return;
+                            default:
+                                return;
+                        }
+                    case Boolean:
+                        BooleanResponseData booleanResponseData = ProductTypeConverters.getObjectFromString(response, BooleanResponseData.class);
+                        callback.onBoolean(booleanResponseData.getFlag());
+                    case Login:
+                        LoginResponseData loginResponseData = ProductTypeConverters.getObjectFromString(response, LoginResponseData.class);
+                        User user = new User(loginResponseData.getFirstName(), loginResponseData.getLastName(), loginResponseData.getPhone(), loginRequestData.getUserEmail(), null, null, 1, loginResponseData.getId());
+                        callback.login(user);
+                    default:
+                        break;
+                }
+            }
+            @Override
+            public void onCancel() {
+            }
+        });
+    }
+
+    public void addFriend(String email, AddFriendCallback<User> callback) {
+        //init request
+        AddFriendRequestData addFriendRequestData = new AddFriendRequestData(userLiveData.getValue().getEmail(), email);
+        //send request
+        CM.sendToServer("Request", addFriendRequestData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String data) {
+                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
+                switch (responseData.getType()) {
+                    case Error:
+                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
+                        switch (errorResponseData.getErrorType()) {
+                            case UserIsNotExist:
+                                callback.userIsNotExist();
+                                return;
+                            case FriendIsNotExist:
+                                callback.friendIsNotExist();
+                                return;
+                            case BothUsersEquals:
+                                callback.bothUsersEquals();
+                                return;
+                            case AlreadyFriends:
+                                callback.alreadyFriends();
+                                return;
+                            default:
+                                return;
+                        }
+                    case AddFriendResponse:
+                        AddFriendResponseData response = ProductTypeConverters.getObjectFromString(data.toString(), AddFriendResponseData.class);
+                        User user = new User(response.getUserData());
+                        callback.onSuccees(user);
+                        return;
+
+                    default:
+                        break;
+                }
+            }
+            @Override
+            public void onCancel() {
+            }
+        });
+    }
+    //getFriends1
+    public void getFriendsFromServer(final FriendsListCallback<List<User>> callback) {
+        //Init the get friends/contacts list of  User (by email).
+        ContactsListRequestData contactsListRequestData = new ContactsListRequestData(userLiveData.getValue().getEmail());
+        //send request
+        CM.sendToServer("Request", contactsListRequestData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String data) {
+                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
+                switch (responseData.getType()) {
+                    case Error:
+                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
+                        switch (errorResponseData.getErrorType()) {
+                            case TechnicalError:
+                                callback.technicalError();
+                                break;
+                            case UserMustToLogin:
+                                callback.userMustToLogin();
+                                break;
+                            default:
+                                break;
+                        }
+                    case Contacts:
+                        ContactsListResponseData response = ProductTypeConverters.getObjectFromString(data, ContactsListResponseData.class);
+                        //convert UserData to User
+                        LinkedList<User> list = new LinkedList<User>();
+                        for (UserData userData:response.getContacts()) {
+                            list.add(new User(userData));
+                        }
+                        callback.onSuccees(list);
+                        break;
+
+                    default:
+                        return;
+                }
+            }
+            @Override
+            public void onCancel() {
+            }
+        });
+    }
+
+    public void deleteFromFriends(int friendId, final CloudManager.CloudCallback<Boolean> cloudCallback)
+    {
+        //TODO delete friend
+    }
+
+
+//CLASSES
     class MyTask extends AsyncTask<List<User>, String, List<User>> {
         @Override
         protected List<User> doInBackground(List<User>[] lists) {

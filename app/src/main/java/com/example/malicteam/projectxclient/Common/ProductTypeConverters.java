@@ -2,6 +2,9 @@ package com.example.malicteam.projectxclient.Common;
 
 import android.arch.persistence.room.TypeConverter;
 
+import com.example.malicteam.projectxclient.Model.CloudManager;
+import com.google.gson.Gson;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -10,6 +13,7 @@ import java.util.List;
  */
 
 public class ProductTypeConverters {
+    private static Gson gson = new Gson();
 
     @TypeConverter
     public static LinkedList<Integer> toList(String list) {
@@ -32,4 +36,14 @@ public class ProductTypeConverters {
         str += "}";
         return str;
     }
+
+    //GSON
+    public static <T> T getObjectFromString(String data, Class<T> classOfT) {
+        return gson.fromJson(data, classOfT);
+    }
+
+    public static String getStringFromObject(Object obj) {
+        return gson.toJson(obj);
+    }
+    //GSON
 }

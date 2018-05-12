@@ -22,6 +22,8 @@ import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.R;
 
+import ResponsesEntitys.UserData;
+
 public class FriendDetailsFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private User user = null;

@@ -13,7 +13,10 @@ public interface Consts {
     public static final String LAST_NAME = "lastName";
     public static final String EMAIL = "email";
     public static final String PHONE_NUMBER = "phone";
+
     public static final String USER = "user";
+    public static final String USER_DATA_OBJECT = "userData";
+
     public static final String NEW_FIRST_NAME = "newFirstName";
     public static final String NEW_LAST_NAME = "newLastName";
     public static final String NEW_EMAIL = "newEmail";
@@ -31,4 +34,8 @@ public interface Consts {
 
     public static final int REQUEST_WRITE_STORAGE = 11;
     public static final int REQUEST_IMAGE_CAPTURE = 1;
+
+    //Server Data (Utils)
+    public static final String TECHNICAL_ERROR = "TechnicalError";
+    public static final String USER_MUST_TO_LOGIN = "userMustToLogin";
 }
