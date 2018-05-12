@@ -2,19 +2,25 @@ package com.example.malicteam.projectxclient.View;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.example.malicteam.projectxclient.Activity.LoginActivity;
+import com.example.malicteam.projectxclient.Activity.MainActivity;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Model.CloudManager;
@@ -25,6 +31,10 @@ import com.example.malicteam.projectxclient.R;
 
 import java.util.LinkedList;
 import java.util.List;
+
+import Responses.AddFriendResponseData;
+import Responses.ContactsListResponseData;
+import Responses.LoginResponseData;
 
 
 public class FriendsListFragment extends Fragment {
@@ -57,17 +67,16 @@ public class FriendsListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_friends_list, container, false);
-        if(getArguments() != null)
-        {
+        if(getArguments() != null) {
             friendsListView = (ListView) view.findViewById(R.id.list_friendsList);
             adapter = new MyAdapter();
             friendsListView.setAdapter(adapter);
             this.userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
-            Repository.instance.getFriends(this.userId, new CloudManager.CloudCallback<List<User>>(){
+            Repository.instance.getFriends(this.userId, new CloudManager.CloudCallback<List<User>>() {
                 @Override
                 public void onComplete(List<User> data) {
                     friendsList = data;
-                    if(adapter!=null){
+                    if (adapter != null) {
                         adapter.notifyDataSetChanged();
                     }
                 }
@@ -76,8 +85,54 @@ public class FriendsListFragment extends Fragment {
                 public void onCancel() {
                 }
             });
+            Repository.instance.getFriends1(new Repository.RepositoryCallback() {
 
-//            friendsViewModel = ViewModelProviders.of(this).get(FriendsViewModel.class);
+
+                                                @Override
+                                                public void onComplete(Object data) {
+                                                    String respone = data.toString();
+                                                    Log.d("TAG", "respone=" + respone);
+                                                    switch (respone) {
+                                                        case "TechnicalError":
+                                                            Log.d("TAG", "In getfriends1-->friendlistFragment ---> Technical error");
+                                                            //Toast.makeText(getApplicationContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
+                                                            break;
+                                                        case "UserMustToLogin":
+                                                            Log.d("TAG", "n getfriends1-->friendlistFragment ---> UserMustToLogin");
+                                                            // Toast.makeText(getApplicationContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
+                                                            break;
+
+                                                        default:
+                                                            ContactsListResponseData contactsListResponseData =CloudManager.getObjectFromString(data.toString(),ContactsListResponseData.class);
+                                                           //contactsListResponseData.getContacts()
+                                                            Log.d("TAG","List= "+contactsListResponseData.getContacts());
+                                                           // friendsList=friendsList.get(0).convertUserDataToUser(((ContactsListResponseData) data).getContacts());
+                                                            User user=new User();
+                                                            friendsList = user.convertUserDataToUser(contactsListResponseData.getContacts());
+
+//                                                            for (User userr:friendsList)
+//                                                            {
+//                                                                Log.d("TAG","a"+userr.getFirstName());
+//                                                            }
+                                                      //     if (adapter != null) {
+//                                                                adapter.notifyDataSetChanged();
+                                                            //}
+                                                            Log.d("TAG", "friend list obtaib sucful");
+
+
+                                                            break;
+                                                    }
+                                                }
+
+                                                @Override
+                                                public void onCancel() {
+
+                                                }
+                                            });
+
+
+
+                                                //            friendsViewModel = ViewModelProviders.of(this).get(FriendsViewModel.class);
 //            friendsViewModel.init(userId);
 //            friendsViewModel.getFriends().observe(this, new Observer<List<User>>() {
 //                @Override
@@ -133,19 +188,19 @@ public class FriendsListFragment extends Fragment {
         ImageButton deleteButton = (ImageButton) view.findViewById(R.id.deleteFriendButton_friendList);
 
 //Add friend
-//        addButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                AlertDialog.Builder builder = new AlertDialog.Builder(FriendsListActivity.this);
-//                builder.setTitle("Add New Friend");
-//                builder.setMessage("Enter Email:");
-//                final EditText input = new EditText(MyApp.getContext());
-//                input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-//                builder.setView(input);
-//                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        emailString = input.getText().toString();
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MyApp.getContext());
+                builder.setTitle("Add New Friend");
+                builder.setMessage("Enter Email:");
+                final EditText input = new EditText(MyApp.getContext());
+                input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+                builder.setView(input);
+                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        emailString = input.getText().toString();
 //                        Repository.instance.addFriend(emailString, new CloudManager.CloudCallback<Boolean>() {
 //                            @Override
 //                            public void onComplete(Boolean data) {
@@ -161,19 +216,64 @@ public class FriendsListFragment extends Fragment {
 //                                dialog.cancel();
 //                            }
 //                        });
-//                    }
-//                });
-//                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.cancel();
-//                    }
-//                });
-//
-//                AlertDialog d = builder.create();
-//                d.show();
-//            }
-//        });
+                        Repository.instance.addFriend(emailString, new Repository.RepositoryCallback<String>() {
+                            @Override
+                            public void onComplete(String data) {
+                                String respone = data.toString();
+                                Log.d("TAG", "respone=" + respone);
+                                switch (respone) {
+                                    case "UserIsNotExist":
+                                        //Log.d("TAG", "In getfriends1-->friendlistFragment ---> Technical error");
+                                        Toast.makeText(MyApp.getContext(), "EARROROR", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    case "FriendIsNotExist":
+                                      //  Log.d("TAG", "n getfriends1-->friendlistFragment ---> UserMustToLogin");
+                                        Toast.makeText(MyApp.getContext(), "Cant found email,please try again.", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    case "BothUsersEquals":
+                                        //Log.d("TAG", "n getfriends1-->friendlistFragment ---> UserMustToLogin");
+                                        Toast.makeText(MyApp.getContext(), "You cant add yourself as friend.", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    default:
+                                       // AddFrie contactsListResponseData =CloudManager.getObjectFromString(data.toString(),ContactsListResponseData.class);
+                                        AddFriendResponseData addFriendResponseData= CloudManager.getObjectFromString(data.toString(),AddFriendResponseData.class);
+                                        //contactsListResponseData.getContacts()
+                                        //Log.d("TAG","List= "+contactsListResponseData.getContacts());
+                                        // friendsList=friendsList.get(0).convertUserDataToUser(((ContactsListResponseData) data).getContacts());
+                                        friendsList.add(new User(addFriendResponseData.getUserData()));
+//                                                            for (User userr:friendsList)
+//                                                            {
+//                                                                Log.d("TAG","a"+userr.getFirstName());
+//                                                            }
+                                        //     if (adapter != null) {
+//                                                                adapter.notifyDataSetChanged();
+                                        //}
+                                        Log.d("TAG", "Friend added Succeful");
+
+
+                                        break;
+                                }
+
+                            }
+
+                            @Override
+                            public void onCancel() {
+
+                            }
+                        });
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                AlertDialog d = builder.create();
+                d.show();
+            }
+        });
 //delete from the main delete button
         deleteButton.setVisibility(View.INVISIBLE);
 //        deleteButton.setOnClickListener(new View.OnClickListener() {

@@ -3,8 +3,10 @@ package com.example.malicteam.projectxclient.Activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatDelegate;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +16,8 @@ import android.widget.Toast;
 import com.example.malicteam.projectxclient.Common.Consts;
 
 import com.example.malicteam.projectxclient.Common.MyApp;
+import com.example.malicteam.projectxclient.Common.MyApp;
+import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,6 +25,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.example.malicteam.projectxclient.Model.User;
 
 import Requests.LoginRequestData;
+
+import Responses.LoginResponseData;
 
 
 public class LoginActivity extends Activity {
@@ -44,11 +50,11 @@ public class LoginActivity extends Activity {
         FirebaseAuth auth = FirebaseAuth.getInstance();
 
         if (auth.getCurrentUser() != null) {
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            //Intent intent = new Intent(LoginActivity.this, MainActivity.class);
             int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
-            intent.putExtra(Consts.USER_ID, id);
-            startActivity(intent);
-            finish();
+            //  intent.putExtra(Consts.USER_ID, id);
+            //  startActivity(intent);
+            //   finish();
         }
 
         initButtons();
@@ -80,51 +86,73 @@ public class LoginActivity extends Activity {
     }
 
     private void tryLogin() {
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+
         //get Inputs
         String email = inputEmail.getText().toString();
         final String password = inputPassword.getText().toString();
         //check the inputs
         if (TextUtils.isEmpty(email)) {
-            Toast.makeText(MyApp.getContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
             return;
         }
         if (TextUtils.isEmpty(password)) {
-            Toast.makeText(MyApp.getContext(), "Enter password!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Enter password!", Toast.LENGTH_SHORT).show();
             return;
         }
 
         progressBar.setVisibility(View.VISIBLE);
 
-        //CLOUDMANAGER //
-        Repository.instance.logIn(email, password, new Repository.RepositoryCallback() {
+
+        //CLOUDMANAGER ////////////////////////////////////////////]
+        Repository.instance.logIn(email,password, new Repository.RepositoryCallback() {
             @Override
             public void onComplete(Object data) {
-                String response = data.toString();
-                switch (response) {
+                String respone=data.toString();
+                Log.d("TAG","respone="+respone);
+                switch (respone)
+                {
                     case "TechnicalError":
+                        Log.d("TAG","In Login-->LoginActivity ---> Technical error");
+                        Toast.makeText(MyApp.getContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
                         Toast.makeText(MyApp.getContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
                         break;
                     case "UserIsNotExist":
+                        Log.d("TAG","In Login-->LoginActivity ---> UserIsNotExist");
                         Toast.makeText(MyApp.getContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
                         break;
-                    case "True":
-                        //LoginRequestData lrd = new LoginRequestData();
-                        Toast.makeText(MyApp.getContext(), "logging in", Toast.LENGTH_SHORT).show();
+
+                    case "False":
+                        Log.d("TAG","In Login-->LoginActivity ---> False");
+                        Toast.makeText(getApplicationContext(), getString(R.string.auth_failed), Toast.LENGTH_SHORT).show();
+                        break;
+                        default:
+                        Log.d("TAG","Login succefull");
+                        //TODO
+                        // toast and then new intent
+                          Toast.makeText(getApplicationContext(), "logging in", Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        LoginResponseData loginResponseData= CloudManager.getObjectFromString(data.toString(),LoginResponseData.class);
+                        User myuser=new User(loginResponseData.getFirstName(), loginResponseData.getLastName(), loginResponseData.getPhone(), email, null, null,1,loginResponseData.getId());
+                         intent.putExtra(Consts.USER, myuser);
                         startActivity(intent);
                         finish();
                         break;
-                    case "False":
-                        Toast.makeText(MyApp.getContext(), getString(R.string.auth_failed), Toast.LENGTH_SHORT).show();
-                        break;
                 }
+
             }
+
             @Override
             public void onCancel() {
 
             }
 
         });
+
+
         ////////////////////////////
         //authenticate user
 //        auth.signInWithEmailAndPassword(email, password)
@@ -141,12 +169,17 @@ public class LoginActivity extends Activity {
 //                        } else {
 //                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
 //                            int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
-//                            intent.putExtra(Consts.USER_ID, id);
+//                            User myuser=new User("Eden","Charcon","0545587734","charcn@aa", null, null);
+//
+//                            intent.putExtra(Consts.USER, myuser);
 //                            startActivity(intent);
 //                            finish();
 //                        }
 //                    }
 //                });
+
+
     }
 }
+
 

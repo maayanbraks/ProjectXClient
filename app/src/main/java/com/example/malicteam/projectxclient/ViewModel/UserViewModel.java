@@ -24,4 +24,8 @@ public class UserViewModel extends ViewModel {
     public LiveData<User> getUser() {
         return user;
     }
+    public void initUser(User user,boolean isMainUser) {
+        this.user=Repository.instance.getUserMain(user);
+
+    }
 }
