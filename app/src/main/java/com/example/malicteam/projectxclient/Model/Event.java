@@ -34,7 +34,7 @@ public class Event implements Serializable {
     private int id;
 
     private String title;
-    private String content;
+  //  private String content;
     private String date;
     private String usersIds;
     private String recordURL;
@@ -47,7 +47,7 @@ public class Event implements Serializable {
     public Event(){
         this.id = 0;
         this.title = "";
-        this.content = "";
+ //       this.content = "";
         this.date = "";
         this.usersIds = "";
         this.recordURL = "";
@@ -60,7 +60,7 @@ public class Event implements Serializable {
     @Ignore
     public Event(String content, String title, String usersIds, String description, String adminId, String time, String url) {
         this.isRecording = true;
-        this.content = content;
+    //    this.content = content;
         this.title = title;
         this.usersIds = usersIds;
         this.description = description;
@@ -76,7 +76,7 @@ public class Event implements Serializable {
 
     public Event(String content, String title, String usersIds, String description, String adminId, String time, int id, String url) {
         this.isRecording = true;
-        this.content = content;
+   //     this.content = content;
         this.title = title;
         this.usersIds = usersIds;
         this.description = description;
@@ -92,7 +92,7 @@ public class Event implements Serializable {
     @Ignore
     public Event(String content, String title, String usersIds, String description, String adminId, String time, String id, String url) {
         this.isRecording = true;
-        this.content = content;
+  //      this.content = content;
         this.title = title;
         this.usersIds = usersIds;
         this.description = description;
@@ -122,17 +122,6 @@ public class Event implements Serializable {
         return id;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void addContent(String content) {
-        this.content.concat("\n" + content);
-    }
 
     public String getTitle() {
         return title;
@@ -199,7 +188,6 @@ public class Event implements Serializable {
         return "Event{" +
                 "isRecording=" + isRecording +
                 ", id=" + id +
-                ", content='" + content + '\'' +
                 ", title='" + title + '\'' +
                 ", date='" + date + '\'' +
                 ", usersIds='" + usersIds + '\'' +

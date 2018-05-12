@@ -125,11 +125,11 @@ public class LoginActivity extends Activity {
                 Log.d("TAG", "Login succefull");
                 //TODO
                 // toast and then new intent
-                Toast.makeText(getApplicationContext(), "logging in...", Toast.LENGTH_SHORT).show();
+ //               Toast.makeText(MyApp.getContext(), "logging in...", Toast.LENGTH_SHORT).show();
                 // create intent
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 // Get UserDate Object from Server
-                LoginResponseData loginResponseData = ProductTypeConverters.getObjectFromString(data.toString(), LoginResponseData.class);
+                // loginResponseData = ProductTypeConverters.getObjectFromString(data.toString(), LoginResponseData.class);
                 // Convert to User Object
 //                User myUser = new User(loginResponseData.getFirstName(), loginResponseData.getLastName(), loginResponseData.getPhone(), email, null, null, 1, loginResponseData.getId());
                 intent.putExtra(Consts.USER, data);
