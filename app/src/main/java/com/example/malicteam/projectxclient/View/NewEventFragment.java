@@ -72,18 +72,18 @@ public class NewEventFragment extends Fragment {
         invitedPpl = new String(" ");
 
         userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
-        currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
-        currentUser.init(userId, true);
-        currentUser.getUser().observe(this, new Observer<User>() {
-            @Override
-            public void onChanged(@Nullable User user) {
-                if (user != null) {
-                    //update details
-                    userId = user.getId();
-                }
-            }
-        });
-        currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
+//        currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
+//        currentUser.init(userId, true);
+//        currentUser.getUser().observe(this, new Observer<User>() {
+//            @Override
+//            public void onChanged(@Nullable User user) {
+//                if (user != null) {
+//                    //update details
+//                    userId = user.getId();
+//                }
+//            }
+//        });
+//        currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
         //currentUser.init(userId);
         startRecord = (Button) view.findViewById(R.id.new_event_start);
         EditText _name = view.findViewById(R.id.new_event_title);

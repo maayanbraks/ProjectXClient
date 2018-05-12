@@ -34,7 +34,7 @@ import java.util.List;
 public class EventsListFragment extends Fragment {
     private EvenetListListener mListener;
     private List<Event> eventsList = new LinkedList<>();
-    private UserViewModel currentUser = null;
+//    private UserViewModel currentUser = null;
     private int _userId;
     private EventAdapter adapter;
 
@@ -77,18 +77,18 @@ public class EventsListFragment extends Fragment {
                 }
             });
 
-            currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
-            currentUser.init(_userId, true);
-            currentUser.getUser().observe(this, new Observer<User>() {
-                @Override
-                public void onChanged(@Nullable User user) {
-                    if (user != null) {
-                        //update details
-                        _userId = user.getId();
-                        refreshList();
-                    }
-                }
-            });
+//            currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
+//            currentUser.init(_userId, true);
+//            currentUser.getUser().observe(this, new Observer<User>() {
+//                @Override
+//                public void onChanged(@Nullable User user) {
+//                    if (user != null) {
+//                        //update details
+//                        _userId = user.getId();
+//                        refreshList();
+//                    }
+//                }
+//            });
         }
         // Inflate the layout for this fragment
         return view;
