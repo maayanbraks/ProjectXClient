@@ -20,6 +20,7 @@ import android.webkit.URLUtil;
 
 import com.example.malicteam.projectxclient.Common.Callbacks.AddEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.EventListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.FriendsListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.LogInCallback;
@@ -534,6 +535,8 @@ public class Repository {
                                 return;
                             case UserIsNotExist:
                                 callback.userIsNotExist();
+                            case ConnectionIsAlreadyEstablished:
+                                callback.UseIsAllReadyLoggedIn();
                                 return;
                             default:
                                 return;
@@ -554,6 +557,46 @@ public class Repository {
             }
         });
     }
+
+    public void EditFriendList(LinkedList<String> friendList, EditFriendListCallback callback) {
+        //init request
+        EditContactsListRequestData editContactsListRequestData = new EditContactsListRequestData(userLiveData.getValue().getEmail(),friendList);
+        //send request
+        CM.sendToServer("Request", editContactsListRequestData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String data) {
+                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
+                switch (responseData.getType()) {
+                    case Error:
+                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
+                        switch (errorResponseData.getErrorType()) {
+                            case UserIsNotExist:
+                                callback.UserIsNotExist();
+                                return;
+                            default:
+                                return;
+                        }
+                    case Boolean:
+                        BooleanResponseData response = ProductTypeConverters.getObjectFromString(data.toString(), BooleanResponseData.class);
+                        if (response.getFlag()) {
+                            callback.onSuccees();
+                            return;
+                        } else {
+                            callback.error();
+                            return;
+                        }
+
+                    default:
+                        break;
+                }
+            }
+
+            @Override
+            public void onCancel() {
+            }
+
+        });
+}
 
     public void addFriend(String email, AddFriendCallback<User> callback) {
         //init request

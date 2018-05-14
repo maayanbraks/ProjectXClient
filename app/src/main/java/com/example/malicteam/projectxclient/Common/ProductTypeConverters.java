@@ -3,6 +3,7 @@ package com.example.malicteam.projectxclient.Common;
 import android.arch.persistence.room.TypeConverter;
 
 import com.example.malicteam.projectxclient.Model.CloudManager;
+import com.example.malicteam.projectxclient.Model.User;
 import com.google.gson.Gson;
 
 import java.util.LinkedList;
@@ -35,6 +36,14 @@ public class ProductTypeConverters {
         }
         str += "}";
         return str;
+    }
+
+    public static LinkedList<String> GenerateListUserToListMails(List<User> users) {
+        LinkedList<String> list = new LinkedList<String>();
+        for (User user : users) {
+            list.add(user.getEmail());
+        }
+        return list;
     }
 
     //GSON

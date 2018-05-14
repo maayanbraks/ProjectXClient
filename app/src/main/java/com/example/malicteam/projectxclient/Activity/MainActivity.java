@@ -34,7 +34,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
+import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.View.NewEventFragment;
 import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
@@ -48,6 +50,7 @@ import com.example.malicteam.projectxclient.View.FriendsListFragment;
 import com.example.malicteam.projectxclient.View.ResetPasswordFragment;
 
 import java.net.URISyntaxException;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.example.malicteam.projectxclient.Model.Event;
@@ -488,6 +491,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    public void deleteFriend(User friend, List<User> friendsList) {
+
+
+    }
+
+    @Override
     public void onEventSelected(Event event) {
         EventDetailsFragment fragment = EventDetailsFragment.newInstance();
         Bundle bundle = new Bundle();
@@ -511,40 +520,57 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     //DeleteFriendListener - open AlertDialog
-    @Override
-    public void deleteFriend(User friend) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MyApp.getContext());//Changed from Activity.this
-        builder.setTitle("Delete Friend");
-        builder.setMessage("Are you sure you wand delete " + friend.getFirstName() + " " + friend.getLastName() + " from your friends?");
-        builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                //On Click YES - delete him!
-                Repository.instance.deleteFromFriends(friend.getId(), new CloudManager.CloudCallback<Boolean>() {
-                    @Override
-                    public void onComplete(Boolean data) {
-                        if (data) {
-                            Toast.makeText(MyApp.getContext(), "Deleted", Toast.LENGTH_SHORT).show();
-                        } else
-                            Toast.makeText(MyApp.getContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        dialog.cancel();
-                    }
-                });
-
-            }
-        })
-                .setNegativeButton("No, Cancel!", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-        builder.show();
-    }
+//    @Override
+//    public void deleteFriend(User friend, LinkedList<User>fr) {
+////        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(MyApp.getContext());//Changed from Activity.this
+////        builder.setTitle("Delete Friend");
+////        builder.setMessage("Are you sure you wand delete " + friend.getFirstName() + " " + friend.getLastName() + " from your friends?");
+////        builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
+////            @Override
+////            public void onClick(DialogInterface dialog, int which) {
+////                Repository.instance.EditFriendList(ProductTypeConverters.GenerateListUserToListMails(friendsList),new EditFriendListCallback() {
+////                    @Override
+////                    public void onSuccees() {
+////
+////                    }
+////
+////                    @Override
+////                    public void UserIsNotExist() {
+////
+////                    }
+////
+////                    @Override
+////                    public void error() {
+////
+////                    }
+////                });
+////            }
+//////                                Repository.instance.deleteFromFriends(friend.getId(), new CloudManager.CloudCallback<Boolean>() {
+//////                                    @Override
+//////                                    public void onComplete(Boolean data) {
+//////                                        if (data) {
+//////                                            Toast.makeText(MyApp.getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+//////                                            refreshList();
+//////                                        } else
+//////                                            Toast.makeText(MyApp.getContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
+//////                                    }
+//////
+//////                                    @Override
+//////                                    public void onCancel() {
+//////                                        dialog.cancel();
+//////                                    }
+//////                                });
+////
+////
+////        })
+////                .setNegativeButton("No, Cancel!", new DialogInterface.OnClickListener() {
+////                    @Override
+////                    public void onClick(DialogInterface dialog, int which) {
+////                        dialog.cancel();
+////                    }
+////                });
+////        builder.show();
+//    }
 
     @Override
     public void sendResetPassword(String email) {

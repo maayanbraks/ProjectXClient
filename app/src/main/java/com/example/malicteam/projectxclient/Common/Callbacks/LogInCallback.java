@@ -9,4 +9,5 @@ public interface LogInCallback<T> {
     void technicalError();
     void userIsNotExist();
     void login(T data);
+    void UseIsAllReadyLoggedIn();
 }

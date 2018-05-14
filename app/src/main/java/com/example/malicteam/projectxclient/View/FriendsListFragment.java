@@ -19,9 +19,12 @@ import android.widget.Toast;
 
 
 import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.FriendsListCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Common.MyApp;
+import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
+import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.R;
@@ -35,7 +38,7 @@ public class FriendsListFragment extends Fragment {
     public interface friendsFragmentInteraction {
         void showFriendDetails(User user);//Different Object from User - only relevant data!
 
-        void deleteFriend(User friend);
+        void deleteFriend(User friend,List<User> friendsList);
     }
 
     private friendsFragmentInteraction mListener;
@@ -412,30 +415,49 @@ public class FriendsListFragment extends Fragment {
                 deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        mListener.deleteFriend(friend);
-//                        AlertDialog.Builder builder = new AlertDialog.Builder(MyApp.getContext());//Changed from Activity.this
-//                        builder.setTitle("Delete Friend");
-//                        builder.setMessage("Are you sure you wand delete " + friend.getFirstName() + " " + friend.getLastName() + " from your friends?");
-//                        builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
-//                            @Override
-//                            public void onClick(DialogInterface dialog, int which) {
-//                                Repository.instance.deleteFromFriends(friend.getId(), new CloudManager.CloudCallback<Boolean>() {
-//                                    @Override
-//                                    public void onComplete(Boolean data) {
-//                                        if (data) {
-//                                            Toast.makeText(MyApp.getContext(), "Deleted", Toast.LENGTH_SHORT).show();
-//                                            refreshList();
-//                                        } else
-//                                            Toast.makeText(MyApp.getContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
-//                                    }
+                        mListener.deleteFriend(friend,friendsList);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());//Changed from Activity.this
+                        builder.setTitle("Delete Friend");
+                        builder.setMessage("Are you sure you wand delete " + friend.getFirstName() + " " + friend.getLastName() + " from your friends?");
+                        builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            Repository.instance.EditFriendList(ProductTypeConverters.GenerateListUserToListMails(friendsList),new EditFriendListCallback() {
+                                @Override
+                                public void onSuccees() {
+                                    friendsList.remove(friend);
+                                           Toast.makeText(MyApp.getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                                            refreshList();
+                                }
+
+                                @Override
+                                public void UserIsNotExist() {
+                                    Toast.makeText(MyApp.getContext(), "User is not exist", Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void error() {
+                                    Toast.makeText(MyApp.getContext(), "ERROR.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                            }
+////                                Repository.instance.deleteFromFriends(friend.getId(), new CloudManager.CloudCallback<Boolean>() {
+////                                    @Override
+////                                    public void onComplete(Boolean data) {
+////                                        if (data) {
+////                                            Toast.makeText(MyApp.getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+////                                            refreshList();
+////                                        } else
+////                                            Toast.makeText(MyApp.getContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
+////                                    }
+////
+////                                    @Override
+////                                    public void onCancel() {
+////                                        dialog.cancel();
+////                                    }
+////                                });
 //
-//                                    @Override
-//                                    public void onCancel() {
-//                                        dialog.cancel();
-//                                    }
-//                                });
 //
-//                            }
 //                        })
 //                                .setNegativeButton("No, Cancel!", new DialogInterface.OnClickListener() {
 //                                    @Override
@@ -444,7 +466,8 @@ public class FriendsListFragment extends Fragment {
 //                                    }
 //                                });
 //                        builder.show();
-                    }
+                    });
+                }
                 });
 
 

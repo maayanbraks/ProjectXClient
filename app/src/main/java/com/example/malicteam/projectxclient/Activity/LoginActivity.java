@@ -29,8 +29,8 @@ public class LoginActivity extends Activity {
     private Button btnSignup, btnLogin, btnReset;
 
 
-    private final String DEFAULT_USER = "SaharMail";
-    private final String DEFAULT_PASSWORD = "A";
+    private final String DEFAULT_USER = "GalMail";
+    private final String DEFAULT_PASSWORD = "B";
 
 
 
@@ -147,6 +147,12 @@ public class LoginActivity extends Activity {
                 intent.putExtra(Consts.USER, data);
                 startActivity(intent);
                 finish();
+            }
+
+            @Override
+            public void UseIsAllReadyLoggedIn() {
+                Log.d("TAG", "In Login-->LoginActivity ---> UseIsAllReadyLoggedIn");
+                Toast.makeText(MyApp.getContext(), "User is already loogged in.", Toast.LENGTH_SHORT).show();
             }
 //            @Override
 //            public void onComplete(Object data) {
