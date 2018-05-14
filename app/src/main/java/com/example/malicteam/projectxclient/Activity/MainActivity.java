@@ -231,10 +231,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         mainFragment.setArguments(bundle);
         FragmentManager fragmentManager = getSupportFragmentManager();
-        //fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
-        FragmentTransaction tran = fragmentManager.beginTransaction();
-        tran.add(R.id.flContent, mainFragment);
-        tran.commit();
+        fragmentManager.beginTransaction().replace(R.id.flContent, mainFragment).commit();
+//        if(mainFragment.getView() == null) {
+//            FragmentTransaction tran = fragmentManager.beginTransaction();
+//            tran.add(R.id.flContent, mainFragment);
+//            tran.commit();
+//        }
+//        else
+//        {
+//            fragmentManager.beginTransaction().replace(R.id.flContent, mainFragment, _mainFragmentClass.getName()).commit();
+//        }
     }
 
     private Class getCurrentShownFragment() {
@@ -255,33 +261,71 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if (getCurrentShownFragment() != _mainFragmentClass) {
+            //Back To Main Screen
             loadMainFragment();
         } else {
-            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MyApp.getContext());
-            // set title
-            alertDialogBuilder.setTitle("What?! Do you want to exit?");
-            // set dialog message
-            alertDialogBuilder
-                    .setCancelable(false)
-                    .setNegativeButton("No, Stay!!", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    })
-                    .setPositiveButton("Yes :(", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            finish();
-                        }
-
-                    });
-            // create alert dialog
-            AlertDialog alertDialog = alertDialogBuilder.create();
-            // show it
-            alertDialog.show();
+            openExitAlert();
         }
     }
 
+    private void openExitAlert(){
+//        AlertDialog.Builder builder = new AlertDialog.Builder(FriendsListActivity.this);
+//        builder.setTitle("Add New Friend");
+//        builder.setMessage("Enter Email:");
+//        builder.setView(input);
+//        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                emailString = input.getText().toString();
+//                Repository.instance.addFriend(emailString, new CloudManager.CloudCallback<Boolean>() {
+//                    @Override
+//                    public void onComplete(Boolean data) {
+//                        if (data) {
+//                            Toast.makeText(getApplicationContext(), "Added", Toast.LENGTH_SHORT).show();
+//                            refreshList();
+//                        } else
+//                            Toast.makeText(getApplicationContext(), "Cannot add to your friends right now, please try later...", Toast.LENGTH_LONG).show();
+//                    }
+//
+//                    @Override
+//                    public void onCancel() {
+//                        dialog.cancel();
+//                    }
+//                });
+//            }
+//        });
+//        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//                dialog.cancel();
+//            }
+//        });
+//
+//        AlertDialog d = builder.create();
+//        d.show();
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        // set title
+        alertDialogBuilder.setTitle("What?! Do you want to exit?");
+        // set dialog message
+        alertDialogBuilder
+                .setCancelable(false)
+                .setNegativeButton("No, Stay!!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
+                .setPositiveButton("Yes :(", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                    }
+
+                });
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        // show it
+        alertDialog.show();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
