@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Activity.RecordingActivity;
+import com.example.malicteam.projectxclient.Common.Callbacks.AddEventCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Model.CloudManager;
@@ -33,20 +34,23 @@ import com.example.malicteam.projectxclient.R;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 public class NewEventFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private int userId;
     private UserViewModel currentUser = null;
-    String UsersInvites;
+    private String UsersInvites;
     private Button startRecord;
     private ImageButton fab;
     private Event event;
     private String invitedPpl;
-    boolean thereIsParti = false;
+    private boolean thereIsParti = false;
 
     public NewEventFragment() {
         // Required empty public constructor
@@ -103,50 +107,78 @@ public class NewEventFragment extends Fragment {
                 String title = _name.getText().toString();
                 String parti = _part.getText().toString();
 
-                if (title == null || title.equals("")) {
-                    Toast.makeText(MyApp.getContext(), "Enter Title", Toast.LENGTH_SHORT).show();
-                    valid = false;
-                }
-                else if (description == null || description.equals("")) {
-                    Toast.makeText(MyApp.getContext(), "Enter Descriptio", Toast.LENGTH_SHORT).show();
-                    valid = false;
-                }
-                else if (!thereIsParti){
-                    Toast.makeText(MyApp.getContext(), "You cant Record alone!", Toast.LENGTH_SHORT).show();
-                    valid = false;
-                }
+//                if (title == null || title.equals("")) {
+//                    Toast.makeText(MyApp.getContext(), "Enter Title", Toast.LENGTH_SHORT).show();
+//                    valid = false;
+//                }
+//                else if (description == null || description.equals("")) {
+//                    Toast.makeText(MyApp.getContext(), "Enter Descriptio", Toast.LENGTH_SHORT).show();
+//                    valid = false;
+//                }
+//                else if (!thereIsParti){
+//                    Toast.makeText(MyApp.getContext(), "You cant Record alone!", Toast.LENGTH_SHORT).show();
+//                    valid = true;
+//                }
 
-                else if(valid) {
-//                    DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
-//                    Date date = new Date();
-                    String dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime());
-                    event = new Event(null, title, UsersInvites, description, "" + userId, dateFormat, null);
-                    sendInvites("" + event.getId());
-                    Repository.instance.addEvent(event);
-                    Intent intent = new Intent(MyApp.getContext(), RecordingActivity.class);
-                    intent.putExtra("sendNewEvent", event);
-                    intent.putExtra("currectuser", userId);
-                    int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
-                    intent.putExtra(Consts.USER_ID, id);
-
-                    try {
-                        currentUser.getUser().getValue().addEventToList(Integer.valueOf(event.getId()));
+                //else//
+                // if(true) {
+                //DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+                Date date = new Date();
+                String dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime());
+                event = new Event(null, title, UsersInvites, description, "" + userId, dateFormat, null);
+//                    sendInvites("" + event.getId());
+                //Repository.instance.addEvent(event);
+                Repository.instance.addEvent(event, new AddEventCallback<Boolean>() {
+                    @Override
+                    public void onSuccees(Boolean bool) {
+                        if (bool) {
+                            Intent intent = new Intent(MyApp.getContext(), RecordingActivity.class);
+                            intent.putExtra("sendNewEvent", event);
+                            intent.putExtra("currectuser", userId);
+                            startActivity(intent);
+                        }
+                        //   try {
+                        //  currentUser.getUser().getValue().addEventToList(Integer.valueOf(event.getId()));
                         //update the userDatabase
-                        Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudCallback() {
-                            @Override
-                            public void onComplete(Object data) {
-                                startActivity(intent);
-                            }
-                            @Override
-                            public void onCancel() {
+//                                Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudCallback() {
+//                                    @Override
+//                                    public void onComplete(Object data) {
+//                                        startActivity(intent);
+//                                    }
+//
+//                                    @Override
+//                                    public void onCancel() {
 
-                            }
-                        });
-                    }catch (Exception e){
-                        Log.d("sdf", "afdasdf");
+                        //}
+                        //});
+                        //}
+
                     }
 
-                }
+                    @Override
+                    public void userIsNotExist() {
+                        Toast.makeText(MyApp.getContext(), "User is not exist,please try again.", Toast.LENGTH_SHORT).show();
+                        Log.d("TAG", "In addevent-->neweventfragment----> Technical userIsNotExist");
+                    }
+
+                    @Override
+                    public void technicalError() {
+                        Toast.makeText(MyApp.getContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
+                        Log.d("TAG", "In addevent-->neweventfragment ---> Technical error");
+                    }
+                });
+
+//                    Intent intent = new Intent(MyApp.getContext(), RecordingActivity.class);
+//                    intent.putExtra("sendNewEvent", event);
+//                    intent.putExtra("currectuser", userId);
+                //int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
+                //intent.putExtra(Consts.USER_ID, id);
+
+
+//                    }catch (Exception e){
+//                        Log.d("sdf", "afdasdf");
+//                    }
+
             }
         });
 
@@ -157,7 +189,8 @@ public class NewEventFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 String parti = _part.getText().toString();
-
+                //TODO
+                //check with server is userExist---->if do --->
                 FirebaseModel.isExistUser(User.generateId(parti), new CloudManager.CloudCallback<Integer>() {
                     @Override
                     public void onComplete(Integer id) {
@@ -178,9 +211,9 @@ public class NewEventFragment extends Fragment {
                                     InviteTextViewEdit(view);
 
                                     if (UsersInvites.equals(" "))
-                                        UsersInvites = user.getId() + "";
+                                        UsersInvites = user.getEmail() + "";
                                     else
-                                        UsersInvites = UsersInvites + "," + user.getId();
+                                        UsersInvites = UsersInvites + "," + user.getEmail();
                                 }
 
                                 @Override
@@ -193,6 +226,7 @@ public class NewEventFragment extends Fragment {
                         } else
                             Toast.makeText(MyApp.getContext(), "Cant find user," + parti, Toast.LENGTH_SHORT).show();
                     }
+
                     @Override
                     public void onCancel() {
                     }
@@ -229,7 +263,6 @@ public class NewEventFragment extends Fragment {
     }
 
 
-
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
@@ -246,6 +279,7 @@ public class NewEventFragment extends Fragment {
                 public void onComplete(Invite invite) {
                     Log.d("TAG", "succeed adding new invite.");
                 }
+
                 @Override
                 public void onCancel() {
                 }

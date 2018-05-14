@@ -586,7 +586,7 @@ public class FirebaseModel {
         value.put("Date", event.getDate());
         // value.put("ContentUrl", event.getContentUrl());
         value.put("AdminId", event.getAdminId());
-        value.put("UsersList", event.getUsersIds());
+        value.put("UsersList", event.getParticipats());
         if (event.isRecording() == true) {
             value.put("RecordingStatus", "true");
 

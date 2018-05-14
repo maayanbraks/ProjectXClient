@@ -20,6 +20,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
+import ResponsesEntitys.EventData;
+
 /**
  * Created by Maayan on 04-Jan-18.
  */
@@ -34,9 +36,9 @@ public class Event implements Serializable {
     private int id;
 
     private String title;
-  //  private String content;
+    //  private String content;
     private String date;
-    private String usersIds;
+    private String participats;
     private String recordURL;
     private String adminId;
     private String description;
@@ -47,9 +49,9 @@ public class Event implements Serializable {
     public Event(){
         this.id = 0;
         this.title = "";
- //       this.content = "";
+        //       this.content = "";
         this.date = "";
-        this.usersIds = "";
+        this.participats = "";
         this.recordURL = "";
         this.adminId = "";
         this.description = "";
@@ -58,11 +60,11 @@ public class Event implements Serializable {
     }
 
     @Ignore
-    public Event(String content, String title, String usersIds, String description, String adminId, String time, String url) {
+    public Event(String content, String title, String participats, String description, String adminId, String time, String url) {
         this.isRecording = true;
-    //    this.content = content;
+        //    this.content = content;
         this.title = title;
-        this.usersIds = usersIds;
+        this.participats = participats;
         this.description = description;
         this.adminId = adminId;
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:MM:SS");
@@ -76,9 +78,9 @@ public class Event implements Serializable {
 
     public Event(String content, String title, String usersIds, String description, String adminId, String time, int id, String url) {
         this.isRecording = true;
-   //     this.content = content;
+        //     this.content = content;
         this.title = title;
-        this.usersIds = usersIds;
+        this.participats = usersIds;
         this.description = description;
         this.adminId = adminId;
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:MM:SS");
@@ -90,11 +92,11 @@ public class Event implements Serializable {
 
     }
     @Ignore
-    public Event(String content, String title, String usersIds, String description, String adminId, String time, String id, String url) {
+    public Event(String content, String title, String participats, String description, String adminId, String time, String id, String url) {
         this.isRecording = true;
-  //      this.content = content;
+        //      this.content = content;
         this.title = title;
-        this.usersIds = usersIds;
+        this.participats = participats;
         this.description = description;
         this.adminId = adminId;
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:MM:SS");
@@ -104,6 +106,21 @@ public class Event implements Serializable {
         this.EventStartTime = time;
         this.recordURL = url;
 
+    }
+    public Event(EventData eventData)
+    {
+        this.isRecording = true;
+        //this.content = eventData.get;
+        this.title ="lala";
+        this.participats = eventData.getParticipantsNames().toString();
+        this.description = "lalall";
+        this.adminId = adminId;
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:MM:SS");
+        Date d = new Date();
+        this.date = eventData.getDateCreated().toString();
+        this.id = eventData.getId();
+        this.EventStartTime = " ";
+        this.recordURL = " ";
     }
 
     public String getEventStartTime() {
@@ -139,12 +156,12 @@ public class Event implements Serializable {
         this.date = date;
     }
 
-    public String getUsersIds() {
-        return usersIds;
+    public String getParticipats() {
+        return participats;
     }
 
-    public void setUsersIds(String usersIds) {
-        this.usersIds = usersIds;
+    public void setParticipats(String participats) {
+        this.participats = participats;
     }
 
     public String getDescription() {
@@ -190,7 +207,7 @@ public class Event implements Serializable {
                 ", id=" + id +
                 ", title='" + title + '\'' +
                 ", date='" + date + '\'' +
-                ", usersIds='" + usersIds + '\'' +
+                ", usersIds='" + participats + '\'' +
                 ", recordURL='" + recordURL + '\'' +
                 ", adminId='" + adminId + '\'' +
                 ", description='" + description + '\'' +

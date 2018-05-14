@@ -16,10 +16,13 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Activity.LoginActivity;
 import com.example.malicteam.projectxclient.Activity.MainActivity;
+import com.example.malicteam.projectxclient.Common.Callbacks.EventListCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
+import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.Repository;
@@ -34,7 +37,7 @@ import java.util.List;
 public class EventsListFragment extends Fragment {
     private EvenetListListener mListener;
     private List<Event> eventsList = new LinkedList<>();
-//    private UserViewModel currentUser = null;
+    //    private UserViewModel currentUser = null;
     private int _userId;
     private EventAdapter adapter;
 
@@ -64,16 +67,42 @@ public class EventsListFragment extends Fragment {
             eventListView.setAdapter(adapter);
 
             this._userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
-            Repository.instance.getEvents(_userId, new CloudManager.CloudCallback<List<Event>>() {
+//            Repository.instance.getEvents(_userId, new CloudManager.CloudCallback<List<Event>>() {
+//                @Override
+//                public void onComplete(List<Event> data) {
+//                    eventsList = data;
+//                    if (adapter != null)
+//                        adapter.notifyDataSetChanged();
+//                }
+
+//                @Override
+//                public void onCancel() {
+//                }
+//            });
+            Repository.instance.getEventsFromServer(new EventListCallback<List<Event>>() {
                 @Override
-                public void onComplete(List<Event> data) {
-                    eventsList = data;
-                    if (adapter != null)
-                        adapter.notifyDataSetChanged();
+                public void onSuccees(List<Event> data) {
+                    try {
+                        if (data != null) {
+                            eventsList = data;
+                            if (adapter != null)
+                                adapter.notifyDataSetChanged();
+                        }
+                    }catch (Exception e){
+                        Log.d("TAG", e.getMessage());
+                    }
                 }
 
                 @Override
-                public void onCancel() {
+                public void UserIsNotExist() {
+                    Toast.makeText(MyApp.getContext(), "User not exist,try again.", Toast.LENGTH_SHORT).show();
+                    Log.d("TAG", "In getEventFromServer->EventListFragment --->UserIsNotExist");
+                }
+
+                @Override
+                public void userMustToLogin() {
+                    Toast.makeText(MyApp.getContext(), "You must log in first", Toast.LENGTH_SHORT).show();
+                    Log.d("TAG", "In getEventFromServer->EventListFragment --->userMustToLogin");
                 }
             });
 

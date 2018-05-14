@@ -3,6 +3,7 @@ package com.example.malicteam.projectxclient.Model;
 import Requests.*;
 import Responses.ErrorResponseData;
 import Responses.*;
+import ResponsesEntitys.EventData;
 import ResponsesEntitys.UserData;
 
 import android.arch.lifecycle.LiveData;
@@ -17,7 +18,9 @@ import android.os.Environment;
 import android.util.Log;
 import android.webkit.URLUtil;
 
+import com.example.malicteam.projectxclient.Common.Callbacks.AddEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.EventListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.FriendsListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.LogInCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
@@ -689,4 +692,102 @@ public class Repository {
             friends = users;
         }
     }
+
+
+    public void getEventsFromServer(final EventListCallback<List<Event>> callback) {
+        //Init the get friends/contacts list of  User (by email).
+        EventsListRequestData eventsListRequestData = new EventsListRequestData(userLiveData.getValue().getEmail());
+        //send request
+        CM.sendToServer("Request", eventsListRequestData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String data) {
+                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
+                switch (responseData.getType()) {
+                    case Error:
+                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
+                        switch (errorResponseData.getErrorType()) {
+                            case UserIsNotExist:
+                                callback.UserIsNotExist();
+                                break;
+                            case UserMustToLogin:
+                                callback.userMustToLogin();
+                                break;
+                            default:
+                                break;
+                        }
+                    case Events:
+                        EventsListResponseData response = ProductTypeConverters.getObjectFromString(data, EventsListResponseData.class);
+                        //convert UserData to User
+                        LinkedList<Event> list = new LinkedList<Event>();
+                        for (EventData eventData:response.getEvents()) {
+                            list.add(new Event(eventData));
+                        }
+                        callback.onSuccees(list);
+                        break;
+
+                    default:
+                        return;
+                }
+            }
+            @Override
+            public void onCancel() {
+            }
+        });
+    }
+
+
+    public void addEvent(Event event,final AddEventCallback<Boolean> callback) {
+        CreateEventRequestData createEventRequestData = new CreateEventRequestData(userLiveData.getValue().getEmail(), event.getParticipats(), event.getTitle(), event.getDescription(), event.getDate());
+        CM.sendToServer("Request", createEventRequestData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String response) {
+                ResponseData responseData = ProductTypeConverters.getObjectFromString(response, ResponseData.class);
+                //Create To ResponseData
+                //Checke type
+                //BY the type -> create refrence ResponseData
+                switch (responseData.getType()) {
+                    case Error:
+                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(response, ErrorResponseData.class);
+                        switch (errorResponseData.getErrorType()) {
+                            case TechnicalError:
+                                callback.technicalError();
+                                return;
+                            case UserIsNotExist:
+                                callback.userIsNotExist();
+                                return;
+                            default:
+                                return;
+                        }
+                    case Boolean:
+                        BooleanResponseData booleanResponseData = ProductTypeConverters.getObjectFromString(response, BooleanResponseData.class);
+                        if (booleanResponseData.getFlag())
+                            callback.onSuccees(true);
+                    default:
+                        break;
+                }
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+
+            //TODO add locally DB
+            //TODO create Content file and save locally
+            //TODO save firebase content
+            String url = "";
+
+            //FirebaseModel.addNewEvent(event);
+
+
+//    public File getContentFile(){
+//
+//        //TODO get content image
+//
+//    }
+        });
+    }
+
+
+
 }

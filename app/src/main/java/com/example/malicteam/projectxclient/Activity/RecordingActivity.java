@@ -283,7 +283,7 @@ public class RecordingActivity extends AppCompatActivity {
                     event.setId(EventList.get(0).getId());
                     event.setDate(EventList.get(0).getDate());
                     event.setDescription(EventList.get(0).getDescription());
-                    event.setUsersIds(EventList.get(0).getUsersIds());
+                    event.setParticipats(EventList.get(0).getParticipats());
                     event.setAdminId(EventList.get(0).getAdminId());
                     // setting the layout from the event information
 //                    TextView _eventTitle = findViewById(R.id.recording_title);
@@ -323,7 +323,7 @@ public class RecordingActivity extends AppCompatActivity {
         TextView startDate = findViewById(R.id.recording_time);
         startTime.setText(time[1]);
         startDate.setText(time[0]);
-        partici.setText(event.getUsersIds());
+        partici.setText(event.getParticipats());
         mFileName += "/outalk" + event.getId() + ".3gp";
 
         if (!(CheckMeAdmin())) {

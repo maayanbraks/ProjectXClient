@@ -34,6 +34,7 @@ import java.util.List;
 public class FriendsListFragment extends Fragment {
     public interface friendsFragmentInteraction {
         void showFriendDetails(User user);//Different Object from User - only relevant data!
+
         void deleteFriend(User friend);
     }
 
@@ -89,17 +90,24 @@ public class FriendsListFragment extends Fragment {
                 public void onSuccees(List<User> data) {
 //                    ContactsListResponseData contactsListResponseData = CloudManager.getObjectFromString(data.toString(), ContactsListResponseData.class);
                     //contactsListResponseData.getContacts()
-                    Log.d("TAG", "List= " + data);
+                    //Log.d("TAG", "List= " + data);
                     // friendsList=friendsList.get(0).convertUserDataToUser(((ContactsListResponseData) data).getContacts());
 //                            User user = new User();
-                    friendsList = data;
+                    try {
+                        if (data != null) {
+                            friendsList = data;
 //                    for (User userr : friendsList) {
 //                        Log.d("TAG", "a" + userr.getFirstName());
 //                    }
-//                    if (adapter != null) {
-//                        adapter.notifyDataSetChanged();
-//                    }
-                    Log.d("TAG", "friend list obtaib sucful");
+                            ////////////////////////////////MAAYAN LOOK HERE ////////////////////////////////////////////////////////////
+                            if (adapter != null) {
+                                adapter.notifyDataSetChanged();
+                            }
+                            Log.d("TAG", "friend list obtaib sucful");
+                        }
+                    } catch (Exception e) {
+                        Log.d("TAg", e.getMessage());
+                    }
                 }
 
                 @Override
@@ -188,8 +196,6 @@ public class FriendsListFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
-
-
 
 
     private void refreshList() {

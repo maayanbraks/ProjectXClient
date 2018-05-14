@@ -16,13 +16,10 @@ import com.example.malicteam.projectxclient.Common.Callbacks.LogInCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
 
 import com.example.malicteam.projectxclient.Common.MyApp;
-import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.R;
 
 import com.example.malicteam.projectxclient.Model.User;
-
-import Responses.LoginResponseData;
 
 
 public class LoginActivity extends Activity {
@@ -30,6 +27,12 @@ public class LoginActivity extends Activity {
     private EditText inputEmail, inputPassword;
     private ProgressBar progressBar;
     private Button btnSignup, btnLogin, btnReset;
+
+
+    private final String DEFAULT_USER = "SaharMail";
+    private final String DEFAULT_PASSWORD = "A";
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +90,15 @@ public class LoginActivity extends Activity {
         //get Inputs
         String email = inputEmail.getText().toString();
         String password = inputPassword.getText().toString();
+
+
+        //DEFAULT
+        email = DEFAULT_USER;
+        password = DEFAULT_PASSWORD;
+
+
+
+
         //check the inputs
         if (TextUtils.isEmpty(email)) {
             Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
