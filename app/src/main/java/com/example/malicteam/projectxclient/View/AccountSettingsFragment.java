@@ -209,7 +209,7 @@ public class AccountSettingsFragment extends Fragment {
         signOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LogoutDialogFragment logoutDialog = new LogoutDialogFragment();
+//                LogoutDialogFragment logoutDialog = new LogoutDialogFragment();
 //                logoutDialog.show(getActivity().getSupportFragmentManager(), "LogoutDialog");
 //                Intent intent = new Intent(AccountSettingsActivity.this, MainActivity.class);
 //                startActivity(intent);

@@ -76,42 +76,42 @@
 ////        addButton.setOnClickListener(new View.OnClickListener() {
 ////            @Override
 ////            public void onClick(View view) {
-////                AlertDialog.Builder builder = new AlertDialog.Builder(FriendsListActivity.this);
-////                builder.setTitle("Add New Friend");
-////                builder.setMessage("Enter Email:");
-////                final EditText input = new EditText(getApplicationContext());
-////                input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-////                builder.setView(input);
-////                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
-////                    @Override
-////                    public void onClick(DialogInterface dialog, int which) {
-////                        emailString = input.getText().toString();
-////                        Repository.instance.addFriend(emailString, new CloudManager.CloudCallback<Boolean>() {
-////                            @Override
-////                            public void onComplete(Boolean data) {
-////                                if (data) {
-////                                    Toast.makeText(getApplicationContext(), "Added", Toast.LENGTH_SHORT).show();
-////                                    refreshList();
-////                                } else
-////                                    Toast.makeText(getApplicationContext(), "Cannot add to your friends right now, please try later...", Toast.LENGTH_LONG).show();
-////                            }
-////
-////                            @Override
-////                            public void onCancel() {
-////                                dialog.cancel();
-////                            }
-////                        });
-////                    }
-////                });
-////                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-////                    @Override
-////                    public void onClick(DialogInterface dialog, int which) {
-////                        dialog.cancel();
-////                    }
-////                });
-////
-////                AlertDialog d = builder.create();
-////                d.show();
+//                AlertDialog.Builder builder = new AlertDialog.Builder(FriendsListActivity.this);
+//                builder.setTitle("Add New Friend");
+//                builder.setMessage("Enter Email:");
+//                final EditText input = new EditText(getApplicationContext());
+//                input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+//                builder.setView(input);
+//                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        emailString = input.getText().toString();
+//                        Repository.instance.addFriend(emailString, new CloudManager.CloudCallback<Boolean>() {
+//                            @Override
+//                            public void onComplete(Boolean data) {
+//                                if (data) {
+//                                    Toast.makeText(getApplicationContext(), "Added", Toast.LENGTH_SHORT).show();
+//                                    refreshList();
+//                                } else
+//                                    Toast.makeText(getApplicationContext(), "Cannot add to your friends right now, please try later...", Toast.LENGTH_LONG).show();
+//                            }
+//
+//                            @Override
+//                            public void onCancel() {
+//                                dialog.cancel();
+//                            }
+//                        });
+//                    }
+//                });
+//                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        dialog.cancel();
+//                    }
+//                });
+//
+//                AlertDialog d = builder.create();
+//                d.show();
 ////            }
 ////        });
 //////delete from the main delete button
