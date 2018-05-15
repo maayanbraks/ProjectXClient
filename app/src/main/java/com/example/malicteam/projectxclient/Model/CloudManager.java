@@ -29,7 +29,7 @@ public class CloudManager {
         void onComplete(T data);
         void onCancel();
     }
-    private final String SERVER_ADDRESS = "http://193.106.55.95:8080";
+    private final String SERVER_ADDRESS = "http://192.168.27.1:8080";
     private CloudCallback<String> localCallbackCloudManager;
     private Socket socket;
     static final int PORT = 8888;

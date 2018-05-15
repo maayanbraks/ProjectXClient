@@ -6,6 +6,7 @@ import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -17,10 +18,12 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
 import ResponsesEntitys.EventData;
+import ResponsesEntitys.UserData;
 
 /**
  * Created by Maayan on 04-Jan-18.
@@ -38,7 +41,16 @@ public class Event implements Serializable {
     private String title;
     //  private String content;
     private String date;
-    private String participats;
+
+    public List<User> getParticipats() {
+        return participats;
+    }
+
+    public void setParticipats(List<User> participats) {
+        this.participats = participats;
+    }
+    @Ignore
+    private List<User> participats;
     private String recordURL;
     private String adminId;
     private String description;
@@ -51,7 +63,7 @@ public class Event implements Serializable {
         this.title = "";
         //       this.content = "";
         this.date = "";
-        this.participats = "";
+        participats=new LinkedList<User>();
         this.recordURL = "";
         this.adminId = "";
         this.description = "";
@@ -60,7 +72,7 @@ public class Event implements Serializable {
     }
 
     @Ignore
-    public Event(String content, String title, String participats, String description, String adminId, String time, String url) {
+    public Event(String content, String title, LinkedList<User> participats, String description, String adminId, String time, String url) {
         this.isRecording = true;
         //    this.content = content;
         this.title = title;
@@ -76,11 +88,11 @@ public class Event implements Serializable {
 
     }
 
-    public Event(String content, String title, String usersIds, String description, String adminId, String time, int id, String url) {
+    public Event(String content, String title, LinkedList<User> participats, String description, String adminId, String time, int id, String url) {
         this.isRecording = true;
         //     this.content = content;
         this.title = title;
-        this.participats = usersIds;
+        this.participats = participats;
         this.description = description;
         this.adminId = adminId;
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:MM:SS");
@@ -92,7 +104,7 @@ public class Event implements Serializable {
 
     }
     @Ignore
-    public Event(String content, String title, String participats, String description, String adminId, String time, String id, String url) {
+    public Event(String content, String title, LinkedList<User> participats, String description, String adminId, String time, String id, String url) {
         this.isRecording = true;
         //      this.content = content;
         this.title = title;
@@ -112,7 +124,7 @@ public class Event implements Serializable {
         this.isRecording = true;
         //this.content = eventData.get;
         this.title ="lala";
-        this.participats = eventData.getParticipantsNames().toString();
+        this.participats = ProductTypeConverters.GenerateListUserFromListDataUser(eventData.getParticipants());
         this.description = "lalall";
         this.adminId = adminId;
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:MM:SS");
@@ -154,14 +166,6 @@ public class Event implements Serializable {
 
     public void setDate(String date) {
         this.date = date;
-    }
-
-    public String getParticipats() {
-        return participats;
-    }
-
-    public void setParticipats(String participats) {
-        this.participats = participats;
     }
 
     public String getDescription() {

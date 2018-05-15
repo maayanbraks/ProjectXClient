@@ -24,6 +24,7 @@ import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallb
 import com.example.malicteam.projectxclient.Common.Callbacks.EventListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.FriendsListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.LogInCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.google.firebase.auth.FirebaseAuth;
@@ -681,6 +682,42 @@ public class Repository {
             }
         });
     }
+    public void getUserIfExist(String email,final isUserExistResponeCallback callback) {
+        //Init the get friends/contacts list of  User (by email).
+        IsUserExistRequestData IsUserExistResponseData = new IsUserExistRequestData(userLiveData.getValue().getEmail(),email);
+
+        //send request
+        CM.sendToServer("Request", IsUserExistResponseData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String data) {
+                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
+                switch (responseData.getType()) {
+                    case Error:
+                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
+                        switch (errorResponseData.getErrorType()) {
+                            case UserIsNotExist:
+                                callback.userIsNotExist();
+                                break;
+                            case FriendIsNotExist:
+                                callback.friendIsNotExist();
+                                break;
+                            default:
+                                break;
+                        }
+                    case IsUserExistResponse:
+                        IsUserExistResponseData response = ProductTypeConverters.getObjectFromString(data, IsUserExistResponseData.class);
+                        callback.onSuccees(response.getUserData());
+                        break;
+
+                    default:
+                        return;
+                }
+            }
+            @Override
+            public void onCancel() {
+            }
+        });
+    }
 
     public void deleteFromFriends(int friendId, final CloudManager.CloudCallback<Boolean> cloudCallback)
     {
@@ -762,9 +799,11 @@ public class Repository {
                         EventsListResponseData response = ProductTypeConverters.getObjectFromString(data, EventsListResponseData.class);
                         //convert UserData to User
                         LinkedList<Event> list = new LinkedList<Event>();
-                        for (EventData eventData:response.getEvents()) {
+                        if (response.getEvents().size()>0) {
+                        for (EventData eventData : response.getEvents()) {
                             list.add(new Event(eventData));
                         }
+                    }
                         callback.onSuccees(list);
                         break;
 
@@ -779,8 +818,8 @@ public class Repository {
     }
 
 
-    public void addEvent(Event event,final AddEventCallback<Boolean> callback) {
-        CreateEventRequestData createEventRequestData = new CreateEventRequestData(userLiveData.getValue().getEmail(), event.getParticipats(), event.getTitle(), event.getDescription(), event.getDate());
+    public void addEvent(List<String> usersMails,Event event,final AddEventCallback<Boolean> callback) {
+        CreateEventRequestData createEventRequestData = new CreateEventRequestData(userLiveData.getValue().getEmail(),usersMails, event.getTitle(), event.getDescription(), event.getDate());
         CM.sendToServer("Request", createEventRequestData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String response) {

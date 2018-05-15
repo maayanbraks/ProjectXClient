@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Activity.RecordingActivity;
 import com.example.malicteam.projectxclient.Common.Callbacks.AddEventCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Model.CloudManager;
@@ -41,11 +42,14 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import ResponsesEntitys.EventData;
+import ResponsesEntitys.UserData;
+
 public class NewEventFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
     private int userId;
     private UserViewModel currentUser = null;
-    private String UsersInvites;
+    private List<String> UsersInvites;
     private Button startRecord;
     private ImageButton fab;
     private Event event;
@@ -72,7 +76,7 @@ public class NewEventFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_new_event, container, false);
-        UsersInvites = " ";
+        UsersInvites=new LinkedList<String>();
         invitedPpl = new String(" ");
 
         userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
@@ -125,10 +129,10 @@ public class NewEventFragment extends Fragment {
                 //DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                 Date date = new Date();
                 String dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime());
-                event = new Event(null, title, UsersInvites, description, "" + userId, dateFormat, null);
+                event = new Event(null, title, null, description, "" + userId, dateFormat, null);
 //                    sendInvites("" + event.getId());
                 //Repository.instance.addEvent(event);
-                Repository.instance.addEvent(event, new AddEventCallback<Boolean>() {
+                Repository.instance.addEvent(UsersInvites,event, new AddEventCallback<Boolean>() {
                     @Override
                     public void onSuccees(Boolean bool) {
                         if (bool) {
@@ -184,56 +188,44 @@ public class NewEventFragment extends Fragment {
 
         fab = (ImageButton) view.findViewById(R.id.addInviteButton);
         fab.setOnClickListener(new View.OnClickListener() {
-            User user;
+                                   User user;
 
-            @Override
-            public void onClick(View v) {
-                String parti = _part.getText().toString();
-                //TODO
-                //check with server is userExist---->if do --->
-                FirebaseModel.isExistUser(User.generateId(parti), new CloudManager.CloudCallback<Integer>() {
-                    @Override
-                    public void onComplete(Integer id) {
-                        if (id > 0) {// if found user
-                            Log.d("TAG", "Found id,");
-                            Repository.instance.getUserById(id, new CloudManager.CloudCallback<List<User>>() {
-                                @Override
-                                public void onComplete(List<User> data) {
-                                    Log.d("TAG", "data size=," + data.size());
-                                    if (data.size() > 0)
-                                        user = data.get(0);
-                                    Toast.makeText(MyApp.getContext(), "Sending invite to" + user.getFirstName(), Toast.LENGTH_SHORT).show();
-                                    if (invitedPpl.equals(" ")) { // if empty
-                                        invitedPpl = user.getFirstName();
-                                    } else {
-                                        invitedPpl = invitedPpl + "," + user.getFirstName();
-                                    }
-                                    InviteTextViewEdit(view);
+                                   @Override
+                                   public void onClick(View v) {
+                                       String parti = _part.getText().toString();
+                                       //TODO
+                                       //check with server is userExist---->if do --->
+                                       Repository.instance.getUserIfExist(parti, new isUserExistResponeCallback() {
+                                           @Override
+                                           public void onSuccees(UserData data) {
+                                               User user = new User(data);
 
-                                    if (UsersInvites.equals(" "))
-                                        UsersInvites = user.getEmail() + "";
-                                    else
-                                        UsersInvites = UsersInvites + "," + user.getEmail();
-                                }
+                                               if (invitedPpl.equals(" ")) { // if empty
+                                                   invitedPpl = user.getFirstName();
+                                                   // InviteTextViewEdit(view);
+                                                   Toast.makeText(MyApp.getContext(), "Adding"+user.getFirstName(), Toast.LENGTH_SHORT).show();
+                                                   Log.d("TAG", "In addevent-->neweventfragment----> OnSucess");
+                                                   Log.d("TAG", "Sucseed found user, added him");
+                                               }
+                                           }
 
-                                @Override
-                                public void onCancel() {
+                                           @Override
+                                           public void userIsNotExist() {
+                                              // Toast.makeText(MyApp.getContext(), "User is not exist,please try again.", Toast.LENGTH_SHORT).show();
+                                               Log.d("TAG", "In addevent-->neweventfragment----> Technical userIsNotExist");
+                                           }
 
-                                }
-                            });
+                                           @Override
+                                           public void friendIsNotExist() {
+                                               //Toast.makeText(MyApp.getContext(), "User is not exist,please try again.", Toast.LENGTH_SHORT).show();
+                                               Log.d("TAG", "In addevent-->neweventfragment----> friendIsNotExist");
 
+                                           }
 
-                        } else
-                            Toast.makeText(MyApp.getContext(), "Cant find user," + parti, Toast.LENGTH_SHORT).show();
-                    }
+                                       });
+                                   }
 
-                    @Override
-                    public void onCancel() {
-                    }
-                });
-            }
-        });
-
+                               });
         // Inflate the layout for this fragment
         return view;
     }
@@ -270,21 +262,21 @@ public class NewEventFragment extends Fragment {
 
     private void sendInvites(String eventId) {
         Log.d("TAG", "usrinvites=" + UsersInvites);
-        String invites = UsersInvites;
-        String[] items = invites.split(",");
-        for (String item : items) {
-            Invite invite = new Invite(eventId, item, "" + userId);
-            Repository.instance.addNewInvite(invite, new CloudManager.CloudCallback<Invite>() {
-                @Override
-                public void onComplete(Invite invite) {
-                    Log.d("TAG", "succeed adding new invite.");
-                }
-
-                @Override
-                public void onCancel() {
-                }
-            });
-        }
+       // String invites = UsersInvites;
+        //String[] items = invites.split(",");
+//        for (String item : items) {
+//            Invite invite = new Invite(eventId, item, "" + userId);
+//            Repository.instance.addNewInvite(invite, new CloudManager.CloudCallback<Invite>() {
+//                @Override
+//                public void onComplete(Invite invite) {
+//                    Log.d("TAG", "succeed adding new invite.");
+//                }
+//
+//                @Override
+//                public void onCancel() {
+//                }
+//            });
+//        }
     }
 
     private void InviteTextViewEdit(View view) {

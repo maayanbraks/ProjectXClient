@@ -9,6 +9,8 @@ import com.google.gson.Gson;
 import java.util.LinkedList;
 import java.util.List;
 
+import ResponsesEntitys.UserData;
+
 /**
  * Created by Maayan on 12-Mar-18.
  */
@@ -45,7 +47,32 @@ public class ProductTypeConverters {
         }
         return list;
     }
-
+    public static String GenerateStringFromList(List<String> list) {
+        String newlist="";
+        for (String num : list) {
+            newlist=newlist+","+num;
+        }
+        newlist=newlist.substring(0,newlist.length()-1);
+        return newlist;
+    }
+    public static List<UserData> GenerateListUserDataFromListUser(List<User> users)
+    {
+        List<UserData> usersData=new LinkedList<UserData>();
+ for (int i=0;i<users.size();i++)
+ {
+     usersData.add(new UserData(users.get(i).getFirstName(),users.get(i).getLastName(),users.get(i).getEmail(),users.get(i).getPictureUrl(),users.get(i).getPhoneNumber()));
+ }
+        return usersData;
+    }
+    public static List<User> GenerateListUserFromListDataUser(List<UserData> usersData)
+    {
+        List<User> users=new LinkedList<User>();
+        for (int i=0;i<users.size();i++)
+        {
+            users.add(new User(usersData.get(i)));
+        }
+        return users;
+    }
     //GSON
     public static <T> T getObjectFromString(String data, Class<T> classOfT) {
         return gson.fromJson(data, classOfT);

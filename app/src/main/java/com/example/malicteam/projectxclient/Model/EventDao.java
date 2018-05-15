@@ -16,9 +16,9 @@ import java.util.List;
 public interface EventDao {
     @Query("SELECT * FROM events")
     List<Event> getAllEvents();
-
-    @Query("SELECT * FROM events WHERE events.participats LIKE '%'+:userId+'%' ")
-    List<Event> getAllUserEvents(int userId);
+//
+//    @Query("SELECT * FROM events WHERE events.participats LIKE '%'+:userId+'%' ")
+//    List<Event> getAllUserEvents(int userId);
 
     @Query("SELECT * FROM events WHERE events.id = :eventId")
     Event getEvent(int eventId);

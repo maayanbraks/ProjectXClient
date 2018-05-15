@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Common.Consts;
+import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
@@ -323,7 +324,7 @@ public class RecordingActivity extends AppCompatActivity {
         TextView startDate = findViewById(R.id.recording_time);
         startTime.setText(time[1]);
         startDate.setText(time[0]);
-        partici.setText(event.getParticipats());
+        partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
         mFileName += "/outalk" + event.getId() + ".3gp";
 
         if (!(CheckMeAdmin())) {
