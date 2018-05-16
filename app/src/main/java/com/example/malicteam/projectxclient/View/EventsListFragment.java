@@ -82,15 +82,26 @@ public class EventsListFragment extends Fragment {
             Repository.instance.getEventsFromServer(new EventListCallback<List<Event>>() {
                 @Override
                 public void onSuccees(List<Event> data) {
-                    try {
-                        if (data != null) {
-                            eventsList = data;
-                            if (adapter != null)
-                                adapter.notifyDataSetChanged();
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (data != null) {
+                                eventsList = data;
+                                if (adapter != null)
+                                    adapter.notifyDataSetChanged();
+                            }
                         }
-                    }catch (Exception e){
-                        Log.d("TAG", e.getMessage());
-                    }
+                    });
+
+//                    try {
+//                        if (data != null) {
+//                            eventsList = data;
+//                            if (adapter != null)
+//                                adapter.notifyDataSetChanged();
+//                        }
+//                    }catch (Exception e){
+//                        Log.d("TAG", e.getMessage());
+//                    }
                 }
 
                 @Override

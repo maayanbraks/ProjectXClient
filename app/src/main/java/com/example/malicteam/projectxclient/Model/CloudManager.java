@@ -27,9 +27,12 @@ import java.net.URISyntaxException;
 public class CloudManager {
     public interface CloudCallback<T> {
         void onComplete(T data);
+
         void onCancel();
     }
-    private final String SERVER_ADDRESS = "http://192.168.27.1:8080";
+
+    //    private final String SERVER_ADDRESS = "http://192.168.27.1:8080";
+    private final String SERVER_ADDRESS = "http://193.106.55.95:8080";
     private CloudCallback<String> localCallbackCloudManager;
     private Socket socket;
     static final int PORT = 8888;
@@ -39,19 +42,24 @@ public class CloudManager {
         isConnected = connectToServer();
         if (isConnected) ;
     }
+
     //Primitives Methods
     public Socket getSocket() {
         return socket;
     }
+
     public void setSocket(Socket socket) {
         this.socket = socket;
     }
+
     public static int getPORT() {
         return PORT;
     }
+
     public boolean isConnected() {
         return isConnected;
     }
+
     public void setConnected(boolean connected) {
         isConnected = connected;
     }
@@ -66,15 +74,16 @@ public class CloudManager {
             return true;
         return false;
     }
+
     public void initListeners() { // here we analize all listeners and responses
         socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
             @Override
             public void call(Object... objects) {
                 Log.d("TAG", "Connection with server has been establish");
-               // RequestData rd = new AddFriendRequestData("test@test.com", "friend@friend.com");
+                // RequestData rd = new AddFriendRequestData("test@test.com", "friend@friend.com");
                 // String jsonString =new Gson().toJson(rd);
-              //  socket.emit("toServer", "lalalalall");
-               // socket.send("test");
+                //  socket.emit("toServer", "lalalalall");
+                // socket.send("test");
                 setConnected(true);
             }
         });
@@ -90,15 +99,15 @@ public class CloudManager {
             public void call(Object... args) {
                 if (localCallbackCloudManager != null) {
                     localCallbackCloudManager.onComplete(args[0].toString());
-                }
-                else {
-                    Log.d("TAG","Localcallback is null");
+                } else {
+                    Log.d("TAG", "Localcallback is null");
                 }
                 Log.d("TAG", "" + args[0]);
                 //handleLiveData("" + args[0]);
             }
         });
     }
+
     public void handleLiveData(String data) { //here Live data responses (need to send to LiveData!
         NotificationData rs = ProductTypeConverters.getObjectFromString(data, NotificationData.class);
         switch (rs.getNotificationType()) {
@@ -120,7 +129,6 @@ public class CloudManager {
     }
 
 
-
 //    public static ResponseData getObjectFromString(String data) {
 //        return gson.fromJson(data, ResponseData.class);
 //    }
@@ -129,14 +137,14 @@ public class CloudManager {
     public void sendToServer(String serverEvent, Object requestObject, final CloudCallback<String> cloudManagerCallback) {
         localCallbackCloudManager = cloudManagerCallback;
         String jsonString = ProductTypeConverters.getStringFromObject(requestObject);
-        Log.d("TAG","sendEvent "+jsonString);
+        Log.d("TAG", "sendEvent " + jsonString);
         socket.emit(serverEvent, jsonString);
     }
 
     public void loginRequest(Object obj, final CloudCallback<String> cloudManagerCallback) {
         localCallbackCloudManager = cloudManagerCallback;
         String jsonString = ProductTypeConverters.getStringFromObject(obj);
-        Log.d("TAG","sendEvent "+jsonString);
+        Log.d("TAG", "sendEvent " + jsonString);
         socket.emit("Login", jsonString);
     }
 
