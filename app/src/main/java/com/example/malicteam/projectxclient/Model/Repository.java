@@ -27,6 +27,7 @@ import com.example.malicteam.projectxclient.Common.Callbacks.LogInCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
+import com.example.malicteam.projectxclient.ViewModel.FriendsViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.File;
@@ -48,7 +49,7 @@ public class Repository {
     private MutableLiveData<User> userLiveData;
     private MutableLiveData<List<User>> FriendsLiveData;
     //private MutableLiveData<List<Event>> eventsData;
-    //private MutableLiveData<List<User>> friendsLiveData;
+    private MutableLiveData<List<User>> friendsLiveData;
 
     private CloudManager CM;
     private List<User> friends = null;//holds local users
@@ -87,11 +88,64 @@ public class Repository {
     public LiveData<User> getUserMain(User user) {
         synchronized (this) {
             if (userLiveData == null) {
-                userLiveData = new MutableLiveData<User>();
+                userLiveData = new MutableLiveData<>();
                 userLiveData.setValue(user);
             }
         }
         return userLiveData;
+    }
+
+    public LiveData<List<User>> getFriendsLive() {
+        synchronized (this) {
+            if (friendsLiveData == null) {
+                friendsLiveData = new MutableLiveData<List<User>>();
+                getFriendsFromServer(new FriendsListCallback<List<User>>() {
+                    @Override
+                    public void onSuccees(List<User> data) {
+                        if (data != null) friendsLiveData.postValue(data);
+                    }
+
+                    @Override
+                    public void technicalError() {
+
+                    }
+
+                    @Override
+                    public void userMustToLogin() {
+
+                    }
+                });
+            }
+        }
+        return friendsLiveData;
+    }
+
+    public void getFriendsMain(FriendsViewModel.FriendsViewModelCallback<LiveData<List<User>>> callback) {
+        synchronized (this) {
+            if (friendsLiveData == null) {
+                friendsLiveData = new MutableLiveData<>();
+                getFriendsFromServer(new FriendsListCallback<List<User>>() {
+                    @Override
+                    public void onSuccees(List<User> data) {
+                        if(data != null) {
+                            friendsLiveData.postValue(data);
+                            callback.onComplete(friendsLiveData);
+                        }
+                    }
+
+                    @Override
+                    public void technicalError() {
+                        Log.d("TAG", "Repository -> GetFriendsMain -> getFriendsFromServer = Technical error");
+                    }
+
+                    @Override
+                    public void userMustToLogin() {
+                        Log.d("TAG", "Repository -> GetFriendsMain -> getFriendsFromServer = Technical error");
+                    }
+                });
+            }
+        }
+//        return friendsLiveData;
     }
 
 //    public LiveData<User> getSomeUser(int id) {
@@ -140,7 +194,7 @@ public class Repository {
 //        int userId = User.generateId(auth.getCurrentUser().getEmail());
 //        //List<User> _friendsList = new LinkedList<>();
 //
-//        FirebaseModel.getFriends(userId, new CloudManager.CloudCallback<List<User>>() {
+//        FirebaseModel.initFriendsList(userId, new CloudManager.CloudCallback<List<User>>() {
 //            @Override
 //            public void onComplete(List<User> friendsList) {
 //                boolean found = false;
@@ -185,7 +239,7 @@ public class Repository {
 //            }
 //        });
 //    }
-//    public LiveData<List<User>> getFriends(int userId) {
+//    public LiveData<List<User>> initFriendsList(int userId) {
 //        synchronized (this) {
 //            if (FriendsLiveData == null) {
 //                FriendsLiveData = new MutableLiveData<List<User>>();
@@ -199,7 +253,7 @@ public class Repository {
 //                }
 //
 //                //2. get all students records that where updated since last update date
-//                FirebaseModel.getFriends(userId, new CloudManager.CloudCallback<List<User>>() {
+//                FirebaseModel.initFriendsList(userId, new CloudManager.CloudCallback<List<User>>() {
 //                    @Override
 //                    public void onComplete(List<User> data) {
 //                        updateFriendsDataInLocalStorage(data);
@@ -214,9 +268,9 @@ public class Repository {
 //        return FriendsLiveData;
 //    }
 
-    //    public void getFriends(int userId, final CloudManager.CloudCallback<List<User>> callback) {
+    //    public void initFriendsList(int userId, final CloudManager.CloudCallback<List<User>> callback) {
 //        FirebaseAuth auth = FirebaseAuth.getInstance();
-//        FirebaseModel.getFriends(userId, new CloudManager.CloudCallback<List<User>>() {
+//        FirebaseModel.initFriendsList(userId, new CloudManager.CloudCallback<List<User>>() {
 //            @Override
 //            public void onComplete(List<User> data) {
 //                updateFriendsDataInLocalStorage(data);
@@ -255,7 +309,7 @@ public class Repository {
 //    public void deleteFromFriends(int friendId, final CloudManager.CloudCallback<Boolean> cloudCallback) {
 //        FirebaseAuth auth = FirebaseAuth.getInstance();
 //        int userId = User.generateId(auth.getCurrentUser().getEmail());
-//        FirebaseModel.getFriends(userId, new CloudManager.CloudCallback<List<User>>() {
+//        FirebaseModel.initFriendsList(userId, new CloudManager.CloudCallback<List<User>>() {
 //            @Override
 //            public void onComplete(List<User> data) {
 //                boolean found = false;
@@ -355,12 +409,12 @@ public class Repository {
 
     }
 
-//    public LiveData<List<User>> getFriends() {
+//    public LiveData<List<User>> initFriendsList() {
 //        synchronized (this) {
 //            if (friendsLiveData == null) {
 //                friendsLiveData = new MutableLiveData<List<User>>();
 //                FirebaseAuth auth = FirebaseAuth.getInstance();
-//                FirebaseModel.getFriends(User.generateId(auth.getCurrentUser().getEmail()), new FirebaseModel.Callback<List<User>>() {
+//                FirebaseModel.initFriendsList(User.generateId(auth.getCurrentUser().getEmail()), new FirebaseModel.Callback<List<User>>() {
 //                    @Override
 //                    public void onComplete(List<User> data) {
 //                        if (data != null)

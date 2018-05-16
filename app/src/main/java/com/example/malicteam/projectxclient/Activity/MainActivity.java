@@ -33,6 +33,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.View.NewEventFragment;
 import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
@@ -51,6 +52,7 @@ import java.util.List;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.Model.Repository;
+import com.example.malicteam.projectxclient.ViewModel.FriendsViewModel;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -58,7 +60,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.EventListListener,
-        FriendsListFragment.friendsFragmentInteraction, NewEventFragment.OnFragmentInteractionListener, FriendDetailsFragment.OnFragmentInteractionListener, EventDetailsFragment.OnFragmentInteractionListener,
+        FriendsListFragment.FriendsFragmentInteraction, NewEventFragment.OnFragmentInteractionListener, FriendDetailsFragment.OnFragmentInteractionListener, EventDetailsFragment.OnFragmentInteractionListener,
         ResetPasswordFragment.ResetPasswordListener {
 
     private final Class _mainFragmentClass = EventsListFragment.class;
@@ -69,6 +71,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private MenuItem currentItem = null;//holds the current item that checked (for un checked it a
     private UserViewModel currentUser = null;
+    private FriendsViewModel currentFriendsList = null;
     private int userId;
     private View headerLayout;
     private DrawerLayout mDrawer;
@@ -567,7 +570,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 ////        builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
 ////            @Override
 ////            public void onClick(DialogInterface dialog, int which) {
-////                Repository.instance.EditFriendList(ProductTypeConverters.GenerateListUserToListMails(friendsList),new EditFriendListCallback() {
+////                Repository.instance.EditFriendList(ProductTypeConverters.GenerateListUserToListMails(currentFriendsList),new EditFriendListCallback() {
 ////                    @Override
 ////                    public void onSuccees() {
 ////
@@ -632,4 +635,100 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
+    ///////////////////////////////////////////////////////////
+    @Override
+    public void addFriend(User friend) {
+        Repository.instance.addFriend("MaayanMail", new AddFriendCallback<User>() {
+            @Override
+            public void onSuccees(User data) {
+//                Log.d("TAG", "friendlistsizeBeforeAdding=" + currentFriendsList.size());
+//                currentFriendsList.add(data);
+//                Log.d("TAG", "friendlistsizeafteradding=" + currentFriendsList.size());
+//                refreshList();
+//                Log.d("TAG", "n addfriend-->friendlistFragment ---> aasdasd" + data.getFirstName());
+            }
+
+            @Override
+            public void userIsNotExist() {
+                Log.d("TAG", "n addfriend-->friendlistFragment ---> userIsNotExist");
+            }
+
+            @Override
+            public void friendIsNotExist() {
+                Log.d("TAG", "n addfriend-->friendlistFragment ---> friendIsNotExist");
+            }
+
+            @Override
+            public void bothUsersEquals() {
+                Log.d("TAG", "n addfriend-->friendlistFragment ---> bothUsersEquals");
+            }
+
+            @Override
+            public void alreadyFriends() {
+                Log.d("TAG", "n addfriend-->friendlistFragment ---> alreadyFriends");
+            }
+        });
+    }
+
+    @Override
+    public void initFriendsList(FriendsViewModel.FriendsViewModelCallback<List<User>> callback) {
+//        currentFriendsList = ViewModelProviders.of(this).get(FriendsViewModel.class);
+////        currentFriendsList.initFriendsList(new FriendsViewModel.FriendsViewModelCallback<Boolean>() {
+////            @Override
+////            public void onComplete(Boolean data) {
+////
+////            }
+////        });
+//        currentFriendsList.getFriendsList().observe(this, new Observer<List<User>>() {
+//            @Override
+//            public void onChanged(@Nullable List<User> list) {
+//                callback.onComplete(list);// = list;
+////                getActivity().runOnUiThread(new Runnable() {
+////                    @Override
+////                    public void run() {
+////                        if (adapter != null) {
+//////                    try {
+////                            adapter.notifyDataSetChanged();
+//////                    } catch (Exception e) {
+//////                        Log.d("TAg", e.getMessage());
+//////                    }
+////                        }
+////                    }
+////                });
+//            }
+//        });
+//        currentFriendsList.getFriendsList().observe(this, new Observer<List<User>>() {
+//            @Override
+//            public void onChanged(@Nullable List<User> list) {
+//                if (list != null) {
+//                    //update details
+//                    updateProfilePicture(list.getPictureUrl());
+//                    userNameHeader.setText(list.getFirstName() + " " + list.getLastName());
+//                    userEmailHeader.setText(list.getEmail());
+//                    userId = list.getId();
+////                    refreshList();
+//                } else {
+//                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+//                    startActivity(intent);
+//                    finish();
+//                }
+//            }
+//        });
+        currentFriendsList = ViewModelProviders.of(this).get(FriendsViewModel.class);
+        currentFriendsList.getFriendsList().observe(this, new Observer<List<User>>() {
+            @Override
+            public void onChanged(@Nullable List<User> users) {
+                callback.onComplete(users);
+            }
+        });
+    }
+
+    @Override
+    public void makeToastShort(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    }
+    @Override
+    public void makeToastLong(String message) {
+        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+    }
 }
