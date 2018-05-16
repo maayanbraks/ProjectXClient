@@ -17,7 +17,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
@@ -34,9 +33,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallback;
-import com.example.malicteam.projectxclient.Common.MyApp;
-import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.View.NewEventFragment;
 import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
@@ -50,7 +46,6 @@ import com.example.malicteam.projectxclient.View.FriendsListFragment;
 import com.example.malicteam.projectxclient.View.ResetPasswordFragment;
 
 import java.net.URISyntaxException;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.example.malicteam.projectxclient.Model.Event;
@@ -62,7 +57,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.EvenetListListener,
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.EventListListener,
         FriendsListFragment.friendsFragmentInteraction, NewEventFragment.OnFragmentInteractionListener, FriendDetailsFragment.OnFragmentInteractionListener, EventDetailsFragment.OnFragmentInteractionListener,
         ResetPasswordFragment.ResetPasswordListener {
 
