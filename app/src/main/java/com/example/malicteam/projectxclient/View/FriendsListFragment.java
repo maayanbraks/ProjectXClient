@@ -38,7 +38,7 @@ public class FriendsListFragment extends Fragment {
     public interface friendsFragmentInteraction {
         void showFriendDetails(User user);//Different Object from User - only relevant data!
 
-        void deleteFriend(User friend,List<User> friendsList);
+        void deleteFriend(User friend, List<User> friendsList);
     }
 
     private friendsFragmentInteraction mListener;
@@ -76,15 +76,15 @@ public class FriendsListFragment extends Fragment {
             friendsListView.setAdapter(adapter);
             this.userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
 
-            Repository.instance.getFriendsFromServer(new FriendsListCallback<List<User>>(){
+            Repository.instance.getFriendsFromServer(new FriendsListCallback<List<User>>() {
                 @Override
                 public void onSuccees(List<User> data) {
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            if(data != null){
+                            if (data != null) {
                                 friendsList = data;
-                                if(adapter != null){
+                                if (adapter != null) {
                                     adapter.notifyDataSetChanged();
                                 }
                                 Log.d("TAG", "friend list obtaib sucful");
@@ -101,7 +101,7 @@ public class FriendsListFragment extends Fragment {
 
                 @Override
                 public void userMustToLogin() {
-                                        Toast.makeText(MyApp.getContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MyApp.getContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
                     Log.d("TAG", "n getfriends1-->friendlistFragment ---> userMustToLogin");
                 }
             });
@@ -234,17 +234,19 @@ public class FriendsListFragment extends Fragment {
 
 
     private void refreshList() {
-        if (adapter != null)
-        {
-            try {
-                adapter.notifyDataSetChanged();
-
-            } catch (Exception e) {
-                Log.d("TAg", e.getMessage());
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (adapter != null) {
+//                    try {
+                    adapter.notifyDataSetChanged();
+//                    } catch (Exception e) {
+//                        Log.d("TAg", e.getMessage());
+//                    }
+                }
             }
+        });
 
-
-        }
     }
 
     private void initButtons(View view) {
@@ -258,11 +260,11 @@ public class FriendsListFragment extends Fragment {
                 Repository.instance.addFriend("MaayanMail", new AddFriendCallback<User>() {
                     @Override
                     public void onSuccees(User data) {
-                        Log.d("TAG","friendlistsizeBeforeAdding="+friendsList.size());
+                        Log.d("TAG", "friendlistsizeBeforeAdding=" + friendsList.size());
                         friendsList.add(data);
-                        Log.d("TAG","friendlistsizeafteradding="+friendsList.size());
+                        Log.d("TAG", "friendlistsizeafteradding=" + friendsList.size());
                         refreshList();
-                        Log.d("TAG", "n addfriend-->friendlistFragment ---> aasdasd"+data.getFirstName());
+                        Log.d("TAG", "n addfriend-->friendlistFragment ---> aasdasd" + data.getFirstName());
                     }
 
                     @Override
@@ -501,15 +503,14 @@ public class FriendsListFragment extends Fragment {
                         Repository.instance.EditFriendList(ProductTypeConverters.GenerateListUserToListMails(friendsListTemp), new EditFriendListCallback() {
                             @Override
                             public void onSuccees() {
-                               // boolean nunu=friendsList.remove(friend);
-                                for (int i=0;i<friendsList.size();i++)
-                                {
+                                // boolean nunu=friendsList.remove(friend);
+                                for (int i = 0; i < friendsList.size(); i++) {
                                     if (friend.getEmail().equals(friendsList.get(i).getEmail()))
                                         friendsList.remove(i);
                                 }
-                              //  Toast.makeText(MyApp.getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+                                //  Toast.makeText(MyApp.getContext(), "Deleted", Toast.LENGTH_SHORT).show();
                                 refreshList();
-                               // Log.d("TAG","lalaala"+nunu);
+                                // Log.d("TAG","lalaala"+nunu);
                             }
 
                             @Override
@@ -549,8 +550,6 @@ public class FriendsListFragment extends Fragment {
 //                                });
 //                        builder.show();
                 });
-
-
 
 
             TextView firstName = (TextView) view.findViewById(R.id.firstName_friendsRow);
