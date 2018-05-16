@@ -1,13 +1,7 @@
 package com.example.malicteam.projectxclient.View;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,24 +12,19 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.Activity.LoginActivity;
-import com.example.malicteam.projectxclient.Activity.MainActivity;
 import com.example.malicteam.projectxclient.Common.Callbacks.EventListCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.Repository;
-import com.example.malicteam.projectxclient.Model.User;
-import com.example.malicteam.projectxclient.Model.UserDao;
 import com.example.malicteam.projectxclient.R;
-import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class EventsListFragment extends Fragment {
-    private EvenetListListener mListener;
+    private EventListListener mListener;
     private List<Event> eventsList = new LinkedList<>();
     //    private UserViewModel currentUser = null;
     private int _userId;
@@ -137,8 +126,8 @@ public class EventsListFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof EvenetListListener) {
-            mListener = (EvenetListListener) context;
+        if (context instanceof EventListListener) {
+            mListener = (EventListListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -174,7 +163,7 @@ public class EventsListFragment extends Fragment {
         });
     }
 
-    public interface EvenetListListener {
+    public interface EventListListener {
         void onEventSelected(Event event);
     }
 
