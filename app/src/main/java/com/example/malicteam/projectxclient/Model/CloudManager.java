@@ -29,7 +29,7 @@ public class CloudManager {
         void onComplete(T data);
         void onCancel();
     }
-    private final String SERVER_ADDRESS = "http://192.168.27.1:8080";
+    private final String SERVER_ADDRESS = "http://193.106.55.95:8080";
     private CloudCallback<String> localCallbackCloudManager;
     private Socket socket;
     static final int PORT = 8888;
@@ -105,13 +105,13 @@ public class CloudManager {
             case EventInvitation:
                 ProductTypeConverters.getObjectFromString(data, EventInvitationNotificationData.class);
                 return;
-            case UserJoinEvent:
+            case UserJoinEvent: //WHEN someboday join the same event i loggeed in.
                 ProductTypeConverters.getObjectFromString(data, UserJoinEventNotification.class);
                 return;
-            case UserLeaveEvent:
+            case UserLeaveEvent: //When somboday leave the event i logged in.
                 ProductTypeConverters.getObjectFromString(data, UserLeaveEventNotification.class);
                 return;
-            case EventClosed:
+            case EventClosed: //When admin closed the event - stop recording.
                 ProductTypeConverters.getObjectFromString(data, EventCloseNotificationData.class);
                 return;
             default:
