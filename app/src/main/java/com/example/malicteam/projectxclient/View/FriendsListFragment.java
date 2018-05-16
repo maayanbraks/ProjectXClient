@@ -75,6 +75,37 @@ public class FriendsListFragment extends Fragment {
             adapter = new MyAdapter();
             friendsListView.setAdapter(adapter);
             this.userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
+
+            Repository.instance.getFriendsFromServer(new FriendsListCallback<List<User>>(){
+                @Override
+                public void onSuccees(List<User> data) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            if(data != null){
+                                friendsList = data;
+                                if(adapter != null){
+                                    adapter.notifyDataSetChanged();
+                                }
+                                Log.d("TAG", "friend list obtaib sucful");
+                            }
+                        }
+                    });
+                }
+
+                @Override
+                public void technicalError() {
+                    Toast.makeText(MyApp.getContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
+                    Log.d("TAG", "In getfriends1-->friendlistFragment ---> Technical error");
+                }
+
+                @Override
+                public void userMustToLogin() {
+                                        Toast.makeText(MyApp.getContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
+                    Log.d("TAG", "n getfriends1-->friendlistFragment ---> userMustToLogin");
+                }
+            });
+
 //            Repository.instance.getFriends(this.userId, new CloudManager.CloudCallback<List<User>>() {
 //                @Override
 //                public void onComplete(List<User> data) {
@@ -88,79 +119,80 @@ public class FriendsListFragment extends Fragment {
 //                public void onCancel() {
 //                }
 //            });
-            Repository.instance.getFriendsFromServer(new FriendsListCallback<List<User>>() {
-                @Override
-                public void onSuccees(List<User> data) {
-//                    ContactsListResponseData contactsListResponseData = CloudManager.getObjectFromString(data.toString(), ContactsListResponseData.class);
-                    //contactsListResponseData.getContacts()
-                    //Log.d("TAG", "List= " + data);
-                    // friendsList=friendsList.get(0).convertUserDataToUser(((ContactsListResponseData) data).getContacts());
-//                            User user = new User();
-                    try {
-                        if (data != null) {
-                            friendsList = data;
-//                    for (User userr : friendsList) {
-//                        Log.d("TAG", "a" + userr.getFirstName());
-//                    }
-                            ////////////////////////////////MAAYAN LOOK HERE ////////////////////////////////////////////////////////////
-                            if (adapter != null) {
-                                adapter.notifyDataSetChanged();
-                            }
-                            Log.d("TAG", "friend list obtaib sucful");
-                        }
-                    } catch (Exception e) {
-                        Log.d("TAg", e.getMessage());
-                    }
-                }
-
-                @Override
-                public void technicalError() {
-                    Toast.makeText(MyApp.getContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
-                    Log.d("TAG", "In getfriends1-->friendlistFragment ---> Technical error");
-                }
-
-                @Override
-                public void userMustToLogin() {
-                    Toast.makeText(MyApp.getContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
-                    Log.d("TAG", "n getfriends1-->friendlistFragment ---> userMustToLogin");
-                }
-                //                @Override
-//                public void onComplete(String data) {
-//                    String response = data.toString();
-//                    Log.d("TAG", "response=" + response);
-//                    switch (response) {
-//                        case Consts.TECHNICAL_ERROR:
-//                            Log.d("TAG", "In getfriends1-->friendlistFragment ---> Technical error");
-//                            //Toast.makeText(getApplicationContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
-//                            break;
-//                        case Consts.USER_MUST_TO_LOGIN:
-//                            Log.d("TAG", "n getfriends1-->friendlistFragment ---> userMustToLogin");
-//                            // Toast.makeText(getApplicationContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
-//                            break;
-//                        default:
-//                            ContactsListResponseData contactsListResponseData = CloudManager.getObjectFromString(data.toString(), ContactsListResponseData.class);
-//                            //contactsListResponseData.getContacts()
-//                            Log.d("TAG", "List= " + contactsListResponseData.getContacts());
-//                            // friendsList=friendsList.get(0).convertUserDataToUser(((ContactsListResponseData) data).getContacts());
-//                            User user = new User();
-//                            friendsList = user.convertUserDataToUser(contactsListResponseData.getContacts());
-////                                                            for (User userr:friendsList)
-////                                                            {
-////                                                                Log.d("TAG","a"+userr.getFirstName());
-////                                                            }
-//                            //     if (adapter != null) {
-////                                                                adapter.notifyDataSetChanged();
-//                            //}
+//            Repository.instance.getFriendsFromServer(new FriendsListCallback<List<User>>() {
+//                @Override
+//                public void onSuccees(List<User> data) {
+////                    ContactsListResponseData contactsListResponseData = CloudManager.getObjectFromString(data.toString(), ContactsListResponseData.class);
+//                    //contactsListResponseData.getContacts()
+//                    //Log.d("TAG", "List= " + data);
+//                    // friendsList=friendsList.get(0).convertUserDataToUser(((ContactsListResponseData) data).getContacts());
+////                            User user = new User();
+//                    try {
+//                        if (data != null) {
+//                            friendsList = data;
+////                    for (User userr : friendsList) {
+////                        Log.d("TAG", "a" + userr.getFirstName());
+////                    }
+//                            ////////////////////////////////MAAYAN LOOK HERE ////////////////////////////////////////////////////////////
+//                            if (adapter != null) {
+//                                adapter.notifyDataSetChanged();
+//                            }
 //                            Log.d("TAG", "friend list obtaib sucful");
-//                            break;
+//                        }
+//                    } catch (Exception e) {
+//                        Log.d("TAg", e.getMessage());
 //                    }
+//                }
+//
+//
+//                @Override
+//                public void technicalError() {
+//                    Toast.makeText(MyApp.getContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
+//                    Log.d("TAG", "In getfriends1-->friendlistFragment ---> Technical error");
 //                }
 //
 //                @Override
-//                public void onCancel() {
-//
+//                public void userMustToLogin() {
+//                    Toast.makeText(MyApp.getContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
+//                    Log.d("TAG", "n getfriends1-->friendlistFragment ---> userMustToLogin");
 //                }
-            });
+//                //                @Override
+////                public void onComplete(String data) {
+////                    String response = data.toString();
+////                    Log.d("TAG", "response=" + response);
+////                    switch (response) {
+////                        case Consts.TECHNICAL_ERROR:
+////                            Log.d("TAG", "In getfriends1-->friendlistFragment ---> Technical error");
+////                            //Toast.makeText(getApplicationContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
+////                            break;
+////                        case Consts.USER_MUST_TO_LOGIN:
+////                            Log.d("TAG", "n getfriends1-->friendlistFragment ---> userMustToLogin");
+////                            // Toast.makeText(getApplicationContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
+////                            break;
+////                        default:
+////                            ContactsListResponseData contactsListResponseData = CloudManager.getObjectFromString(data.toString(), ContactsListResponseData.class);
+////                            //contactsListResponseData.getContacts()
+////                            Log.d("TAG", "List= " + contactsListResponseData.getContacts());
+////                            // friendsList=friendsList.get(0).convertUserDataToUser(((ContactsListResponseData) data).getContacts());
+////                            User user = new User();
+////                            friendsList = user.convertUserDataToUser(contactsListResponseData.getContacts());
+//////                                                            for (User userr:friendsList)
+//////                                                            {
+//////                                                                Log.d("TAG","a"+userr.getFirstName());
+//////                                                            }
+////                            //     if (adapter != null) {
+//////                                                                adapter.notifyDataSetChanged();
+////                            //}
+////                            Log.d("TAG", "friend list obtaib sucful");
+////                            break;
+////                    }
+////                }
+////
+////                @Override
+////                public void onCancel() {
+////
+////                }
+//            });
             //            friendsViewModel = ViewModelProviders.of(this).get(FriendsViewModel.class);
 //            friendsViewModel.init(userId);
 //            friendsViewModel.getFriends().observe(this, new Observer<List<User>>() {
