@@ -1,9 +1,14 @@
 package com.example.malicteam.projectxclient.Activity;
 
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,6 +18,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.CloudManager;
@@ -20,7 +26,9 @@ import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.Model.Model;
 import com.example.malicteam.projectxclient.Model.Repository;
+import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.R;
+import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
 import java.io.IOException;
 import java.util.List;
@@ -28,7 +36,7 @@ import java.util.List;
 import android.Manifest;
 
 public class RecordingActivity extends AppCompatActivity {
-
+    private UserViewModel currentUser = null;
     private boolean mStartPlaying = true;
     private String eventIdTogetIn;
     private ImageButton recordingButton;
@@ -37,11 +45,12 @@ public class RecordingActivity extends AppCompatActivity {
     private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private static String mFileName = null;
     private ImageButton playingButton;
-
+    Event eventtemp;
     private MediaRecorder mRecorder = null;
     private Event event;
     private MediaPlayer mPlayer = null;
-    private int userId;
+    private User myUser;
+
     private boolean permissionToRecordAccepted = false;
     private String[] permissions = {Manifest.permission.RECORD_AUDIO};
 
@@ -50,11 +59,20 @@ public class RecordingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording);
+        currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
+        currentUser.getUser().observe(this, new Observer<User>() {
+            @Override
+            public void onChanged(@Nullable User user) {
+                if (user != null) {
+        myUser = user;
 
+                }
+            }
+        });
         eventIdTogetIn = " ";
-        userId = getIntent().getIntExtra(Consts.USER_ID, Consts.DEFAULT_UID);
+
         mFileName = getExternalCacheDir().getAbsolutePath();
-        //ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
 
         TextView backButton = (TextView) findViewById(R.id.back_btn_recording);
         backButton.setOnClickListener(new View.OnClickListener() {
@@ -68,7 +86,22 @@ public class RecordingActivity extends AppCompatActivity {
                 finish();
             }
         });
+        Repository.instance.InitCallbacksForCloudManeger(new RecordingActivityCallback() {
+            @Override
+            public void userJoinEvent(int userId) {
+                userHasJoinTheEvent(userId);
+            }
 
+            @Override
+            public void userLeftEvent(int userId) {
+                userHasLeftTheEvent((userId));
+            }
+
+            @Override
+            public void eventClosed() {
+                StopRecordingByAdmin();
+            }
+        });
         recordingButton = (ImageButton) findViewById(R.id.btnStop);
         // Set layout only if admin or not
         recordingButton.setOnClickListener(new View.OnClickListener() {
@@ -92,16 +125,17 @@ public class RecordingActivity extends AppCompatActivity {
                 });
 
         if (getIntent().getSerializableExtra("sendNewEvent") != null) {
-            event = (Event) getIntent().getSerializableExtra("sendNewEvent");
+            eventtemp = (Event) getIntent().getSerializableExtra("sendNewEvent");
         }
-        if (getIntent().getSerializableExtra("eventidToGetIn") != null) {
-            eventIdTogetIn = getIntent().getStringExtra("eventidToGetIn");
+        if (getIntent().getSerializableExtra("eventFromInvitation") != null) {
+            event = (Event) getIntent().getSerializableExtra("eventFromInvitation");
         }
         //
         if (!(eventIdTogetIn.equals(" "))) //means got enter by invite
         {
-            SetEventFromInvitation(eventIdTogetIn);
-        } else {// entered this activity from Creating new one(NewEventActivity)
+            SetEventFromInvitation(eventtemp);
+        }
+        else {// entered this activity from Creating new one(NewEventActivity)
             SetEventFromNewActivity();
         }
     }
@@ -231,69 +265,59 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
     private boolean CheckMeAdmin() {
-        if (userId != Consts.DEFAULT_UID) {
-            Log.d("TAG", "userId=" + userId);
-            Log.d("TAG", "event.getadminID=" + event.getAdminId());
-            if (String.valueOf(userId).equals(event.getAdminId())) {
+//        if (userId != Consts.DEFAULT_UID) {
+//            Log.d("TAG", "userId=" + userId);
+//            Log.d("TAG", "event.getadminID=" + event.getAdminId());
+            if (String.valueOf(myUser.getId()).equals(event.getAdminId())) {
                 //Log.d("TAG","EQUAL");
                 return true;
             }
-
-
-            return false;
-        }
         return false;
     }
 
     private void uploadFile() {
         Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
-        Repository.instance.saveRecord(String.valueOf(userId), mFileName, "" + event.getId(), new Model.SaveAudioListener() {
-            @Override
-            public void complete(String url) {
-//                Toast.makeText(getApplication(), "Upload as succeed" , Toast.LENGTH_SHORT).show();
-//                event.setRecordURL(url);
-            }
-
-            @Override
-            public void fail() {
-                Toast.makeText(getApplication(), "Upload failed.", Toast.LENGTH_SHORT).show();
-            }
-        }, new CloudManager.CloudCallback<Boolean>() {
-            @Override
-            public void onComplete(Boolean data) {
-
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-        });
+//        Repository.instance.saveRecord(String.valueOf(userId), mFileName, "" + event.getId(), new Model.SaveAudioListener() {
+//                @Override
+//                public void complete(String url) {
+////                Toast.makeText(getApplication(), "Upload as succeed" , Toast.LENGTH_SHORT).show();
+////                event.setRecordURL(url);
+//            }
+//
+//            @Override
+//            public void fail() {
+//                Toast.makeText(getApplication(), "Upload failed.", Toast.LENGTH_SHORT).show();
+//            }
+//        }, new CloudManager.CloudCallback<Boolean>() {
+//            @Override
+//            public void onComplete(Boolean data) {
+//
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//
+//            }
+//        });
     }
 
-    public void SetEventFromInvitation(String eventid) {
-        Repository.instance.getEventById(Integer.valueOf(eventid), new CloudManager.CloudCallback<List<Event>>() {
+    public void SetEventFromInvitation(Event eventtemp) {
+//        Repository.instance.getEventById(Integer.valueOf(eventid), new CloudManager.CloudCallback<List<Event>>() {
 
-            @Override
-            public void onComplete(List<Event> EventList) {
-                if (EventList.size() != 0) //
-                {
+//            @Override
+//            public void onComplete(List<Event> EventList) {
+//                if (EventList.size() != 0) //
+//                {
                     //getting event informatio
-                    event = EventList.get(0);
-                    event.setTitle(EventList.get(0).getTitle());
-                    event.setId(EventList.get(0).getId());
-                    event.setDate(EventList.get(0).getDate());
-                    event.setDescription(EventList.get(0).getDescription());
-                    event.setParticipats(EventList.get(0).getParticipats());
-                    event.setAdminId(EventList.get(0).getAdminId());
+                          event=eventtemp;
                     // setting the layout from the event information
-//                    TextView _eventTitle = findViewById(R.id.recording_title);
-//                    TextView Date = findViewById(R.id.recording_date);
-//                    TextView partici = findViewById(R.id.parti);
-//                    _eventTitle.setText(event.getTitle());
-//                    Date.setText(event.getDate());
-//                    partici.setText(event.getUsersIds());
-//                    mFileName += "/outalk" + event.getId() + ".3gp";
+                    TextView _eventTitle = findViewById(R.id.recording_title);
+                    TextView Date = findViewById(R.id.recording_date);
+                    TextView partici = findViewById(R.id.participants_recording);
+                    _eventTitle.setText(event.getTitle());
+                    Date.setText(event.getDate());
+                    partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
+                    mFileName += "/outalk" + event.getId() + ".3gp";
                     SetActivity();
                     CheckRecordingStatus();
                     //check if me as admin
@@ -302,16 +326,9 @@ public class RecordingActivity extends AppCompatActivity {
 
 
                 }
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-        });
 
 
-    }
+
 
     public void SetActivity() {
         recordingButton = (ImageButton) findViewById(R.id.btnStop);
@@ -334,6 +351,24 @@ public class RecordingActivity extends AppCompatActivity {
         }
         recordOrSave();
 
+    }
+    public void userHasJoinTheEvent(int userId) {
+        for (int i=0;i<event.getParticipats().size();i++)
+        {
+            if (event.getParticipats().get(i).getId()==userId)
+            {
+                Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName()+" "+event.getParticipats().get(i).getLastName()+",just joined", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+    public void userHasLeftTheEvent(int userId) {
+        for (int i=0;i<event.getParticipats().size();i++)
+        {
+            if (event.getParticipats().get(i).getId()==userId)
+            {
+                Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName()+" "+event.getParticipats().get(i).getLastName()+",just left", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     public void SetEventFromNewActivity() {

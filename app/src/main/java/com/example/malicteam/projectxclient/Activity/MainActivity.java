@@ -33,6 +33,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.malicteam.projectxclient.Common.MyApp;
+import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.View.NewEventFragment;
 import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
@@ -55,6 +57,8 @@ import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+
+import Notifications.EventInvitationNotificationData;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.EventListListener,
@@ -191,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onClick(View view) {
                 Fragment fragment = null;
                 Bundle bundle = new Bundle();
-                bundle.putInt(Consts.USER_ID, userId);
+                bundle.putSerializable(Consts.USER, currentUser.getUser().getValue());
                 Class fragmentClass = null;
                 fragmentClass = NewEventFragment.class;
                 try {
@@ -220,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void loadMainFragment() {
         Bundle bundle = new Bundle();
-        bundle.putInt(Consts.USER_ID, userId);
+        bundle.putSerializable(Consts.USER, currentUser.getUser().getValue());
         Fragment mainFragment = null;
         try {
             mainFragment = (EventsListFragment) _mainFragmentClass.newInstance();
@@ -366,7 +370,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 fragmentClass = FriendsListFragment.class;
                 break;
             case R.id.nav_events_new:
-                bundle.putInt(Consts.USER_ID, userId);
+                bundle.putSerializable(Consts.USER, currentUser.getUser().getValue());
                 fragmentClass = NewEventFragment.class;
                 break;
 
@@ -431,7 +435,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setCancelable(false)
                 .setNegativeButton("Decline", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        declineToInvite(invite);
+                      //  declineToInvite(invite);
                         //Todo make delined to invite
                         // dialog.cancel();
                     }
@@ -439,7 +443,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d("TAG", "You have agreed invite");
-                        agreeToInvite(invite);
+                     //   agreeToInvite(invite);
                         //Todo make Agree to evnet
                         // GetInEvent(invite.getEventId());
                         // MainActivity.this.finish();
@@ -456,55 +460,58 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    public void agreeToInvite(Invite invite) {
+    public void agreeToInvite(EventInvitationNotificationData eventInvitationNotificationData) {
         //TODO get in to event
+        //tell server we agreed
+
         //get in to event.
-        getInEvent(invite.getEventId());
-        //delete from invite DB
+        getInEvent(new Event(eventInvitationNotificationData.getEventData()));
+
 //        Repository.instance.removeInvite(new FirebaseModel.Callback<Boolean>() {
 //            @Override
 //            public void onComplete(Boolean data) {
 //            }
 //        }, invite);
         //Add event to myeventlist/
-        Log.d("TAG", "invitegetevnetid=" + invite.getEventId());
-        currentUser.getUser().getValue().addEventToList(Integer.valueOf(invite.getEventId()));
+        Log.d("TAG", "invitegetevnetid=" + eventInvitationNotificationData.getEventId());
+//        currentUser.getUser().getValue().addEventToList(Integer.valueOf(eventInvitationNotificationData.getEventId()));
         //update the userDatabase
-        Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudCallback() {
-            @Override
-            public void onComplete(Object data) {
-
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-        });
+//        Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudCallback() {
+//            @Override
+//            public void onComplete(Object data) {
+//
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//
+//            }
+//        });
     }
 
-    public void declineToInvite(Invite invite) {
+    public static void declineToInvite(EventInvitationNotificationData eventInvitationNotificationData) {
         //TODO
+        //tell server we declined.
+
+
         //delete from invite DB
-        Repository.instance.removeInvite(new CloudManager.CloudCallback<Boolean>() {
-            @Override
-            public void onComplete(Boolean data) {
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-        }, invite);
+//        Repository.instance.removeInvite(new CloudManager.CloudCallback<Boolean>() {
+//            @Override
+//            public void onComplete(Boolean data) {
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//
+//            }
+//        }, invite);
 
     }
 
-    public void getInEvent(String eventId) {
+    public void getInEvent(Event event) {
         Intent intent;
         intent = new Intent(getApplicationContext(), RecordingActivity.class);
-        intent.putExtra("eventidToGetIn", eventId);
-        int id = User.generateId(FirebaseAuth.getInstance().getCurrentUser().getEmail());
-        intent.putExtra(Consts.USER_ID, id);
+        intent.putExtra("eventFromInvitation", event);
         // Log.d("Tag","eventID="+eventId);
         startActivity(intent);
     }
@@ -629,6 +636,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         progressBar.setVisibility(View.GONE);
                     }
                 });
+    }
+
+    public void GetInvation(EventInvitationNotificationData eventInvitationNotificationData) {
+
+        //todo
+        //open dialog with information
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MyApp.getContext());
+
+        // set title
+        alertDialogBuilder.setTitle("You got new Invitation, from " + ProductTypeConverters.getAdminFirstNameByEmail(eventInvitationNotificationData.getEventData()) +"");
+
+        // set dialog message
+        alertDialogBuilder
+                .setCancelable(false)
+                .setNegativeButton("Decline", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        declineToInvite(eventInvitationNotificationData);
+                        //Todo make delined to invite
+                        // dialog.cancel();
+                    }
+                })
+                .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Log.d("TAG", "You have agreed invite");
+                        agreeToInvite(eventInvitationNotificationData);
+                        //Todo make Agree to evnet
+                        // GetInEvent(invite.getEventId());
+                        // MainActivity.this.finish();
+                    }
+
+                });
+
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+
+        // show it
+        if (!((Activity) MyApp.getContext()).isFinishing()) {
+            alertDialog.show();
+        }
+
+
+
     }
 
 

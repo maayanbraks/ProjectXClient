@@ -107,7 +107,7 @@ public class User implements Serializable {
     public User(UserData userdata) { //
         this.firstName = userdata.getFirstName();
         this.lastName =  userdata.getLastName();
-        this.phoneNumber =  userdata.getPhone();
+        this.phoneNumber =  userdata.getPhoneNumber();
         this.email = userdata.getEmail();
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date date = new Date();

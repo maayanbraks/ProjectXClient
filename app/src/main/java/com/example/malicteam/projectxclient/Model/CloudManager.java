@@ -1,12 +1,14 @@
 package com.example.malicteam.projectxclient.Model;
 
-import android.animation.TypeConverter;
 import android.util.Log;
 
 //import com.github.nkzawa.emitter.Emitter;
 //import com.github.nkzawa.socketio.client.IO;
 //import com.github.nkzawa.socketio.client.Socket;
 
+import com.example.malicteam.projectxclient.Activity.MainActivity;
+import com.example.malicteam.projectxclient.Activity.RecordingActivity;
+import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 
 import Notifications.EventCloseNotificationData;
@@ -34,6 +36,7 @@ public class CloudManager {
     //    private final String SERVER_ADDRESS = "http://192.168.27.1:8080";
     private final String SERVER_ADDRESS = "http://193.106.55.95:8080";
     private CloudCallback<String> localCallbackCloudManager;
+    private RecordingActivityCallback recordingActivityCallback;
     private Socket socket;
     static final int PORT = 8888;
     private boolean isConnected;
@@ -62,6 +65,9 @@ public class CloudManager {
 
     public void setConnected(boolean connected) {
         isConnected = connected;
+    }
+    public void setRecordingCallback(final RecordingActivityCallback callback) {
+        this.recordingActivityCallback =callback;
     }
 
 
@@ -106,22 +112,40 @@ public class CloudManager {
                 //handleLiveData("" + args[0]);
             }
         });
-    }
+
+            socket.on("Notification", new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+           handleLiveData((args.toString()));
+            Log.d("TAG", "" + args[0]);
+            //handleLiveData("" + args[0]);
+        }
+    });
+}
 
     public void handleLiveData(String data) { //here Live data responses (need to send to LiveData!
         NotificationData rs = ProductTypeConverters.getObjectFromString(data, NotificationData.class);
+        MainActivity mainActivity=new MainActivity();
+        RecordingActivity recordingActivity=new RecordingActivity();
+        Log.d("TAG","handleliveData--->rs.getnotificationType:="+rs.getNotificationType());
         switch (rs.getNotificationType()) {
             case EventInvitation:
-                ProductTypeConverters.getObjectFromString(data, EventInvitationNotificationData.class);
+                EventInvitationNotificationData eventInvitationNotificationData=ProductTypeConverters.getObjectFromString(data, EventInvitationNotificationData.class);
+                //MainActivity.GetInvation(eventInvitationNotificationData);
+
+                mainActivity.GetInvation(eventInvitationNotificationData);
                 return;
             case UserJoinEvent:
-                ProductTypeConverters.getObjectFromString(data, UserJoinEventNotification.class);
+                UserJoinEventNotification userJoinEventNotification= ProductTypeConverters.getObjectFromString(data, UserJoinEventNotification.class);
+                recordingActivityCallback.userJoinEvent(userJoinEventNotification.getUserId());
                 return;
             case UserLeaveEvent:
-                ProductTypeConverters.getObjectFromString(data, UserLeaveEventNotification.class);
+                UserLeaveEventNotification userLeaveEventNotification= ProductTypeConverters.getObjectFromString(data, UserLeaveEventNotification.class);
+                recordingActivityCallback.userLeftEvent(userLeaveEventNotification.getUserId());
                 return;
             case EventClosed:
-                ProductTypeConverters.getObjectFromString(data, EventCloseNotificationData.class);
+                EventCloseNotificationData eventCloseNotificationData=ProductTypeConverters.getObjectFromString(data, EventCloseNotificationData.class);
+               recordingActivityCallback.eventClosed();
                 return;
             default:
                 return;
