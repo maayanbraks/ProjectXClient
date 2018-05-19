@@ -62,16 +62,17 @@ public class RecordingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording);
-        currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
-        currentUser.getUser().observe(this, new Observer<User>() {
-            @Override
-            public void onChanged(@Nullable User user) {
-                if (user != null) {
-        myUser = user;
-
-                }
-            }
-        });
+        myUser=(User)getIntent().getSerializableExtra(Consts.USER);
+  //        currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
+//        currentUser.getUser().observe(this, new Observer<User>() {
+//            @Override
+//            public void onChanged(@Nullable User user) {
+//                if (user != null) {
+//        myUser = user;
+//
+//                }
+//            }
+//        });
         eventIdTogetIn = " ";
 
         mFileName = getExternalCacheDir().getAbsolutePath();
@@ -334,7 +335,7 @@ public class RecordingActivity extends AppCompatActivity {
 //                if (EventList.size() != 0) //
 //                {
                     //getting event informatio
-                          event=eventtemp;
+        event=eventtemp;
                     // setting the layout from the event information
                     TextView _eventTitle = findViewById(R.id.recording_title);
                     TextView Date = findViewById(R.id.recording_date);

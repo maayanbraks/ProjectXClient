@@ -92,7 +92,7 @@ public class FriendsListFragment extends Fragment {
             mListener = (FriendsFragmentInteraction) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement NewEventInteraction");
         }
     }
 

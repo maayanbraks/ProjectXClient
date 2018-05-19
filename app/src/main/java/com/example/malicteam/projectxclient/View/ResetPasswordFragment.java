@@ -82,7 +82,7 @@ public class ResetPasswordFragment extends Fragment {
             mListener = (ResetPasswordListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement NewEventInteraction");
         }
     }
 

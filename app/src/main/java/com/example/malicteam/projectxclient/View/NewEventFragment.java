@@ -1,12 +1,9 @@
 package com.example.malicteam.projectxclient.View;
 
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -25,28 +22,22 @@ import com.example.malicteam.projectxclient.Common.Callbacks.AddEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Common.MyApp;
-import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Event;
-import com.example.malicteam.projectxclient.Model.FirebaseModel;
-import com.example.malicteam.projectxclient.Model.Invite;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.R;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
-import com.google.firebase.auth.FirebaseAuth;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import ResponsesEntitys.EventData;
 import ResponsesEntitys.UserData;
 
 public class NewEventFragment extends Fragment {
-    private OnFragmentInteractionListener mListener;
+    private NewEventInteraction mListener;
     private int userId;
     private UserViewModel currentUser = null;
     private List<String> UsersInvites;
@@ -141,11 +132,11 @@ public class NewEventFragment extends Fragment {
                // event.addToParticipats(myUser);
                 Repository.instance.addEvent(UsersInvites,event, new AddEventCallback<Boolean>() {
                     @Override
-                    public void onSuccees(Boolean bool) {
-                        if (bool) {
+                    public void onSuccees(Boolean data) {
+                        if (data) {
                             Intent intent = new Intent(MyApp.getContext(), RecordingActivity.class);
                             intent.putExtra("sendNewEvent", event);
-                            intent.putExtra("currectuser", userId);
+                            intent.putExtra(Consts.USER, myUser);
                             startActivity(intent);
                         }
                         //   try {
@@ -195,41 +186,62 @@ public class NewEventFragment extends Fragment {
 
         fab = (ImageButton) view.findViewById(R.id.addInviteButton);
         fab.setOnClickListener(new View.OnClickListener() {
-                                   User user;
+
 
                                    @Override
                                    public void onClick(View v) {
                                        String parti = _part.getText().toString();
                                        //TODO
                                        //check with server is userExist---->if do --->
-                                       Repository.instance.getUserIfExist(parti, new isUserExistResponeCallback() {
+                                       mListener.isUserExist(parti, new AddEventCallback<String>() {
                                            @Override
-                                           public void onSuccees(UserData data) {
-                                               User user = new User(data);
-                                               if (invitedPpl.equals(" ")) { // if empty
-                                                   invitedPpl = user.getFirstName();
-                                                    InviteTextViewEdit(view);
-                                                    String maketoast="Adding"+user.getFirstName()+" "+user.getLastName();
-                                                   mListener.makeToastLong(maketoast);
-                                                   Log.d("TAG", "In addevent-->neweventfragment----> OnSucess");
-                                                   Log.d("TAG", "Sucseed found user, added him");
-                                               }
+                                           public void onSuccees(String data) {
+                                               if(invitedPpl.equals(" "))
+                                                   invitedPpl = data;
+                                               InviteTextViewEdit(view);
+                                               Log.d("TAG", "In addevent-->neweventfragment----> OnSucess");
+                                               Log.d("TAG", "Sucseed found user, added him");
                                            }
 
                                            @Override
                                            public void userIsNotExist() {
-                                              // Toast.makeText(MyApp.getContext(), "User is not exist,please try again.", Toast.LENGTH_SHORT).show();
-                                               Log.d("TAG", "In addevent-->neweventfragment----> Technical userIsNotExist");
+
                                            }
 
                                            @Override
-                                           public void friendIsNotExist() {
-                                               //Toast.makeText(MyApp.getContext(), "User is not exist,please try again.", Toast.LENGTH_SHORT).show();
-                                               Log.d("TAG", "In addevent-->neweventfragment----> friendIsNotExist");
+                                           public void technicalError() {
 
                                            }
-
                                        });
+//
+//                                       Repository.instance.getUserIfExist(parti, new isUserExistResponeCallback() {
+//                                           @Override
+//                                           public void onSuccees(UserData data) {
+//                                               User user = new User(data);
+//                                               if (invitedPpl.equals(" ")) { // if empty
+//                                                   invitedPpl = user.getFirstName();
+//                                                    InviteTextViewEdit(view);
+//                                                    String maketoast="Adding"+user.getFirstName()+" "+user.getLastName();
+//                                                   mListener.makeToastShort(maketoast);
+//                                                   Log.d("TAG", "In addevent-->neweventfragment----> OnSucess");
+//                                                   Log.d("TAG", "Sucseed found user, added him");
+//                                               }
+//                                           }
+//
+//                                           @Override
+//                                           public void userIsNotExist() {
+//                                              // Toast.makeText(MyApp.getContext(), "User is not exist,please try again.", Toast.LENGTH_SHORT).show();
+//                                               Log.d("TAG", "In addevent-->neweventfragment----> Technical userIsNotExist");
+//                                           }
+//
+//                                           @Override
+//                                           public void friendIsNotExist() {
+//                                               //Toast.makeText(MyApp.getContext(), "User is not exist,please try again.", Toast.LENGTH_SHORT).show();
+//                                               Log.d("TAG", "In addevent-->neweventfragment----> friendIsNotExist");
+//
+//                                           }
+//
+//                                       });
                                    }
 
                                });
@@ -237,21 +249,15 @@ public class NewEventFragment extends Fragment {
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof NewEventInteraction) {
+            mListener = (NewEventInteraction) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement NewEventInteraction");
         }
     }
 
@@ -262,9 +268,9 @@ public class NewEventFragment extends Fragment {
     }
 
 
-    public interface OnFragmentInteractionListener extends BasicInteractionInterface{
+    public interface NewEventInteraction extends BasicInteractionInterface{
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+                void isUserExist(String parti, AddEventCallback<String> callback);
     }
 
     private void sendInvites(String eventId) {

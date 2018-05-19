@@ -7,6 +7,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.InstrumentationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -33,12 +34,13 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.malicteam.projectxclient.Common.Callbacks.AddEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.MainActivityCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
 import com.example.malicteam.projectxclient.Model.CloudManager;
-import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.View.NewEventFragment;
 import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
 import com.example.malicteam.projectxclient.Common.Consts;
@@ -62,11 +64,11 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
-import Notifications.EventInvitationNotificationData;
+import ResponsesEntitys.UserData;
 
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.EventListListener,
-        FriendsListFragment.FriendsFragmentInteraction, NewEventFragment.OnFragmentInteractionListener, FriendDetailsFragment.OnFragmentInteractionListener, EventDetailsFragment.OnFragmentInteractionListener,
+        FriendsListFragment.FriendsFragmentInteraction, NewEventFragment.NewEventInteraction, FriendDetailsFragment.OnFragmentInteractionListener, EventDetailsFragment.OnFragmentInteractionListener,
         ResetPasswordFragment.ResetPasswordListener {
 
     private final Class _mainFragmentClass = EventsListFragment.class;
@@ -283,7 +285,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void openExitAlert(){
+    private void openExitAlert() {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(FriendsListActivity.this);
 //        builder.setTitle("Add New Friend");
 //        builder.setMessage("Enter Email:");
@@ -448,7 +450,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setCancelable(false)
                 .setNegativeButton("Decline", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                      //  declineToInvite(invite);
+                        //  declineToInvite(invite);
                         //Todo make delined to invite
                         // dialog.cancel();
                     }
@@ -456,7 +458,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d("TAG", "You have agreed invite");
-                     //   agreeToInvite(invite);
+                        //   agreeToInvite(invite);
                         //Todo make Agree to evnet
                         // GetInEvent(invite.getEventId());
                         // MainActivity.this.finish();
@@ -690,7 +692,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
 
-
     }
 
 
@@ -783,11 +784,52 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void makeToastShort(String message) {
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+    public void isUserExist(String parti, AddEventCallback<String> callback) {
+        Repository.instance.getUserIfExist(parti, new isUserExistResponeCallback() {
+            @Override
+            public void onSuccees(UserData data) {
+                User user = new User(data);
+                String maketoast = "Adding" + user.getFirstName() + " " + user.getLastName();
+                makeToastShort(maketoast);
+               // Toast.makeText(MyApp.getContext(), maketoast, Toast.LENGTH_LONG);
+                callback.onSuccees(user.getFirstName());
+            }
+
+            @Override
+            public void userIsNotExist() {
+                // Toast.makeText(MyApp.getContext(), "User is not exist,please try again.", Toast.LENGTH_SHORT).show();
+                Log.d("TAG", "In addevent-->neweventfragment----> Technical userIsNotExist");
+            }
+
+            @Override
+            public void friendIsNotExist() {
+                //Toast.makeText(MyApp.getContext(), "User is not exist,please try again.", Toast.LENGTH_SHORT).show();
+                Log.d("TAG", "In addevent-->neweventfragment----> friendIsNotExist");
+
+            }
+
+        });
     }
+
+    @Override
+    public void makeToastShort(String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
     @Override
     public void makeToastLong(String message) {
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            }
+        });
+
     }
 }
