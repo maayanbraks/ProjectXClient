@@ -38,6 +38,7 @@ import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
 import com.example.malicteam.projectxclient.Model.CloudManager;
+import com.example.malicteam.projectxclient.Model.FirebaseModel;
 import com.example.malicteam.projectxclient.View.NewEventFragment;
 import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
 import com.example.malicteam.projectxclient.Common.Consts;
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int userId;
     private View headerLayout;
     private DrawerLayout mDrawer;
+
     //New Server
 //    private User mUser = null;
 
@@ -184,7 +186,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Repository.instance.InitMainActivityCallback(new MainActivityCallback() {
             @Override
             public void GotInvitation(Event event) {
-
+                GetInvation(event);
             }
         });
 //        eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -471,12 +473,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    public void agreeToInvite(EventInvitationNotificationData eventInvitationNotificationData) {
+    public void agreeToInvite(Event event) {
         //TODO get in to event
         //tell server we agreed
 
         //get in to event.
-        getInEvent(new Event(eventInvitationNotificationData.getEventData()));
+        getInEvent(event);
 
 //        Repository.instance.removeInvite(new FirebaseModel.Callback<Boolean>() {
 //            @Override
@@ -484,7 +486,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            }
 //        }, invite);
         //Add event to myeventlist/
-        Log.d("TAG", "invitegetevnetid=" + eventInvitationNotificationData.getEventId());
+        Log.d("TAG", "invitegetevnetid=" + event.getId());
 //        currentUser.getUser().getValue().addEventToList(Integer.valueOf(eventInvitationNotificationData.getEventId()));
         //update the userDatabase
 //        Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudCallback() {
@@ -500,7 +502,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        });
     }
 
-    public static void declineToInvite(EventInvitationNotificationData eventInvitationNotificationData) {
+    public static void declineToInvite(Event event) {
         //TODO
         //tell server we declined.
 
@@ -649,21 +651,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 });
     }
 
-    public void GetInvation(EventInvitationNotificationData eventInvitationNotificationData) {
+    public void GetInvation(Event event) {
 
         //todo
         //open dialog with information
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MyApp.getContext());
 
         // set title
-        alertDialogBuilder.setTitle("You got new Invitation, from " + ProductTypeConverters.getAdminFirstNameByEmail(eventInvitationNotificationData.getEventData()) +"");
+        alertDialogBuilder.setTitle("You got new Invitation, from " + ProductTypeConverters.getAdminFirstNameByEmail(event));
 
         // set dialog message
         alertDialogBuilder
                 .setCancelable(false)
                 .setNegativeButton("Decline", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        declineToInvite(eventInvitationNotificationData);
+                        declineToInvite(event);
                         //Todo make delined to invite
                         // dialog.cancel();
                     }
@@ -671,7 +673,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d("TAG", "You have agreed invite");
-                        agreeToInvite(eventInvitationNotificationData);
+                        agreeToInvite(event);
                         //Todo make Agree to evnet
                         // GetInEvent(invite.getEventId());
                         // MainActivity.this.finish();

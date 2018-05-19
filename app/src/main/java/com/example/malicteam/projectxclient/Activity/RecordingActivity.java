@@ -18,6 +18,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.malicteam.projectxclient.Common.Callbacks.CloseEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
@@ -34,6 +35,8 @@ import java.io.IOException;
 import java.util.List;
 
 import android.Manifest;
+
+import UpdateObjects.CloseEvent;
 
 public class RecordingActivity extends AppCompatActivity {
     private UserViewModel currentUser = null;
@@ -247,6 +250,28 @@ public class RecordingActivity extends AppCompatActivity {
         mRecorder = null;
         if (CheckMeAdmin()) {
             setRecordingStatus();
+           //closeevent();
+            Repository.instance.closeEvent(null,event.getId(), new CloseEventCallback() {
+                @Override
+                public void onSuccees() {
+                    Toast.makeText(getApplication(), "Stopping record", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void UserIsNotExist() {
+                    Toast.makeText(getApplication(), "Error:UserIsNotExist", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void EventIsNotExist() {
+                    Toast.makeText(getApplication(), "Error:EventIsNotExist", Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void TechnicalError() {
+                    Toast.makeText(getApplication(), "Error:TechnicalError", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
         Log.d("TAG", "Stop recording func");
 

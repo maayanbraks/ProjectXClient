@@ -206,11 +206,11 @@ public class NewEventFragment extends Fragment {
                                            @Override
                                            public void onSuccees(UserData data) {
                                                User user = new User(data);
-
                                                if (invitedPpl.equals(" ")) { // if empty
                                                    invitedPpl = user.getFirstName();
-                                                   // InviteTextViewEdit(view);
-                                                   Toast.makeText(MyApp.getContext(), "Adding"+user.getFirstName(), Toast.LENGTH_SHORT).show();
+                                                    InviteTextViewEdit(view);
+                                                    String maketoast="Adding"+user.getFirstName()+" "+user.getLastName();
+                                                   mListener.makeToastLong(maketoast);
                                                    Log.d("TAG", "In addevent-->neweventfragment----> OnSucess");
                                                    Log.d("TAG", "Sucseed found user, added him");
                                                }
@@ -262,7 +262,7 @@ public class NewEventFragment extends Fragment {
     }
 
 
-    public interface OnFragmentInteractionListener {
+    public interface OnFragmentInteractionListener extends BasicInteractionInterface{
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
@@ -287,10 +287,22 @@ public class NewEventFragment extends Fragment {
     }
 
     private void InviteTextViewEdit(View view) {
-        thereIsParti = true;
-        TextView _invites = view.findViewById(R.id.newEvent_Invites);
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
 
-        _invites.setText("Participats:" + invitedPpl);
+//                    try {
+                    thereIsParti = true;
+                    TextView _invites = view.findViewById(R.id.newEvent_Invites);
+
+                    _invites.setText("Participats:" + invitedPpl);
+//                    } catch (Exception e) {
+//                        Log.d("TAg", e.getMessage());
+//                    }
+                }
+
+        });
+
     }
 
     public void onRadioButtonClicked(View view) {
