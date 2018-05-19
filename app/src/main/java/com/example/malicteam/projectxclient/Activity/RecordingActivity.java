@@ -140,6 +140,7 @@ public class RecordingActivity extends AppCompatActivity {
             SetEventFromInvitation(eventtemp);
         }
         else {// entered this activity from Creating new one(NewEventActivity)
+            event=eventtemp;
             SetEventFromNewActivity();
         }
     }
