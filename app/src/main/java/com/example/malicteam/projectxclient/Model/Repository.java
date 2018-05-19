@@ -25,10 +25,12 @@ import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallb
 import com.example.malicteam.projectxclient.Common.Callbacks.EventListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.FriendsListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.LogInCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.MainActivityCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
+import com.example.malicteam.projectxclient.View.Dialogs.LogoutDialogFragment;
 import com.example.malicteam.projectxclient.ViewModel.FriendsViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -743,7 +745,6 @@ public class Repository {
     public void getUserIfExist(String email,final isUserExistResponeCallback callback) {
         //Init the get friends/contacts list of  User (by email).
         IsUserExistRequestData IsUserExistResponseData = new IsUserExistRequestData(userLiveData.getValue().getEmail(),email);
-
         //send request
         CM.sendToServer("Request", IsUserExistResponseData, new CloudManager.CloudCallback<String>() {
             @Override
@@ -775,6 +776,7 @@ public class Repository {
             }
             @Override
             public void onCancel() {
+                Log.d("TAG","on cancel in getuserifexist funcs in Reposotiry");
             }
         });
     }
@@ -916,6 +918,10 @@ public class Repository {
             CM.setRecordingCallback(callback);
 
         }
+    public void InitMainActivityCallback(final MainActivityCallback callback) {
+        CM.setMainActivityCallback(callback);
+    }
+
 
     public void addEvent(List<String> usersMails,Event event,final AddEventCallback<Boolean> callback) {
         CreateEventRequestData createEventRequestData = new CreateEventRequestData(userLiveData.getValue().getEmail(),ProductTypeConverters.GenerateListUserToListMails(event.getParticipats()),event.getTitle(), event.getDescription());

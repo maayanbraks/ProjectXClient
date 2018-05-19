@@ -33,6 +33,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.malicteam.projectxclient.Common.Callbacks.MainActivityCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
@@ -170,6 +171,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+
         //Permission
         boolean hasPermission = (ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
@@ -179,6 +181,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, Consts.REQUEST_WRITE_STORAGE);
         }
 
+        Repository.instance.InitMainActivityCallback(new MainActivityCallback() {
+            @Override
+            public void GotInvitation(Event event) {
+
+            }
+        });
 //        eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            @Override
 //            public void onItemClick(Adapte
