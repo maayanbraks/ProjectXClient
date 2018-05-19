@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.example.malicteam.projectxclient.Activity.MainActivity;
 import com.example.malicteam.projectxclient.Activity.RecordingActivity;
+import com.example.malicteam.projectxclient.Common.Callbacks.MainActivityCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 
@@ -37,6 +38,7 @@ public class CloudManager {
     private final String SERVER_ADDRESS = "http://193.106.55.95:8080";
     private CloudCallback<String> localCallbackCloudManager;
     private RecordingActivityCallback recordingActivityCallback;
+    private MainActivityCallback mainActivityCallback;
     private Socket socket;
     static final int PORT = 8888;
     private boolean isConnected;
@@ -68,6 +70,9 @@ public class CloudManager {
     }
     public void setRecordingCallback(final RecordingActivityCallback callback) {
         this.recordingActivityCallback =callback;
+    }
+    public void setMainActivityCallback(final MainActivityCallback callback) {
+        this.mainActivityCallback =callback;
     }
 
 
@@ -125,15 +130,12 @@ public class CloudManager {
 
     public void handleLiveData(String data) { //here Live data responses (need to send to LiveData!
         NotificationData rs = ProductTypeConverters.getObjectFromString(data, NotificationData.class);
-        MainActivity mainActivity=new MainActivity();
-        RecordingActivity recordingActivity=new RecordingActivity();
         Log.d("TAG","handleliveData--->rs.getnotificationType:="+rs.getNotificationType());
         switch (rs.getNotificationType()) {
             case EventInvitation:
                 EventInvitationNotificationData eventInvitationNotificationData=ProductTypeConverters.getObjectFromString(data, EventInvitationNotificationData.class);
                 //MainActivity.GetInvation(eventInvitationNotificationData);
-
-                mainActivity.GetInvation(eventInvitationNotificationData);
+                mainActivityCallback.GotInvitation(new Event(eventInvitationNotificationData.getEventData()));
                 return;
             case UserJoinEvent:
                 UserJoinEventNotification userJoinEventNotification= ProductTypeConverters.getObjectFromString(data, UserJoinEventNotification.class);

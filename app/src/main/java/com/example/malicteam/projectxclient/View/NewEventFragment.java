@@ -132,10 +132,13 @@ public class NewEventFragment extends Fragment {
                 Date date = new Date();
                 String dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime());
                 event = new Event(null, title, null, description, "" + userId, dateFormat, null);
+                List<User> participats=new LinkedList<>();
+                participats.add(myUser);
+                event.setParticipats(participats);
 //                    sendInvites("" + event.getId());
                 //Repository.instance.addEvent(event);
                 //UsersInvites.add(myUser.getEmail());
-                event.addToParticipats(myUser);
+               // event.addToParticipats(myUser);
                 Repository.instance.addEvent(UsersInvites,event, new AddEventCallback<Boolean>() {
                     @Override
                     public void onSuccees(Boolean bool) {
