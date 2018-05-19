@@ -53,6 +53,7 @@ public class NewEventFragment extends Fragment {
     private Button startRecord;
     private ImageButton fab;
     private Event event;
+    private User myUser;
     private String invitedPpl;
     private boolean thereIsParti = false;
 
@@ -93,6 +94,7 @@ public class NewEventFragment extends Fragment {
 //        });
 //        currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
         //currentUser.init(userId);
+        myUser = (User) getArguments().getSerializable(Consts.USER);
         startRecord = (Button) view.findViewById(R.id.new_event_start);
         EditText _name = view.findViewById(R.id.new_event_title);
         EditText _desc = view.findViewById(R.id.new_event_description);
@@ -132,6 +134,8 @@ public class NewEventFragment extends Fragment {
                 event = new Event(null, title, null, description, "" + userId, dateFormat, null);
 //                    sendInvites("" + event.getId());
                 //Repository.instance.addEvent(event);
+                //UsersInvites.add(myUser.getEmail());
+                event.addToParticipats(myUser);
                 Repository.instance.addEvent(UsersInvites,event, new AddEventCallback<Boolean>() {
                     @Override
                     public void onSuccees(Boolean bool) {
@@ -161,13 +165,13 @@ public class NewEventFragment extends Fragment {
 
                     @Override
                     public void userIsNotExist() {
-                        Toast.makeText(MyApp.getContext(), "User is not exist,please try again.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "User is not exist,please try again.", Toast.LENGTH_SHORT).show();
                         Log.d("TAG", "In addevent-->neweventfragment----> Technical userIsNotExist");
                     }
 
                     @Override
                     public void technicalError() {
-                        Toast.makeText(MyApp.getContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
+                     //   Toast.makeText(getActivity(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
                         Log.d("TAG", "In addevent-->neweventfragment ---> Technical error");
                     }
                 });

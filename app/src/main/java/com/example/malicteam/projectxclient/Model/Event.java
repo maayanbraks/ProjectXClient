@@ -151,7 +151,10 @@ public class Event implements Serializable {
         return id;
     }
 
-
+    public void addToParticipats(User user)
+    {
+        this.participats.add(user);
+    }
     public String getTitle() {
         return title;
     }

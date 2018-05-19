@@ -9,6 +9,7 @@ import com.google.gson.Gson;
 import java.util.LinkedList;
 import java.util.List;
 
+import ResponsesEntitys.EventData;
 import ResponsesEntitys.UserData;
 
 /**
@@ -41,18 +42,23 @@ public class ProductTypeConverters {
     }
 
     public static LinkedList<String> GenerateListUserToListMails(List<User> users) {
-        LinkedList<String> list = new LinkedList<String>();
-        for (User user : users) {
-            list.add(user.getEmail());
+        LinkedList<String> list = new LinkedList<>();
+        if (users != null) {
+            for (User user : users) {
+                list.add(user.getEmail());
+            }
         }
         return list;
     }
     public static String GenerateStringFromList(List<String> list) {
         String newlist="";
-        for (String num : list) {
-            newlist=newlist+","+num;
+        if (list != null){
+            for (String num : list) {
+                newlist = newlist + "," + num;
+            }
+           //newlist=newlist.substring(0,newlist.length()-1);
         }
-        newlist=newlist.substring(0,newlist.length()-1);
+
         return newlist;
     }
     public static List<UserData> GenerateListUserDataFromListUser(List<User> users)
@@ -82,4 +88,20 @@ public class ProductTypeConverters {
         return gson.toJson(obj);
     }
     //GSON
+
+
+    public static String getAdminFirstNameByEmail(EventData eventData) {
+        if (eventData!=null) {
+
+            for (int i=0;i<eventData.getParticipants().size();i++)
+            {
+                if (eventData.getAdminMail().equals(eventData.getParticipants().get(i)))
+                {
+                    return eventData.getParticipants().get(i).getFirstName();
+                }
+            }
+        }
+
+        return null;
+    }
 }

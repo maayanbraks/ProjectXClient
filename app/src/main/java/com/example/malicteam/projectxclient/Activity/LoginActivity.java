@@ -123,13 +123,13 @@ public class LoginActivity extends Activity {
             @Override
             public void technicalError() {
                 Log.d("TAG", "In Login-->LoginActivity ---> Technical error");
-                Toast.makeText(MyApp.getContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void userIsNotExist() {
                 Log.d("TAG", "In Login-->LoginActivity ---> UserIsNotExist");
-                Toast.makeText(MyApp.getContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -152,7 +152,7 @@ public class LoginActivity extends Activity {
             @Override
             public void UseIsAllReadyLoggedIn() {
                 Log.d("TAG", "In Login-->LoginActivity ---> UseIsAllReadyLoggedIn");
-                Toast.makeText(MyApp.getContext(), "User is already loogged in.", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(MyApp.getContext(), "User is already loogged in.", Toast.LENGTH_SHORT).show();
             }
 //            @Override
 //            public void onComplete(Object data) {

@@ -20,10 +20,12 @@ import android.webkit.URLUtil;
 
 import com.example.malicteam.projectxclient.Common.Callbacks.AddEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.CloseEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.EventListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.FriendsListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.LogInCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
@@ -35,6 +37,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -745,6 +749,7 @@ public class Repository {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
+                Log.d("TAG","oiasdjadjdjkaspdojaspdojasdojassdoj+gettype="+responseData.getType());
                 switch (responseData.getType()) {
                     case Error:
                         ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
@@ -759,10 +764,47 @@ public class Repository {
                                 break;
                         }
                     case IsUserExistResponse:
+                        Log.d("TAG","IsUserExistResponeseoasjdsodjdsjdodjasd");
                         IsUserExistResponseData response = ProductTypeConverters.getObjectFromString(data, IsUserExistResponseData.class);
                         callback.onSuccees(response.getUserData());
                         break;
 
+                    default:
+                        return;
+                }
+            }
+            @Override
+            public void onCancel() {
+            }
+        });
+    }
+    public void closeEvent(String[] protocol,int eventId,final CloseEventCallback callback) {
+        //Init the get friends/contacts list of  User (by email).
+        CloseEventRequestData closeEventRequestData = new CloseEventRequestData(userLiveData.getValue().getEmail(),eventId,new String[]{""});
+
+        //send request
+        CM.sendToServer("Request", closeEventRequestData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String data) {
+                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
+                switch (responseData.getType()) {
+                    case Error:
+                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
+                        switch (errorResponseData.getErrorType()) {
+                            case UserIsNotExist:
+                                callback.UserIsNotExist();
+                                break;
+                            case FriendIsNotExist:
+                                callback.EventIsNotExist();
+                            case TechnicalError:
+                                callback.TechnicalError();
+                                break;
+                            default:
+                                break;
+                        }
+                    case Boolean: // this momment if boolean it mean ALWAS TRUE
+                        callback.onSuccees();
+                        break;
                     default:
                         return;
                 }
@@ -870,10 +912,13 @@ public class Repository {
             }
         });
     }
+        public void InitCallbacksForCloudManeger(final RecordingActivityCallback callback) {
+            CM.setRecordingCallback(callback);
 
+        }
 
     public void addEvent(List<String> usersMails,Event event,final AddEventCallback<Boolean> callback) {
-        CreateEventRequestData createEventRequestData = new CreateEventRequestData(userLiveData.getValue().getEmail(),usersMails, event.getTitle(), event.getDescription(), event.getDate());
+        CreateEventRequestData createEventRequestData = new CreateEventRequestData(userLiveData.getValue().getEmail(),ProductTypeConverters.GenerateListUserToListMails(event.getParticipats()),event.getTitle(), event.getDescription());
         CM.sendToServer("Request", createEventRequestData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String response) {
