@@ -924,7 +924,7 @@ public class Repository {
 
 
     public void addEvent(List<String> usersMails,Event event,final AddEventCallback<Boolean> callback) {
-        CreateEventRequestData createEventRequestData = new CreateEventRequestData(userLiveData.getValue().getEmail(),ProductTypeConverters.GenerateListUserToListMails(event.getParticipats()),event.getTitle(), event.getDescription());
+        CreateEventRequestData createEventRequestData = new CreateEventRequestData(userLiveData.getValue().getEmail(),usersMails,event.getTitle(), event.getDescription());
         CM.sendToServer("Request", createEventRequestData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String response) {
