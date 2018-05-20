@@ -37,6 +37,17 @@ public class AddFriendFragment extends DialogFragment {
     private String emailString = "";
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof AddFriendInteraction) {
+            mListener = (AddFriendInteraction) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(title);
