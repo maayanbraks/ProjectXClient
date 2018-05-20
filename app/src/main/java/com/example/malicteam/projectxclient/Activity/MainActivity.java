@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ResetPasswordFragment.ResetPasswordListener, AddFriendFragment.AddFriendInteraction {
 
     private final Class _mainFragmentClass = EventsListFragment.class;
+    private Class _currentFragmentClass = _mainFragmentClass;
 
     //    private List<Event> eventsList = new Link
     private TextView userNameHeader;
@@ -185,6 +186,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //Draw
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        for (int i = 0; i < navigationView.getMenu().size(); i++) {
+            if (navigationView.getMenu().getItem(i).getClass().getName().equals(_currentFragmentClass.getName())) {
+                navigationView.getMenu().getItem(i).setChecked(true);
+            }
+        }
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawer.addDrawerListener(toggle);
@@ -713,11 +719,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void addFriend(String friendsEmail){
+    public void addFriend(String friendsEmail) {
         Repository.instance.addFriend(friendsEmail, new AddFriendCallback<Boolean>() {
             @Override
             public void onSuccees(Boolean data) {
-                if(data)
+                if (data)
                     makeToastShort("Added");
 //                Log.d("TAG", "friendlistsizeBeforeAdding=" + currentFriendsList.size());
 //                currentFriendsList.add(data);
@@ -778,7 +784,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 User user = new User(data);
                 String maketoast = "Adding" + user.getFirstName() + " " + user.getLastName();
                 makeToastShort(maketoast);
-               // Toast.makeText(MyApp.getContext(), maketoast, Toast.LENGTH_LONG);
+                // Toast.makeText(MyApp.getContext(), maketoast, Toast.LENGTH_LONG);
                 callback.onSuccees(user.getFirstName());
             }
 
