@@ -377,7 +377,7 @@ void initFriendsList(Observer<List<User>> observer);
                         refreshList();
                     }
                 });
-            
+
             TextView firstName = (TextView) view.findViewById(R.id.firstName_friendsRow);
             TextView lastName = (TextView) view.findViewById(R.id.lastName_friendsRow);
             TextView email = (TextView) view.findViewById(R.id.email_friendsRow);
