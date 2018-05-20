@@ -70,7 +70,7 @@ import ResponsesEntitys.UserData;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.EventListListener,
         FriendsListFragment.FriendsFragmentInteraction, NewEventFragment.NewEventInteraction, FriendDetailsFragment.OnFragmentInteractionListener, EventDetailsFragment.OnFragmentInteractionListener,
-        ResetPasswordFragment.ResetPasswordListener {
+        ResetPasswordFragment.ResetPasswordListener, AddFriendFragment.AddFriendInteraction {
 
     private final Class _mainFragmentClass = EventsListFragment.class;
 
@@ -721,13 +721,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
+//    @Override
+//    public void initFriendsList(FriendsViewModel.FriendsViewModelCallback<List<User>> callback) {
+//        currentFriendsList = ViewModelProviders.of(this).get(FriendsViewModel.class);
+//        currentFriendsList.getFriendsList().observe(this, new Observer<List<User>>() {
+//            @Override
+//            public void onChanged(@Nullable List<User> users) {
+//                callback.onComplete(users);
+//            }
+//        });
+//    }
+
     @Override
-    public void initFriendsList(FriendsViewModel.FriendsViewModelCallback<List<User>> callback) {
+    public void initFriendsList(Observer<List<User>> observer) {
         currentFriendsList = ViewModelProviders.of(this).get(FriendsViewModel.class);
         currentFriendsList.getFriendsList().observe(this, new Observer<List<User>>() {
             @Override
             public void onChanged(@Nullable List<User> users) {
-                callback.onComplete(users);
+                observer.onChanged(users);
             }
         });
     }

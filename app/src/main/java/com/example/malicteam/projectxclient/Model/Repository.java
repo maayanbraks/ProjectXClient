@@ -688,6 +688,7 @@ public class Repository {
                     case AddFriendResponse:
                         AddFriendResponseData response = ProductTypeConverters.getObjectFromString(data.toString(), AddFriendResponseData.class);
                         User user = new User(response.getUserData());
+                        friendsLiveData.getValue().add(user);//Here we add friend
                         callback.onSuccees(user);
                         return;
 

@@ -1,5 +1,6 @@
 package com.example.malicteam.projectxclient.View;
 
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -30,7 +31,8 @@ import java.util.List;
 public class FriendsListFragment extends Fragment {
     public interface FriendsFragmentInteraction extends BasicInteractionInterface{
         void showFriendDetails(User user);
-        void initFriendsList(FriendsViewModel.FriendsViewModelCallback<List<User>> callback);
+//        void initFriendsList(FriendsViewModel.FriendsViewModelCallback<List<User>> callback);
+void initFriendsList(Observer<List<User>> observer);
         void addFriend();
         void deleteFriend(User friend, List<User> friendsList);
     }
@@ -69,9 +71,16 @@ public class FriendsListFragment extends Fragment {
             friendsListView = (ListView) view.findViewById(R.id.list_friendsList);
             adapter = new MyAdapter();
             friendsListView.setAdapter(adapter);
-            mListener.initFriendsList(new FriendsViewModel.FriendsViewModelCallback<List<User>>() {
+//            mListener.initFriendsList(new FriendsViewModel.FriendsViewModelCallback<List<User>>() {
+//                @Override
+//                public void onComplete(List<User> data) {
+//                    friendsList = data;
+//                    refreshList();
+//                }
+//            });
+            mListener.initFriendsList(new Observer<List<User>>() {
                 @Override
-                public void onComplete(List<User> data) {
+                public void onChanged(List<User> data) {
                     friendsList = data;
                     refreshList();
                 }
