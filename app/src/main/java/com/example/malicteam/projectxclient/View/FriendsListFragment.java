@@ -34,7 +34,7 @@ public class FriendsListFragment extends Fragment {
 //        void initFriendsList(FriendsViewModel.FriendsViewModelCallback<List<User>> callback);
 void initFriendsList(Observer<List<User>> observer);
         void addFriend();
-        void deleteFriend(User friend, List<User> friendsList);
+        void deleteFriend(User friend);
     }
 
     private FriendsFragmentInteraction mListener;
@@ -60,7 +60,6 @@ void initFriendsList(Observer<List<User>> observer);
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -374,60 +373,11 @@ void initFriendsList(Observer<List<User>> observer);
 //                        builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
 //                            @Override
 //                            public void onClick(DialogInterface dialog, int which) {
-                        List<User> friendsListTemp = friendsList;
-                        friendsListTemp.remove(friend);
-                        Repository.instance.EditFriendList(ProductTypeConverters.GenerateListUserToListMails(friendsListTemp), new EditFriendListCallback() {
-                            @Override
-                            public void onSuccees() {
-                                // boolean nunu=friendsList.remove(friend);
-                                for (int i = 0; i < friendsList.size(); i++) {
-                                    if (friend.getEmail().equals(friendsList.get(i).getEmail()))
-                                        friendsList.remove(i);
-                                }
-                                //  Toast.makeText(MyApp.getContext(), "Deleted", Toast.LENGTH_SHORT).show();
-                                refreshList();
-                                // Log.d("TAG","lalaala"+nunu);
-                            }
-
-                            @Override
-                            public void UserIsNotExist() {
-                                Toast.makeText(MyApp.getContext(), "User is not exist", Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void error() {
-                                Toast.makeText(MyApp.getContext(), "ERROR.", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        mListener.deleteFriend(friend);
+                        refreshList();
                     }
-////                                Repository.instance.deleteFromFriends(friend.getId(), new CloudManager.CloudCallback<Boolean>() {
-////                                    @Override
-////                                    public void onComplete(Boolean data) {
-////                                        if (data) {
-////                                            Toast.makeText(MyApp.getContext(), "Deleted", Toast.LENGTH_SHORT).show();
-////                                            refreshList();
-////                                        } else
-////                                            Toast.makeText(MyApp.getContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
-////                                    }
-////
-////                                    @Override
-////                                    public void onCancel() {
-////                                        dialog.cancel();
-////                                    }
-////                                });
-//
-//
-//                        })
-//                                .setNegativeButton("No, Cancel!", new DialogInterface.OnClickListener() {
-//                                    @Override
-//                                    public void onClick(DialogInterface dialog, int which) {
-//                                        dialog.cancel();
-//                                    }
-//                                });
-//                        builder.show();
                 });
-
-
+            
             TextView firstName = (TextView) view.findViewById(R.id.firstName_friendsRow);
             TextView lastName = (TextView) view.findViewById(R.id.lastName_friendsRow);
             TextView email = (TextView) view.findViewById(R.id.email_friendsRow);

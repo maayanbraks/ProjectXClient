@@ -36,6 +36,7 @@ import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Common.Callbacks.AddEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.MainActivityCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
@@ -69,7 +70,7 @@ import Notifications.EventInvitationNotificationData;
 import ResponsesEntitys.UserData;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.EventListListener,
-        FriendsListFragment.FriendsFragmentInteraction, NewEventFragment.NewEventInteraction, FriendDetailsFragment.OnFragmentInteractionListener, EventDetailsFragment.OnFragmentInteractionListener,
+        FriendsListFragment.FriendsFragmentInteraction, NewEventFragment.NewEventInteraction, EventDetailsFragment.OnFragmentInteractionListener,
         ResetPasswordFragment.ResetPasswordListener, AddFriendFragment.AddFriendInteraction {
 
     private final Class _mainFragmentClass = EventsListFragment.class;
@@ -508,8 +509,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void deleteFriend(User friend, List<User> friendsList) {
+    public void deleteFriend(User friend) {
+        List<User> friendsListTemp = currentFriendsList.getFriendsList().getValue();
+        friendsListTemp.remove(friend);
+        Repository.instance.EditFriendList(ProductTypeConverters.GenerateListUserToListMails(friendsListTemp), new EditFriendListCallback() {
+            @Override
+            public void onSuccees() {
+                //Delete from local list
+                Repository.instance.deleteFromFriends(friend);
+//                currentFriendsList.getFriendsList().getValue().remove(friend);
+//                for (int i = 0; i < currentFriendsList.getFriendsList().getValue().size(); i++) {
+//                    if (friend.getEmail().equals(friendsList.get(i).getEmail()))
+//                        friendsList.remove(i);
+//                }
+                makeToastLong(friend.getFirstName() + " " + friend.getLastName() + " was Deleted");
+                // Log.d("TAG","lalaala"+nunu);
+            }
 
+            @Override
+            public void UserIsNotExist() {
+                Toast.makeText(MyApp.getContext(), "User is not exist", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void error() {
+                Toast.makeText(MyApp.getContext(), "ERROR.", Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
@@ -688,10 +714,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void addFriend(String friendsEmail){
-        Repository.instance.addFriend(friendsEmail, new AddFriendCallback<User>() {
+        Repository.instance.addFriend(friendsEmail, new AddFriendCallback<Boolean>() {
             @Override
-            public void onSuccees(User data) {
-                makeToastShort("Added");
+            public void onSuccees(Boolean data) {
+                if(data)
+                    makeToastShort("Added");
 //                Log.d("TAG", "friendlistsizeBeforeAdding=" + currentFriendsList.size());
 //                currentFriendsList.add(data);
 //                Log.d("TAG", "friendlistsizeafteradding=" + currentFriendsList.size());

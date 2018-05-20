@@ -658,7 +658,7 @@ public class Repository {
         });
 }
 
-    public void addFriend(String email, AddFriendCallback<User> callback) {
+    public void addFriend(String email, AddFriendCallback<Boolean> callback) {
         //init request
         AddFriendRequestData addFriendRequestData = new AddFriendRequestData(userLiveData.getValue().getEmail(), email);
         //send request
@@ -689,7 +689,7 @@ public class Repository {
                         AddFriendResponseData response = ProductTypeConverters.getObjectFromString(data.toString(), AddFriendResponseData.class);
                         User user = new User(response.getUserData());
                         friendsLiveData.getValue().add(user);//Here we add friend
-                        callback.onSuccees(user);
+                        callback.onSuccees(true);
                         return;
 
                     default:
@@ -817,9 +817,9 @@ public class Repository {
         });
     }
 
-    public void deleteFromFriends(int friendId, final CloudManager.CloudCallback<Boolean> cloudCallback)
+    public void deleteFromFriends(User friend)
     {
-        //TODO delete friend
+        friendsLiveData.getValue().remove(friend);
     }
 
 
