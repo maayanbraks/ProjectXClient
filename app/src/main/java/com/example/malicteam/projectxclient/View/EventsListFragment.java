@@ -130,7 +130,7 @@ public class EventsListFragment extends Fragment {
             mListener = (EventListListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement NewEventInteraction");
         }
 
         _userId = getArguments().getInt(Consts.USER_ID);

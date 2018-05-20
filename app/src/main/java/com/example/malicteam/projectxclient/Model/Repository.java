@@ -893,15 +893,15 @@ public class Repository {
                                 break;
                         }
                     case Events:
-                        EventsListResponseData response = ProductTypeConverters.getObjectFromString(data, EventsListResponseData.class);
+                     //   EventsListResponseData response = ProductTypeConverters.getObjectFromString(data, EventsListResponseData.class);
                         //convert UserData to User
                         LinkedList<Event> list = new LinkedList<Event>();
-                        if (response.getEvents().size()>0) {
-                        for (EventData eventData : response.getEvents()) {
-                            list.add(new Event(eventData));
-                        }
-                    }
-                        callback.onSuccees(list);
+//                        if (response.getEvents().size()>0) {
+//                        for (EventData eventData : response.getEvents()) {
+//                            list.add(new Event(eventData));
+//                        }
+//                    }
+//                        callback.onSuccees(list);
                         break;
 
                     default:

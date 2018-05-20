@@ -3,6 +3,7 @@ package com.example.malicteam.projectxclient.Common;
 import android.arch.persistence.room.TypeConverter;
 
 import com.example.malicteam.projectxclient.Model.CloudManager;
+import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.User;
 import com.google.gson.Gson;
 
@@ -90,14 +91,14 @@ public class ProductTypeConverters {
     //GSON
 
 
-    public static String getAdminFirstNameByEmail(EventData eventData) {
-        if (eventData!=null) {
+    public static String getAdminFirstNameByEmail(Event event) {
+        if (event!=null) {
 
-            for (int i=0;i<eventData.getParticipants().size();i++)
+            for (int i=0;i<event.getParticipats().size();i++)
             {
-                if (eventData.getAdminMail().equals(eventData.getParticipants().get(i)))
+                if (event.getAdminId().equals(event.getParticipats().get(i)))
                 {
-                    return eventData.getParticipants().get(i).getFirstName();
+                    return event.getParticipats().get(i).getFirstName();
                 }
             }
         }
