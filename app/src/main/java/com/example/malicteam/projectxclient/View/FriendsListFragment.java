@@ -29,12 +29,9 @@ import java.util.List;
 
 public class FriendsListFragment extends Fragment {
     public interface FriendsFragmentInteraction extends BasicInteractionInterface{
-        void showFriendDetails(User user);//Different Object from User - only relevant data!
-
-        void addFriend(User friend);
+        void showFriendDetails(User user);
         void initFriendsList(FriendsViewModel.FriendsViewModelCallback<List<User>> callback);
-
-
+        void addFriend();
         void deleteFriend(User friend, List<User> friendsList);
     }
 
@@ -153,6 +150,8 @@ public class FriendsListFragment extends Fragment {
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                mListener.addFriend();
 //                openDialog();
 
 //                AlertDialog.Builder builder = new AlertDialog.Builder(MyApp.getContext());

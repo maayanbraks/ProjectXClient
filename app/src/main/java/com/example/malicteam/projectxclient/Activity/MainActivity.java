@@ -33,11 +33,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.MainActivityCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
-import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
 import com.example.malicteam.projectxclient.Model.CloudManager;
+import com.example.malicteam.projectxclient.View.Dialogs.AddFriendFragment;
 import com.example.malicteam.projectxclient.View.NewEventFragment;
 import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
 import com.example.malicteam.projectxclient.Common.Consts;
@@ -66,7 +67,7 @@ import Notifications.EventInvitationNotificationData;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.EventListListener,
         FriendsListFragment.FriendsFragmentInteraction, NewEventFragment.OnFragmentInteractionListener, FriendDetailsFragment.OnFragmentInteractionListener, EventDetailsFragment.OnFragmentInteractionListener,
-        ResetPasswordFragment.ResetPasswordListener {
+        ResetPasswordFragment.ResetPasswordListener, AddFriendFragment.AddFriendInteraction {
 
     private final Class _mainFragmentClass = EventsListFragment.class;
 
@@ -88,51 +89,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//
-//        ListView eventListView = (ListView) findViewById(R.id._listOfEvents);
-//        adapter = new EventAdapter();
-//        eventListView.setAdapter(adapter);
-
-        // User myuser = (User) getIntent().getSerializableExtra(Consts.USER);
-//         User myuser = new User("Eden","Charcon","alkal","Sharkonz@gmail.com",null,null,    1,1);
-
-//        mUser = (User) getIntent().getSerializableExtra(Consts.USER);
-//        userId = mUser.getId();
-
-
-        //invitation code:
-//        Repository.instance.getInvite("" + userId, new CloudManager.CloudCallback<Invite>() {
-//            @Override
-//            public void onComplete(Invite invite) {
-//                Invitation(invite);
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//
-//            }
-//        }, new FirebaseModel.GetInvitation() {
-//            @Override
-//            public void onComplete(Invite invite) {
-//                Invitation(invite);
-//            }
-//        });
-        //End of - invitation code
-
-        //Get Events
-//        Repository.instance.getEvents(userId, new CloudManager.CloudCallback<List<Event>>() {
-//            @Override
-//            public void onComplete(List<Event> data) {
-//                eventsList = data;
-//                if (adapter != null)
-//                    adapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//            }
-//        });
-
         try {
             CloudManager cd = new CloudManager();
         } catch (URISyntaxException e) {
@@ -281,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void openExitAlert(){
+    private void openExitAlert() {
 //        AlertDialog.Builder builder = new AlertDialog.Builder(FriendsListActivity.this);
 //        builder.setTitle("Add New Friend");
 //        builder.setMessage("Enter Email:");
@@ -446,7 +402,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setCancelable(false)
                 .setNegativeButton("Decline", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                      //  declineToInvite(invite);
+                        //  declineToInvite(invite);
                         //Todo make delined to invite
                         // dialog.cancel();
                     }
@@ -454,7 +410,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d("TAG", "You have agreed invite");
-                     //   agreeToInvite(invite);
+                        //   agreeToInvite(invite);
                         //Todo make Agree to evnet
                         // GetInEvent(invite.getEventId());
                         // MainActivity.this.finish();
@@ -656,7 +612,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MyApp.getContext());
 
         // set title
-        alertDialogBuilder.setTitle("You got new Invitation, from " + ProductTypeConverters.getAdminFirstNameByEmail(eventInvitationNotificationData.getEventData()) +"");
+        alertDialogBuilder.setTitle("You got new Invitation, from " + ProductTypeConverters.getAdminFirstNameByEmail(eventInvitationNotificationData.getEventData()) + "");
 
         // set dialog message
         alertDialogBuilder
@@ -686,18 +642,50 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (!((Activity) MyApp.getContext()).isFinishing()) {
             alertDialog.show();
         }
-
-
-
     }
 
-
-    ///////////////////////////////////////////////////////////
     @Override
-    public void addFriend(User friend) {
-        Repository.instance.addFriend("MaayanMail", new AddFriendCallback<User>() {
+    public void addFriend() {
+        AddFriendFragment addFriendDialog = new AddFriendFragment();
+        addFriendDialog.show(getSupportFragmentManager(), "addFriendDialog");
+//        Repository.instance.addFriend("MaayanMail", new AddFriendCallback<User>() {
+//            @Override
+//            public void onSuccees(User data) {
+////                Log.d("TAG", "friendlistsizeBeforeAdding=" + currentFriendsList.size());
+////                currentFriendsList.add(data);
+////                Log.d("TAG", "friendlistsizeafteradding=" + currentFriendsList.size());
+////                refreshList();
+////                Log.d("TAG", "n addfriend-->friendlistFragment ---> aasdasd" + data.getFirstName());
+//            }
+//
+//            @Override
+//            public void userIsNotExist() {
+//                Log.d("TAG", "n addfriend-->friendlistFragment ---> userIsNotExist");
+//            }
+//
+//            @Override
+//            public void friendIsNotExist() {
+//                Log.d("TAG", "n addfriend-->friendlistFragment ---> friendIsNotExist");
+//            }
+//
+//            @Override
+//            public void bothUsersEquals() {
+//                Log.d("TAG", "n addfriend-->friendlistFragment ---> bothUsersEquals");
+//            }
+//
+//            @Override
+//            public void alreadyFriends() {
+//                Log.d("TAG", "n addfriend-->friendlistFragment ---> alreadyFriends");
+//            }
+//        });
+    }
+
+    @Override
+    public void addFriend(String friendsEmail){
+        Repository.instance.addFriend(friendsEmail, new AddFriendCallback<User>() {
             @Override
             public void onSuccees(User data) {
+                makeToastShort("Added");
 //                Log.d("TAG", "friendlistsizeBeforeAdding=" + currentFriendsList.size());
 //                currentFriendsList.add(data);
 //                Log.d("TAG", "friendlistsizeafteradding=" + currentFriendsList.size());
@@ -729,48 +717,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void initFriendsList(FriendsViewModel.FriendsViewModelCallback<List<User>> callback) {
-//        currentFriendsList = ViewModelProviders.of(this).get(FriendsViewModel.class);
-////        currentFriendsList.initFriendsList(new FriendsViewModel.FriendsViewModelCallback<Boolean>() {
-////            @Override
-////            public void onComplete(Boolean data) {
-////
-////            }
-////        });
-//        currentFriendsList.getFriendsList().observe(this, new Observer<List<User>>() {
-//            @Override
-//            public void onChanged(@Nullable List<User> list) {
-//                callback.onComplete(list);// = list;
-////                getActivity().runOnUiThread(new Runnable() {
-////                    @Override
-////                    public void run() {
-////                        if (adapter != null) {
-//////                    try {
-////                            adapter.notifyDataSetChanged();
-//////                    } catch (Exception e) {
-//////                        Log.d("TAg", e.getMessage());
-//////                    }
-////                        }
-////                    }
-////                });
-//            }
-//        });
-//        currentFriendsList.getFriendsList().observe(this, new Observer<List<User>>() {
-//            @Override
-//            public void onChanged(@Nullable List<User> list) {
-//                if (list != null) {
-//                    //update details
-//                    updateProfilePicture(list.getPictureUrl());
-//                    userNameHeader.setText(list.getFirstName() + " " + list.getLastName());
-//                    userEmailHeader.setText(list.getEmail());
-//                    userId = list.getId();
-////                    refreshList();
-//                } else {
-//                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-//                    startActivity(intent);
-//                    finish();
-//                }
-//            }
-//        });
         currentFriendsList = ViewModelProviders.of(this).get(FriendsViewModel.class);
         currentFriendsList.getFriendsList().observe(this, new Observer<List<User>>() {
             @Override
@@ -784,6 +730,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void makeToastShort(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
     }
+
     @Override
     public void makeToastLong(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();

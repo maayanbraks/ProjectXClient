@@ -92,6 +92,8 @@ public class LoginActivity extends Activity {
         String password = inputPassword.getText().toString();
 
 
+
+
         //DEFAULT
         email = DEFAULT_USER;
         password = DEFAULT_PASSWORD;

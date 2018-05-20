@@ -53,7 +53,6 @@ import static android.content.Context.MODE_PRIVATE;
 //Singleton
 public class Repository {
     private MutableLiveData<User> userLiveData;
-    private MutableLiveData<List<User>> FriendsLiveData;
     //private MutableLiveData<List<Event>> eventsData;
     private MutableLiveData<List<User>> friendsLiveData;
 
