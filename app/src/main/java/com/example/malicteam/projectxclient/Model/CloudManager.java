@@ -23,6 +23,8 @@ import io.socket.emitter.Emitter;
 
 import java.net.URISyntaxException;
 
+import static java.lang.Thread.sleep;
+
 /**
  * Created by Charcon on 02/05/2018.
  */
@@ -121,7 +123,7 @@ public class CloudManager {
             socket.on("Notification", new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-           handleLiveData((args.toString()));
+           handleLiveData((args[0].toString()));
             Log.d("TAG", "" + args[0]);
             //handleLiveData("" + args[0]);
         }
@@ -129,13 +131,23 @@ public class CloudManager {
 }
 
     public void handleLiveData(String data) { //here Live data responses (need to send to LiveData!
+        //Log.d("TAG","StringNotification:="+data);
         NotificationData rs = ProductTypeConverters.getObjectFromString(data, NotificationData.class);
+       // Log.d("TAG","StringNotification:="+data);
         Log.d("TAG","handleliveData--->rs.getnotificationType:="+rs.getNotificationType());
         switch (rs.getNotificationType()) {
             case EventInvitation:
                 EventInvitationNotificationData eventInvitationNotificationData=ProductTypeConverters.getObjectFromString(data, EventInvitationNotificationData.class);
                 //MainActivity.GetInvation(eventInvitationNotificationData);
-                mainActivityCallback.GotInvitation(new Event(eventInvitationNotificationData.getEventData()));
+                if (mainActivityCallback==null) {
+                    try {
+                        sleep(1000);
+                        mainActivityCallback.GotInvitation(new Event(eventInvitationNotificationData.getEventData()));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
                 return;
             case UserJoinEvent:
                 UserJoinEventNotification userJoinEventNotification= ProductTypeConverters.getObjectFromString(data, UserJoinEventNotification.class);

@@ -1,6 +1,7 @@
 package com.example.malicteam.projectxclient.Common;
 
 import android.arch.persistence.room.TypeConverter;
+import android.util.Log;
 
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Event;
@@ -73,8 +74,8 @@ public class ProductTypeConverters {
     }
     public static List<User> GenerateListUserFromListDataUser(List<UserData> usersData)
     {
-        List<User> users=new LinkedList<User>();
-        for (int i=0;i<users.size();i++)
+        List<User> users=new LinkedList<>();
+        for (int i=0;i<usersData.size();i++)
         {
             users.add(new User(usersData.get(i)));
         }
@@ -96,7 +97,8 @@ public class ProductTypeConverters {
 
             for (int i=0;i<event.getParticipats().size();i++)
             {
-                if (event.getAdminId().equals(event.getParticipats().get(i)))
+                Log.d("TAG","(event.getAdminId()="+(event.getAdminId())+"event.getParticipats().get(i).getEmail()"+event.getParticipats().get(i).getEmail());
+                if (event.getAdminId().equals(event.getParticipats().get(i).getEmail()))
                 {
                     return event.getParticipats().get(i).getFirstName();
                 }

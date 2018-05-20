@@ -645,10 +645,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //todo
         //open dialog with information
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MyApp.getContext());
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
 
         // set title
-        alertDialogBuilder.setTitle("You got new Invitation, from " + ProductTypeConverters.getAdminFirstNameByEmail(event));
+        alertDialogBuilder.setTitle("You got new Invitation, from " + event.getAdminId());
 
         // set dialog message
         alertDialogBuilder
@@ -672,15 +672,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 });
 
         // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
+        runOnUiThread(new Runnable() {
+                          @Override
+                          public void run() {
+                              AlertDialog alertDialog = alertDialogBuilder.create();
+                                  alertDialog.show();
+////                              }
+//
+                         }
+                     });
 
         // show it
-        if (!((Activity) MyApp.getContext()).isFinishing()) {
-            alertDialog.show();
+
+
         }
 
-
-    }
 
     @Override
     public void addFriend() {
