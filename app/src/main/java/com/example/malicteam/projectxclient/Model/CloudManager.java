@@ -159,7 +159,7 @@ public class CloudManager {
                 return;
             case EventClosed:
                 EventCloseNotificationData eventCloseNotificationData=ProductTypeConverters.getObjectFromString(data, EventCloseNotificationData.class);
-               recordingActivityCallback.eventClosed();
+               recordingActivityCallback.eventClosed(eventCloseNotificationData.getEventId());
                 return;
             default:
                 return;

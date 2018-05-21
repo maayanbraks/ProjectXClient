@@ -20,7 +20,10 @@ import android.webkit.URLUtil;
 
 import com.example.malicteam.projectxclient.Common.Callbacks.AddEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.AgreeToEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.CloseEventCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.CreateUserCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.DeclineToEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.EventListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.FriendsListCallback;
@@ -190,9 +193,9 @@ public class Repository {
         FirebaseModel.getEventById(id, callback);
     }
 
-    public void getEventRecordingStatus(int id, CloudManager.CloudCallback<List<Boolean>> callback) {
-        FirebaseModel.getEventRecordingStatus(id, callback);
-    }
+//    public void getEventRecordingStatus(int id, CloudManager.CloudCallback<List<Boolean>> callback) {
+//        FirebaseModel.getEventRecordingStatus(id, callback);
+//    }
 
 //    public void addFriend(String email, final CloudManager.CloudCallback<Boolean> cloudCallback) {
 //        FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -857,7 +860,7 @@ public class Repository {
                     editor.commit();
                 }
                 //return the complete student list to the caller
-                List<User> friends = AppLocalStoreDb.getLocalDatabase(MyApp.getContext()).UserDao().getAllFriends();
+             //   List<User> friends = AppLocalStoreDb.getLocalDatabase(MyApp.getContext()).UserDao().getAllFriends();
 
                 return friends;
             }
@@ -903,6 +906,77 @@ public class Repository {
                         }
                     }
                         callback.onSuccees(list);
+                        break;
+
+                    default:
+                        return;
+                }
+            }
+            @Override
+            public void onCancel() {
+            }
+        });
+    }
+    public void AgreeToInvite(int eventId,final AgreeToEventCallback<Boolean> callback) {
+        //Init the get friends/contacts list of  User (by email).
+        JoinEventRequestData joinEventRequestData = new JoinEventRequestData(userLiveData.getValue().getEmail(),eventId);
+        //send request
+        CM.sendToServer("Request", joinEventRequestData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String data) {
+                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
+                switch (responseData.getType()) {
+                    case Error:
+                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
+                        switch (errorResponseData.getErrorType()) {
+                            case UserIsNotExist:
+                                callback.UserIsNotExist();
+                                break;
+                            case NoPendingEvents:
+                                callback.NoPendingEvents();
+                                break;
+                            default:
+                                break;
+                        }
+                    case Boolean:
+                        callback.onSuccees(true);
+                        break;
+
+                    default:
+                        return;
+                }
+            }
+            @Override
+            public void onCancel() {
+            }
+        });
+    }
+    public void DeclineToInvite(int eventId,final DeclineToEventCallback<Boolean> callback) {
+        //Init the get friends/contacts list of  User (by email).
+        DeclineEventRequestData declineEventRequestData = new DeclineEventRequestData(userLiveData.getValue().getEmail(),eventId);
+        //send request
+        CM.sendToServer("Request", declineEventRequestData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String data) {
+                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
+                switch (responseData.getType()) {
+                    case Error:
+                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
+                        switch (errorResponseData.getErrorType()) {
+                            case UserIsNotExist:
+                                callback.UserIsNotExist();
+                                break;
+                            case NoPendingEvents:
+                                callback.NoPendingEvents();
+                                break;
+                            case TechnicalError:
+                                callback.TechnicalError();
+                                break;
+                            default:
+                                break;
+                        }
+                    case Boolean:
+                        callback.onSuccees(true);
                         break;
 
                     default:
@@ -975,6 +1049,43 @@ public class Repository {
         });
     }
 
+
+
+    public void CreateUser(User user,String credential, CreateUserCallback<Boolean> callback) {
+        CreateUserRequestData createUserRequestData = new CreateUserRequestData(user.getEmail(),credential,user.getFirstName(),user.getLastName(),user.getPhoneNumber(),null,null);
+        CM.sendToServer("Request", createUserRequestData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String data) {
+                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
+                switch (responseData.getType()) {
+                    case Error:
+                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
+                        switch (errorResponseData.getErrorType()) {
+                            case TechnicalError:
+                                callback.TechnicalError();
+                                return;
+                            case EmailAlreadyRegistered:
+                                callback.EmailAlreadyRegistered();
+                                return;
+                            default:
+                                return;
+                        }
+                    case Boolean:
+                        BooleanResponseData booleanResponseData = ProductTypeConverters.getObjectFromString(data, BooleanResponseData.class);
+                        if (booleanResponseData.getFlag())
+                            callback.onSuccees(true);
+                    default:
+                        break;
+                }
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+//    }
+        });
+    }
 
 
 }

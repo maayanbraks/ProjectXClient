@@ -12,6 +12,6 @@ import Notifications.UserLeaveEventNotification;
 public interface RecordingActivityCallback {
     void userJoinEvent(int userId);
     void userLeftEvent(int userId);
-    void eventClosed();
+    void eventClosed(int eventId);
 
 }
