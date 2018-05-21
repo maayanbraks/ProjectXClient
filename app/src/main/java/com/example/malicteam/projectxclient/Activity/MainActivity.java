@@ -75,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private final Class _mainFragmentClass = EventsListFragment.class;
     private Class _currentFragmentClass = _mainFragmentClass;
+    private int _mainNavView = R.id.nav_events_list;
+
+
 
     //    private List<Event> eventsList = new Link
     private TextView userNameHeader;
@@ -186,11 +189,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //Draw
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        for (int i = 0; i < navigationView.getMenu().size(); i++) {
-            if (navigationView.getMenu().getItem(i).getClass().getName().equals(_currentFragmentClass.getName())) {
-                navigationView.getMenu().getItem(i).setChecked(true);
-            }
-        }
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawer.addDrawerListener(toggle);
@@ -249,40 +247,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void openExitAlert() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(FriendsListActivity.this);
-//        builder.setTitle("Add New Friend");
-//        builder.setMessage("Enter Email:");
-//        builder.setView(input);
-//        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                emailString = input.getText().toString();
-//                Repository.instance.addFriend(emailString, new CloudManager.CloudCallback<Boolean>() {
-//                    @Override
-//                    public void onComplete(Boolean data) {
-//                        if (data) {
-//                            Toast.makeText(getApplicationContext(), "Added", Toast.LENGTH_SHORT).show();
-//                            refreshList();
-//                        } else
-//                            Toast.makeText(getApplicationContext(), "Cannot add to your friends right now, please try later...", Toast.LENGTH_LONG).show();
-//                    }
-//
-//                    @Override
-//                    public void onCancel() {
-//                        dialog.cancel();
-//                    }
-//                });
-//            }
-//        });
-//        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.cancel();
-//            }
-//        });
-//
-//        AlertDialog d = builder.create();
-//        d.show();
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         // set title
         alertDialogBuilder.setTitle("What?! Do you want to exit?");

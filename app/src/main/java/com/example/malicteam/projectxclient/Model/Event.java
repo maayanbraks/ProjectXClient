@@ -123,9 +123,9 @@ public class Event implements Serializable {
     {
         this.isRecording = true;
         //this.content = eventData.get;
-        this.title ="lala";
+        this.title =eventData.getTitle();
         this.participats = ProductTypeConverters.GenerateListUserFromListDataUser(eventData.getParticipants());
-        this.description = "lalall";
+        this.description = eventData.getDescription();
         this.adminId = adminId;
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:MM:SS");
         Date d = new Date();
