@@ -36,6 +36,8 @@ import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Common.Callbacks.AddEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.AgreeToEventCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.DeclineToEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.MainActivityCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
@@ -407,7 +409,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //tell server we agreed
 
         //get in to event.
-        getInEvent(event);
+
+        Repository.instance.AgreeToInvite(event.getId(), new AgreeToEventCallback<Boolean>() {
+            @Override
+            public void onSuccees(Boolean data) {
+                getInEvent(event);
+            }
+
+            @Override
+            public void NoPendingEvents() {
+                Toast.makeText(MyApp.getContext(), "Error:NoPendingEvents", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void UserIsNotExist() {
+                Toast.makeText(MyApp.getContext(), "Error:UserIsNotExist", Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
 //        Repository.instance.removeInvite(new FirebaseModel.Callback<Boolean>() {
 //            @Override
@@ -434,7 +453,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static void declineToInvite(Event event) {
         //TODO
         //tell server we declined.
+        Repository.instance.DeclineToInvite(event.getId(), new DeclineToEventCallback<Boolean>() {
+            @Override
+            public void onSuccees(Boolean data) {
+                Toast.makeText(MyApp.getContext(), "Refused.", Toast.LENGTH_SHORT).show();
+            }
 
+            @Override
+            public void TechnicalError() {
+                Toast.makeText(MyApp.getContext(), "Error:TechnicalError", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void NoPendingEvents() {
+                Toast.makeText(MyApp.getContext(), "Error:NoPendingEvents", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void UserIsNotExist() {
+                Toast.makeText(MyApp.getContext(), "Error:UserIsNotExist", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         //delete from invite DB
 //        Repository.instance.removeInvite(new CloudManager.CloudCallback<Boolean>() {
@@ -451,8 +490,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void getInEvent(Event event) {
+
         Intent intent;
         intent = new Intent(getApplicationContext(), RecordingActivity.class);
+        intent.putExtra(Consts.USER, currentUser.getUser().getValue());
         intent.putExtra("eventFromInvitation", event);
         // Log.d("Tag","eventID="+eventId);
         startActivity(intent);
@@ -609,10 +650,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //todo
         //open dialog with information
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MyApp.getContext());
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
 
         // set title
-        alertDialogBuilder.setTitle("You got new Invitation, from " + ProductTypeConverters.getAdminFirstNameByEmail(event));
+        alertDialogBuilder.setTitle("You got new Invitation, from " + event.getAdminId());
 
         // set dialog message
         alertDialogBuilder
@@ -636,15 +677,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 });
 
         // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
+        runOnUiThread(new Runnable() {
+                          @Override
+                          public void run() {
+                              AlertDialog alertDialog = alertDialogBuilder.create();
+                                  alertDialog.show();
+////                              }
+//
+                         }
+                     });
 
         // show it
-        if (!((Activity) MyApp.getContext()).isFinishing()) {
-            alertDialog.show();
+
+
         }
 
-
-    }
 
     @Override
     public void addFriend() {

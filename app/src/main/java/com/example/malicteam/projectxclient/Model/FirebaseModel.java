@@ -453,28 +453,28 @@ public class FirebaseModel {
 //        });
     }
 
-    public static void getEventRecordingStatus(int eventId, final CloudManager.CloudCallback<List<Boolean>> callback) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference idsListRef = database.getReference("Events").child(Integer.toString(eventId));
-        List<Boolean> checkStatus = new LinkedList<>();
-        idsListRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                Map<String, Object> value = (Map<String, Object>) dataSnapshot.getValue();
-                String recordingStatus = (String) value.get("RecordingStatus");
-                if (recordingStatus.equals("false")) {
-                    checkStatus.add(false);
-                    callback.onComplete(checkStatus);
-                }
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                callback.onComplete(null);
-            }
-        });
-    }
+//    public static void getEventRecordingStatus(int eventId, final CloudManager.CloudCallback<List<Boolean>> callback) {
+//        FirebaseDatabase database = FirebaseDatabase.getInstance();
+//        DatabaseReference idsListRef = database.getReference("Events").child(Integer.toString(eventId));
+//        List<Boolean> checkStatus = new LinkedList<>();
+//        idsListRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                Map<String, Object> value = (Map<String, Object>) dataSnapshot.getValue();
+//                String recordingStatus = (String) value.get("RecordingStatus");
+//                if (recordingStatus.equals("false")) {
+//                    checkStatus.add(false);
+//                    callback.onComplete(checkStatus);
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//                callback.onComplete(null);
+//            }
+//        });
+//    }
 
     public static void isExistUser(int id, final CloudManager.CloudCallback cloudCallback) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();

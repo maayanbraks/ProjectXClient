@@ -29,8 +29,8 @@ public class LoginActivity extends Activity {
     private Button btnSignup, btnLogin, btnReset;
 
 
-    private final String DEFAULT_USER = "RoeeMail";
-    private final String DEFAULT_PASSWORD = "F";
+    private final String DEFAULT_USER = "EdenMail";
+    private final String DEFAULT_PASSWORD = "D";
 
 
 

@@ -125,6 +125,7 @@ public class NewEventFragment extends Fragment {
                 event = new Event(null, title, null, description, "" + userId, dateFormat, null);
                 List<User> participats=new LinkedList<>();
                 participats.add(myUser);
+                UsersInvites.add(myUser.getEmail());
                 event.setParticipats(participats);
 //                    sendInvites("" + event.getId());
                 //Repository.instance.addEvent(event);
@@ -198,6 +199,7 @@ public class NewEventFragment extends Fragment {
                                            public void onSuccees(String data) {
                                                if(invitedPpl.equals(" "))
                                                    invitedPpl = data;
+                                               UsersInvites.add(parti);
                                                InviteTextViewEdit(view);
                                                Log.d("TAG", "In addevent-->neweventfragment----> OnSucess");
                                                Log.d("TAG", "Sucseed found user, added him");

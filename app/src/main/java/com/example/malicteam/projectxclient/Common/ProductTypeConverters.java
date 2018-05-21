@@ -1,12 +1,17 @@
 package com.example.malicteam.projectxclient.Common;
 
 import android.arch.persistence.room.TypeConverter;
+import android.util.Log;
 
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.User;
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -73,8 +78,8 @@ public class ProductTypeConverters {
     }
     public static List<User> GenerateListUserFromListDataUser(List<UserData> usersData)
     {
-        List<User> users=new LinkedList<User>();
-        for (int i=0;i<users.size();i++)
+        List<User> users=new LinkedList<>();
+        for (int i=0;i<usersData.size();i++)
         {
             users.add(new User(usersData.get(i)));
         }
@@ -96,7 +101,8 @@ public class ProductTypeConverters {
 
             for (int i=0;i<event.getParticipats().size();i++)
             {
-                if (event.getAdminId().equals(event.getParticipats().get(i)))
+                Log.d("TAG","(event.getAdminId()="+(event.getAdminId())+"event.getParticipats().get(i).getEmail()"+event.getParticipats().get(i).getEmail());
+                if (event.getAdminId().equals(event.getParticipats().get(i).getEmail()))
                 {
                     return event.getParticipats().get(i).getFirstName();
                 }
@@ -104,5 +110,15 @@ public class ProductTypeConverters {
         }
 
         return null;
+    }
+    public static byte[] convertFileToByte(File file) throws IOException {
+        //init array with file length
+        byte[] bytesArray = new byte[(int) file.length()];
+
+        FileInputStream fis = new FileInputStream(file);
+        fis.read(bytesArray); //read file into bytes[]
+        fis.close();
+
+        return bytesArray;
     }
 }
