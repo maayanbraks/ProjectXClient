@@ -443,11 +443,16 @@ public class RecordingActivity extends AppCompatActivity {
     public void userHasJoinTheEvent(int userId) {
         for (int i=0;i<event.getParticipats().size();i++)
         {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+//                    Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName()+" "+event.getParticipats().get(i).getLastName()+",just joined", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplication(), userId+",just joined", Toast.LENGTH_LONG).show();
+                }
+            });
 //            if (event.getParticipats().get(i).get()==userId)
             //{
-                Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName()+" "+event.getParticipats().get(i).getLastName()+",just joined", Toast.LENGTH_LONG).show();
-            //}
-            Toast.makeText(getApplication(), userId+",just joined", Toast.LENGTH_LONG).show();
+
         }
     }
     public void userHasLeftTheEvent(int userId) {

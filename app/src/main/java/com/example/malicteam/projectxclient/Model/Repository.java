@@ -8,6 +8,7 @@ import ResponsesEntitys.UserData;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -992,7 +993,7 @@ public class Repository {
             CM.setRecordingCallback(callback);
 
         }
-    public void InitMainActivityCallback(final MainActivityCallback callback) {
+    public void InitMainActivityCallback(final Observer<Event> callback) {
         CM.setMainActivityCallback(callback);
     }
 
@@ -1051,7 +1052,7 @@ public class Repository {
 
 
 
-    public void CreateUser(User user,String credential, CreateUserCallback<Boolean> callback) {
+    public void createUser(User user, String credential, CreateUserCallback<Boolean> callback) {
         CreateUserRequestData createUserRequestData = new CreateUserRequestData(user.getEmail(),credential,user.getFirstName(),user.getLastName(),user.getPhoneNumber(),null,null);
         CM.sendToServer("Request", createUserRequestData, new CloudManager.CloudCallback<String>() {
             @Override

@@ -7,7 +7,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.InstrumentationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -76,9 +75,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ResetPasswordFragment.ResetPasswordListener, AddFriendFragment.AddFriendInteraction {
 
     private final Class _mainFragmentClass = EventsListFragment.class;
-    private Class _currentFragmentClass = _mainFragmentClass;
-    private int _mainNavView = R.id.nav_events_list;
-
+    private final int _mainNavId = R.id.nav_events_list;
 
 
     //    private List<Event> eventsList = new Link
@@ -148,12 +145,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, Consts.REQUEST_WRITE_STORAGE);
         }
 
-        Repository.instance.InitMainActivityCallback(new MainActivityCallback() {
+//        Repository.instance.InitMainActivityCallback(new MainActivityCallback() {
+//            @Override
+//            public void GotInvitation(Event event) {
+//                GetInvation(event);אל
+//            }
+//        });
+        Repository.instance.InitMainActivityCallback(new Observer<Event>() {
             @Override
-            public void GotInvitation(Event event) {
-                GetInvation(event);
+            public void onChanged(Event data) {
+                GetInvation(data);
             }
         });
+
 //        eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            @Override
 //            public void onItemClick(Adapte
@@ -201,6 +205,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void loadMainFragment() {
+        if(this.currentItem != null) {
+            this.currentItem.setChecked(false);
+        }
+        this.currentItem = navigationView.getMenu().findItem(_mainNavId);
+        navigationView.getMenu().findItem(_mainNavId).setChecked(true);
+
         Bundle bundle = new Bundle();
         bundle.putSerializable(Consts.USER, currentUser.getUser().getValue());
         Fragment mainFragment = null;

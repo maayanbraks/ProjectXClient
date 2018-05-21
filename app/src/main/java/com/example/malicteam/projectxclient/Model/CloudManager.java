@@ -1,5 +1,6 @@
 package com.example.malicteam.projectxclient.Model;
 
+import android.arch.lifecycle.Observer;
 import android.util.Log;
 
 //import com.github.nkzawa.emitter.Emitter;
@@ -40,7 +41,7 @@ public class CloudManager {
     private final String SERVER_ADDRESS = "http://193.106.55.95:8080";
     private CloudCallback<String> localCallbackCloudManager;
     private RecordingActivityCallback recordingActivityCallback;
-    private MainActivityCallback mainActivityCallback;
+    private Observer<Event> mainActivityCallback;
     private Socket socket;
     static final int PORT = 8888;
     private boolean isConnected;
@@ -70,11 +71,13 @@ public class CloudManager {
     public void setConnected(boolean connected) {
         isConnected = connected;
     }
+
     public void setRecordingCallback(final RecordingActivityCallback callback) {
-        this.recordingActivityCallback =callback;
+        this.recordingActivityCallback = callback;
     }
-    public void setMainActivityCallback(final MainActivityCallback callback) {
-        this.mainActivityCallback =callback;
+
+    public void setMainActivityCallback(final Observer<Event> callback) {
+        this.mainActivityCallback = callback;
     }
 
 
@@ -120,29 +123,29 @@ public class CloudManager {
             }
         });
 
-            socket.on("Notification", new Emitter.Listener() {
-        @Override
-        public void call(Object... args) {
-           handleLiveData((args[0].toString()));
-            Log.d("TAG", "" + args[0]);
-            //handleLiveData("" + args[0]);
-        }
-    });
-}
+        socket.on("Notification", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                handleLiveData((args[0].toString()));
+                Log.d("TAG", "" + args[0]);
+                //handleLiveData("" + args[0]);
+            }
+        });
+    }
 
     public void handleLiveData(String data) { //here Live data responses (need to send to LiveData!
         //Log.d("TAG","StringNotification:="+data);
         NotificationData rs = ProductTypeConverters.getObjectFromString(data, NotificationData.class);
-       // Log.d("TAG","StringNotification:="+data);
-        Log.d("TAG","handleliveData--->rs.getnotificationType:="+rs.getNotificationType());
+        // Log.d("TAG","StringNotification:="+data);
+        Log.d("TAG", "handleliveData--->rs.getnotificationType:=" + rs.getNotificationType());
         switch (rs.getNotificationType()) {
             case EventInvitation:
-                EventInvitationNotificationData eventInvitationNotificationData=ProductTypeConverters.getObjectFromString(data, EventInvitationNotificationData.class);
+                EventInvitationNotificationData eventInvitationNotificationData = ProductTypeConverters.getObjectFromString(data, EventInvitationNotificationData.class);
                 //MainActivity.GetInvation(eventInvitationNotificationData);
-                if (mainActivityCallback==null) {
+                if (mainActivityCallback == null) {
                     try {
                         sleep(1000);
-                        mainActivityCallback.GotInvitation(new Event(eventInvitationNotificationData.getEventData()));
+                        mainActivityCallback.onChanged(new Event(eventInvitationNotificationData.getEventData()));
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -150,16 +153,16 @@ public class CloudManager {
                 }
                 return;
             case UserJoinEvent:
-                UserJoinEventNotification userJoinEventNotification= ProductTypeConverters.getObjectFromString(data, UserJoinEventNotification.class);
+                UserJoinEventNotification userJoinEventNotification = ProductTypeConverters.getObjectFromString(data, UserJoinEventNotification.class);
                 recordingActivityCallback.userJoinEvent(userJoinEventNotification.getUserId());
                 return;
             case UserLeaveEvent:
-                UserLeaveEventNotification userLeaveEventNotification= ProductTypeConverters.getObjectFromString(data, UserLeaveEventNotification.class);
+                UserLeaveEventNotification userLeaveEventNotification = ProductTypeConverters.getObjectFromString(data, UserLeaveEventNotification.class);
                 recordingActivityCallback.userLeftEvent(userLeaveEventNotification.getUserId());
                 return;
             case EventClosed:
-                EventCloseNotificationData eventCloseNotificationData=ProductTypeConverters.getObjectFromString(data, EventCloseNotificationData.class);
-               recordingActivityCallback.eventClosed(eventCloseNotificationData.getEventId());
+                EventCloseNotificationData eventCloseNotificationData = ProductTypeConverters.getObjectFromString(data, EventCloseNotificationData.class);
+                recordingActivityCallback.eventClosed(eventCloseNotificationData.getEventId());
                 return;
             default:
                 return;
