@@ -38,9 +38,11 @@ import com.example.malicteam.projectxclient.View.Dialogs.LogoutDialogFragment;
 import com.example.malicteam.projectxclient.ViewModel.FriendsViewModel;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.sql.Date;
@@ -60,18 +62,12 @@ public class Repository {
     //private MutableLiveData<List<Event>> eventsData;
     private MutableLiveData<List<User>> friendsLiveData;
 
-    private CloudManager CM;
     private List<User> friends = null;//holds local users
 
     public static final Repository instance = new Repository();
     private LocalStorageManager localStorage = new LocalStorageManager();
 
     public Repository() {
-        try {
-            CM = new CloudManager();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
     }
 
 //    public LiveData<User> getUser(int id) {
@@ -136,7 +132,7 @@ public class Repository {
                 getFriendsFromServer(new FriendsListCallback<List<User>>() {
                     @Override
                     public void onSuccees(List<User> data) {
-                        if(data != null) {
+                        if (data != null) {
                             friendsLiveData.postValue(data);
                             callback.onComplete(friendsLiveData);
                         }
@@ -292,7 +288,6 @@ public class Repository {
 //            }
 //        });
 //    }
-
 
 
     public void getEvents(int userId, CloudManager.CloudCallback<List<Event>> cloudCallback) {
@@ -579,11 +574,10 @@ public class Repository {
 //    }
 
 
-
-//New Server Methods
+    //New Server Methods
     public void logIn(String username, String password, final LogInCallback<User> callback) {
         LoginRequestData loginRequestData = new LoginRequestData(username, password);
-        CM.loginRequest(loginRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.loginRequest(loginRequestData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String response) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(response, ResponseData.class);
@@ -616,6 +610,7 @@ public class Repository {
                         break;
                 }
             }
+
             @Override
             public void onCancel() {
             }
@@ -624,9 +619,9 @@ public class Repository {
 
     public void EditFriendList(LinkedList<String> friendList, EditFriendListCallback callback) {
         //init request
-        EditContactsListRequestData editContactsListRequestData = new EditContactsListRequestData(userLiveData.getValue().getEmail(),friendList);
+        EditContactsListRequestData editContactsListRequestData = new EditContactsListRequestData(userLiveData.getValue().getEmail(), friendList);
         //send request
-        CM.sendToServer("Request", editContactsListRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", editContactsListRequestData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
@@ -660,13 +655,13 @@ public class Repository {
             }
 
         });
-}
+    }
 
     public void addFriend(String email, AddFriendCallback<Boolean> callback) {
         //init request
         AddFriendRequestData addFriendRequestData = new AddFriendRequestData(userLiveData.getValue().getEmail(), email);
         //send request
-        CM.sendToServer("Request", addFriendRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", addFriendRequestData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
@@ -700,17 +695,19 @@ public class Repository {
                         break;
                 }
             }
+
             @Override
             public void onCancel() {
             }
         });
     }
+
     //getFriends1
     public void getFriendsFromServer(final FriendsListCallback<List<User>> callback) {
         //Init the get friends/contacts list of  User (by email).
         ContactsListRequestData contactsListRequestData = new ContactsListRequestData(userLiveData.getValue().getEmail());
         //send request
-        CM.sendToServer("Request", contactsListRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", contactsListRequestData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
@@ -731,7 +728,7 @@ public class Repository {
                         ContactsListResponseData response = ProductTypeConverters.getObjectFromString(data, ContactsListResponseData.class);
                         //convert UserData to User
                         LinkedList<User> list = new LinkedList<User>();
-                        for (UserData userData:response.getContacts()) {
+                        for (UserData userData : response.getContacts()) {
                             list.add(new User(userData));
                         }
                         callback.onSuccees(list);
@@ -741,20 +738,22 @@ public class Repository {
                         return;
                 }
             }
+
             @Override
             public void onCancel() {
             }
         });
     }
-    public void getUserIfExist(String email,final isUserExistResponeCallback callback) {
+
+    public void getUserIfExist(String email, final isUserExistResponeCallback callback) {
         //Init the get friends/contacts list of  User (by email).
-        IsUserExistRequestData IsUserExistResponseData = new IsUserExistRequestData(userLiveData.getValue().getEmail(),email);
+        IsUserExistRequestData IsUserExistResponseData = new IsUserExistRequestData(userLiveData.getValue().getEmail(), email);
         //send request
-        CM.sendToServer("Request", IsUserExistResponseData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", IsUserExistResponseData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
-                Log.d("TAG","oiasdjadjdjkaspdojaspdojasdojassdoj+gettype="+responseData.getType());
+                Log.d("TAG", "oiasdjadjdjkaspdojaspdojasdojassdoj+gettype=" + responseData.getType());
                 switch (responseData.getType()) {
                     case Error:
                         ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
@@ -769,7 +768,7 @@ public class Repository {
                                 break;
                         }
                     case IsUserExistResponse:
-                        Log.d("TAG","IsUserExistResponeseoasjdsodjdsjdodjasd");
+                        Log.d("TAG", "IsUserExistResponeseoasjdsodjdsjdodjasd");
                         IsUserExistResponseData response = ProductTypeConverters.getObjectFromString(data, IsUserExistResponseData.class);
                         callback.onSuccees(response.getUserData());
                         break;
@@ -778,18 +777,36 @@ public class Repository {
                         return;
                 }
             }
+
             @Override
             public void onCancel() {
-                Log.d("TAG","on cancel in getuserifexist funcs in Reposotiry");
+                Log.d("TAG", "on cancel in getuserifexist funcs in Reposotiry");
             }
         });
     }
-    public void closeEvent(String[] protocol,int eventId,final CloseEventCallback callback) {
+
+    public void closeEvent(String[] protocol, int eventId, String filePath, final CloseEventCallback callback) {
+        //init File to byte[]
+        File file = new File(filePath);
+        int fileSize = (int) file.length();
+        byte[] audioBytes = new byte[fileSize];
+        try {
+            BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
+            buf.read(audioBytes, 0, audioBytes.length);
+            buf.close();
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         //Init the get friends/contacts list of  User (by email).
-        CloseEventRequestData closeEventRequestData = new CloseEventRequestData(userLiveData.getValue().getEmail(),eventId,new String[]{""});
+        CloseEventRequestData closeEventRequestData = new CloseEventRequestData(userLiveData.getValue().getEmail(), eventId, audioBytes);
 
         //send request
-        CM.sendToServer("Request", closeEventRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", closeEventRequestData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
@@ -815,19 +832,19 @@ public class Repository {
                         return;
                 }
             }
+
             @Override
             public void onCancel() {
             }
         });
     }
 
-    public void deleteFromFriends(User friend)
-    {
+    public void deleteFromFriends(User friend) {
         friendsLiveData.getValue().remove(friend);
     }
 
 
-//CLASSES
+    //CLASSES
     class MyTask extends AsyncTask<List<User>, String, List<User>> {
         @Override
         protected List<User> doInBackground(List<User>[] lists) {
@@ -861,7 +878,7 @@ public class Repository {
                     editor.commit();
                 }
                 //return the complete student list to the caller
-             //   List<User> friends = AppLocalStoreDb.getLocalDatabase(MyApp.getContext()).UserDao().getAllFriends();
+                //   List<User> friends = AppLocalStoreDb.getLocalDatabase(MyApp.getContext()).UserDao().getAllFriends();
 
                 return friends;
             }
@@ -880,7 +897,7 @@ public class Repository {
         //Init the get friends/contacts list of  User (by email).
         EventsListRequestData eventsListRequestData = new EventsListRequestData(userLiveData.getValue().getEmail());
         //send request
-        CM.sendToServer("Request", eventsListRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", eventsListRequestData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
@@ -901,11 +918,11 @@ public class Repository {
                         EventsListResponseData response = ProductTypeConverters.getObjectFromString(data, EventsListResponseData.class);
 //                        convert UserData to User
                         LinkedList<Event> list = new LinkedList<Event>();
-                        if (response.getEvents().size()>0) {
-                        for (EventData eventData : response.getEvents()) {
-                            list.add(new Event(eventData));
+                        if (response.getEvents().size() > 0) {
+                            for (EventData eventData : response.getEvents()) {
+                                list.add(new Event(eventData));
+                            }
                         }
-                    }
                         callback.onSuccees(list);
                         break;
 
@@ -913,50 +930,54 @@ public class Repository {
                         return;
                 }
             }
-            @Override
-            public void onCancel() {
-            }
-        });
-    }
-    public void AgreeToInvite(int eventId,final AgreeToEventCallback<Boolean> callback) {
-        //Init the get friends/contacts list of  User (by email).
-        JoinEventRequestData joinEventRequestData = new JoinEventRequestData(userLiveData.getValue().getEmail(),eventId);
-        //send request
-        CM.sendToServer("Request", joinEventRequestData, new CloudManager.CloudCallback<String>() {
-            @Override
-            public void onComplete(String data) {
-                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
-                switch (responseData.getType()) {
-                    case Error:
-                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
-                        switch (errorResponseData.getErrorType()) {
-                            case UserIsNotExist:
-                                callback.UserIsNotExist();
-                                break;
-                            case NoPendingEvents:
-                                callback.NoPendingEvents();
-                                break;
-                            default:
-                                break;
-                        }
-                    case Boolean:
-                        callback.onSuccees(true);
-                        break;
 
-                    default:
-                        return;
-                }
-            }
             @Override
             public void onCancel() {
             }
         });
     }
-    public void DeclineToInvite(int eventId,final DeclineToEventCallback<Boolean> callback) {
+
+    public void AgreeToInvite(int eventId, final AgreeToEventCallback<Boolean> callback) {
+//        //Init the get friends/contacts list of  User (by email).
+//        EventRequestDa joinEventRequestData = new JoinEventRequestData(userLiveData.getValue().getEmail(), eventId);
+//        //send request
+//        CloudManager.instance.sendToServer("Request", joinEventRequestData, new CloudManager.CloudCallback<String>() {
+//            @Override
+//            public void onComplete(String data) {
+//                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
+//                switch (responseData.getType()) {
+//                    case Error:
+//                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
+//                        switch (errorResponseData.getErrorType()) {
+//                            case UserIsNotExist:
+//                                callback.UserIsNotExist();
+//                                break;
+//                            case NoPendingEvents:
+//                                callback.NoPendingEvents();
+//                                break;
+//                            default:
+//                                break;
+//                        }
+//                    case Boolean:
+//                        callback.onSuccees(true);
+//                        break;
+//
+//                    default:
+//                        return;
+//                }
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//            }
+//        });
+    }
+
+    public void DeclineToInvite(int eventId, final DeclineToEventCallback<Boolean> callback) {
         //Init the get friends/contacts list of  User (by email).
-        DeclineEventRequestData declineEventRequestData = new DeclineEventRequestData(userLiveData.getValue().getEmail(),eventId);
+        DeclineEventRequestData declineEventRequestData = new DeclineEventRequestData(userLiveData.getValue().getEmail(), eventId);
         //send request
-        CM.sendToServer("Request", declineEventRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", declineEventRequestData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
@@ -984,23 +1005,26 @@ public class Repository {
                         return;
                 }
             }
+
             @Override
             public void onCancel() {
             }
         });
     }
-        public void InitCallbacksForCloudManeger(final RecordingActivityCallback callback) {
-            CM.setRecordingCallback(callback);
 
-        }
+    public void InitCallbacksForCloudManeger(final RecordingActivityCallback callback) {
+        CloudManager.instance.setRecordingCallback(callback);
+
+    }
+
     public void InitMainActivityCallback(final Observer<Event> callback) {
-        CM.setMainActivityCallback(callback);
+        CloudManager.instance.setMainActivityCallback(callback);
     }
 
 
-    public void addEvent(List<String> usersMails,Event event,final AddEventCallback<Boolean> callback) {
-        CreateEventRequestData createEventRequestData = new CreateEventRequestData(userLiveData.getValue().getEmail(),usersMails,event.getTitle(), event.getDescription());
-        CM.sendToServer("Request", createEventRequestData, new CloudManager.CloudCallback<String>() {
+    public void addEvent(List<String> usersMails, Event event, final AddEventCallback<Boolean> callback) {
+        CreateEventRequestData createEventRequestData = new CreateEventRequestData(userLiveData.getValue().getEmail(), usersMails, event.getTitle(), event.getDescription());
+        CloudManager.instance.sendToServer("Request", createEventRequestData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String response) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(response, ResponseData.class);
@@ -1051,10 +1075,9 @@ public class Repository {
     }
 
 
-
     public void createUser(User user, String credential, CreateUserCallback<Boolean> callback) {
-        CreateUserRequestData createUserRequestData = new CreateUserRequestData(user.getEmail(),credential,user.getFirstName(),user.getLastName(),user.getPhoneNumber(),null,null);
-        CM.sendToServer("Request", createUserRequestData, new CloudManager.CloudCallback<String>() {
+        CreateUserRequestData createUserRequestData = new CreateUserRequestData(user.getEmail(), credential, user.getFirstName(), user.getLastName(), user.getPhoneNumber(), null, null);
+        CloudManager.instance.sendToServer("Request", createUserRequestData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);

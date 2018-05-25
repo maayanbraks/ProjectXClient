@@ -37,6 +37,8 @@ public class CloudManager {
         void onCancel();
     }
 
+    public static final CloudManager instance = new CloudManager();
+
     //    private final String SERVER_ADDRESS = "http://192.168.27.1:8080";
     private final String SERVER_ADDRESS = "http://193.106.55.95:8080";
     private CloudCallback<String> localCallbackCloudManager;
@@ -46,9 +48,13 @@ public class CloudManager {
     static final int PORT = 8888;
     private boolean isConnected;
 
-    public CloudManager() throws URISyntaxException {
-        isConnected = connectToServer();
-        if (isConnected) ;
+    public CloudManager() {
+        try {
+            isConnected = connectToServer();
+            if (isConnected) ;
+        } catch (Exception e) {
+            Log.d("TAG", "Cloud Manager CTOR -> " + e.getMessage());
+        }
     }
 
     //Primitives Methods
@@ -185,7 +191,7 @@ public class CloudManager {
     public void loginRequest(Object obj, final CloudCallback<String> cloudManagerCallback) {
         localCallbackCloudManager = cloudManagerCallback;
         String jsonString = ProductTypeConverters.getStringFromObject(obj);
-        Log.d("TAG", "sendEvent " + jsonString);
+        Log.d("TAG", "sendLoginEvent " + jsonString);
         socket.emit("Login", jsonString);
     }
 

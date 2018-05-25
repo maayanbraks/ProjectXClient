@@ -15,6 +15,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Common.Callbacks.CreateUserCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.LogInCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.View.Dialogs.PictureDialogFragment;
@@ -73,7 +74,6 @@ public class SignupActivity extends AppCompatActivity {
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 //Get Input to Strings
                 String email = inputEmail.getText().toString().trim();
                 String password = inputPassword.getText().toString().trim();
