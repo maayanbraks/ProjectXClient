@@ -137,7 +137,7 @@ public class RecordingActivity extends AppCompatActivity {
                 });
 
         if (getIntent().getSerializableExtra("sendNewEvent") != null) {
-            eventtemp = (Event) getIntent().getSerializableExtra("sendNewEvent");
+            eventtemp = (Event) getIntent().getSerializableExtra(Consts.SEND_EVENT);
             event = eventtemp;
             SetEventFromNewActivity();
             FromInvitation = false;

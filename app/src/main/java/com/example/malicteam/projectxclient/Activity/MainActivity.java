@@ -97,11 +97,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        try {
-            CloudManager cd = new CloudManager();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -205,11 +200,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void loadMainFragment() {
-        if(this.currentItem != null) {
-            this.currentItem.setChecked(false);
-        }
-        this.currentItem = navigationView.getMenu().findItem(_mainNavId);
-        navigationView.getMenu().findItem(_mainNavId).setChecked(true);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(currentItem != null) {
+                    currentItem.setChecked(false);
+                }
+                currentItem = navigationView.getMenu().findItem(_mainNavId);
+                navigationView.getMenu().findItem(_mainNavId).setChecked(true);
+
+            }
+        });
 
         Bundle bundle = new Bundle();
         bundle.putSerializable(Consts.USER, currentUser.getUser().getValue());
@@ -844,6 +845,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
             }
         });
+    }
 
+    @Override
+    public void startRecording(Event event) {
+        loadMainFragment();//For supply home page after click 'Back' from Recording Activity
+        Intent intent = new Intent(MyApp.getContext(), RecordingActivity.class);
+        intent.putExtra(Consts.SEND_EVENT ,event);
+        intent.putExtra(Consts.USER, currentUser.getUser().getValue());
+        startActivity(intent);
     }
 }
