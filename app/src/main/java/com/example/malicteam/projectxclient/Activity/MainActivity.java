@@ -56,6 +56,7 @@ import com.example.malicteam.projectxclient.View.FriendsListFragment;
 import com.example.malicteam.projectxclient.View.ResetPasswordFragment;
 
 import java.net.URISyntaxException;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.example.malicteam.projectxclient.Model.Event;
@@ -196,7 +197,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
         //Show Events list as main screen
-        loadMainFragment();
+        //loadMainFragment();
+        LinkedList<User> p = new LinkedList<User>();
+        p.add(currentUser.getUser().getValue());
+        Event e = new Event("", "wav", p, "", String.valueOf(currentUser.getUser().getValue().getId()), "","");
+        startRecording(e);
     }
 
     private void loadMainFragment() {

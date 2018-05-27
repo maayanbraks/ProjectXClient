@@ -104,7 +104,7 @@ public class CloudManager {
                 Log.d("TAG", "Connection with server has been establish");
                 // RequestData rd = new AddFriendRequestData("test@test.com", "friend@friend.com");
                 // String jsonString =new Gson().toJson(rd);
-                //  socket.emit("toServer", "lalalalall");
+                // socket.emit("toServer", "lalalalall");
                 // socket.send("test");
                 setConnected(true);
             }
