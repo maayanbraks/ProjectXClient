@@ -38,7 +38,6 @@ import ResponsesEntitys.UserData;
 
 public class NewEventFragment extends Fragment {
     private NewEventInteraction mListener;
-    private int userId;
     private UserViewModel currentUser = null;
     private List<String> UsersInvites;
     private Button startRecord;
@@ -71,7 +70,6 @@ public class NewEventFragment extends Fragment {
         UsersInvites = new LinkedList<String>();
         invitedPpl = new String(" ");
 
-        userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
 //        currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
 //        currentUser.init(userId, true);
 //        currentUser.getUser().observe(this, new Observer<User>() {
@@ -122,11 +120,11 @@ public class NewEventFragment extends Fragment {
                 //DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                 Date date = new Date();
                 String dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime());
-                event = new Event(null, title, null, description, "" + userId, dateFormat, null);
-                List<User> participats = new LinkedList<>();
-                participats.add(myUser);
+
+                List<User> participents = new LinkedList<>();
+                participents.add(myUser);
                 UsersInvites.add(myUser.getEmail());
-                event.setParticipats(participats);
+                event = new Event(null, title, participents, description, String.valueOf(myUser.getId()), dateFormat, null);
 //                    sendInvites("" + event.getId());
                 //Repository.instance.addEvent(event);
                 //UsersInvites.add(myUser.getEmail());

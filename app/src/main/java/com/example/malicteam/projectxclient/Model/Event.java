@@ -49,6 +49,7 @@ public class Event implements Serializable {
     public void setParticipats(List<User> participats) {
         this.participats = participats;
     }
+
     @Ignore
     private List<User> participats;
     private String recordURL;
@@ -58,12 +59,12 @@ public class Event implements Serializable {
     private boolean isRecording;
     private static final long serialVersionUID = 1L;
 
-    public Event(){
+    public Event() {
         this.id = 0;
         this.title = "";
         //       this.content = "";
         this.date = "";
-        participats=new LinkedList<User>();
+        participats = new LinkedList<User>();
         this.recordURL = "";
         this.adminId = "";
         this.description = "";
@@ -72,7 +73,7 @@ public class Event implements Serializable {
     }
 
     @Ignore
-    public Event(String content, String title, LinkedList<User> participats, String description, String adminId, String time, String url) {
+    public Event(String content, String title, List<User> participats, String description, String adminId, String time, String url) {
         this.isRecording = true;
         //    this.content = content;
         this.title = title;
@@ -88,7 +89,7 @@ public class Event implements Serializable {
 
     }
 
-    public Event(String content, String title, LinkedList<User> participats, String description, String adminId, String time, int id, String url) {
+    public Event(String content, String title, List<User> participats, String description, String adminId, String time, int id, String url) {
         this.isRecording = true;
         //     this.content = content;
         this.title = title;
@@ -103,8 +104,9 @@ public class Event implements Serializable {
         this.recordURL = url;
 
     }
+
     @Ignore
-    public Event(String content, String title, LinkedList<User> participats, String description, String adminId, String time, String id, String url) {
+    public Event(String content, String title, List<User> participats, String description, String adminId, String time, String id, String url) {
         this.isRecording = true;
         //      this.content = content;
         this.title = title;
@@ -119,11 +121,11 @@ public class Event implements Serializable {
         this.recordURL = url;
 
     }
-    public Event(EventData eventData)
-    {
+
+    public Event(EventData eventData) {
         this.isRecording = true;
         //this.content = eventData.get;
-        this.title =eventData.getTitle();
+        this.title = eventData.getTitle();
         this.participats = ProductTypeConverters.GenerateListUserFromListDataUser(eventData.getParticipants());
         this.description = eventData.getDescription();
         this.adminId = eventData.getAdminMail();
@@ -151,10 +153,10 @@ public class Event implements Serializable {
         return id;
     }
 
-    public void addToParticipats(User user)
-    {
+    public void addToParticipats(User user) {
         this.participats.add(user);
     }
+
     public String getTitle() {
         return title;
     }

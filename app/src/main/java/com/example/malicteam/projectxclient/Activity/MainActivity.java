@@ -77,9 +77,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private final Class _mainFragmentClass = EventsListFragment.class;
     private final int _mainNavId = R.id.nav_events_list;
-
-
-    //    private List<Event> eventsList = new Link
     private TextView userNameHeader;
     private TextView userEmailHeader;
     private NavigationView navigationView;
@@ -89,10 +86,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int userId;
     private View headerLayout;
     private DrawerLayout mDrawer;
-
-    //New Server
-//    private User mUser = null;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -122,7 +115,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     userNameHeader.setText(user.getFirstName() + " " + user.getLastName());
                     userEmailHeader.setText(user.getEmail());
                     userId = user.getId();
-//                    refreshList();
                 } else {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);
@@ -141,29 +133,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, Consts.REQUEST_WRITE_STORAGE);
         }
 
-//        Repository.instance.InitMainActivityCallback(new MainActivityCallback() {
-//            @Override
-//            public void GotInvitation(Event event) {
-//                GetInvation(event);אל
-//            }
-//        });
         Repository.instance.InitMainActivityCallback(new Observer<Event>() {
             @Override
             public void onChanged(Event data) {
                 GetInvation(data);
             }
         });
-
-//        eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(Adapte
-// rView<?> parent, View view, int position, long id) {
-//                Event event = eventsList.get(position);
-//                Intent intent = new Intent(getApplicationContext(), EventDetails.class);
-//                intent.putExtra(Consts.SEND_EVENT, event);
-//                startActivity(intent);
-//            }
-//        });
 
         //End of
         //Floating add button
@@ -196,12 +171,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mDrawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        //Show Events list as main screen
-        //loadMainFragment();
-        LinkedList<User> p = new LinkedList<User>();
-        p.add(currentUser.getUser().getValue());
-        Event e = new Event("", "wav", p, "", String.valueOf(currentUser.getUser().getValue().getId()), "","");
-        startRecording(e);
+        //Show main screen
+        loadMainFragment();
     }
 
     private void loadMainFragment() {
