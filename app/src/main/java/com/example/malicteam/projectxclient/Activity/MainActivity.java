@@ -145,10 +145,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, Consts.REQUEST_WRITE_STORAGE);
         }
 
-        Repository.instance.InitMainActivityCallback(new MainActivityCallback() {
+        Repository.instance.InitMainActivityCallback(new Observer<Event>() {
             @Override
-            public void GotInvitation(Event event) {
-                GetInvation(event);
+            public void onChanged(Event data) {
+                GetInvation(data);
             }
         });
 //        eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

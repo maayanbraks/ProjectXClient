@@ -1,5 +1,6 @@
 package com.example.malicteam.projectxclient.Model;
 
+import android.arch.lifecycle.Observer;
 import android.util.Log;
 
 //import com.github.nkzawa.emitter.Emitter;
@@ -40,7 +41,7 @@ public class CloudManager {
     private final String SERVER_ADDRESS = "http://193.106.55.95:8080";
     private CloudCallback<String> localCallbackCloudManager;
     private RecordingActivityCallback recordingActivityCallback;
-    private MainActivityCallback mainActivityCallback;
+    private Observer<Event> mainActivityCallback;
     private Socket socket;
     static final int PORT = 8888;
     private boolean isConnected;
@@ -73,7 +74,7 @@ public class CloudManager {
     public void setRecordingCallback(final RecordingActivityCallback callback) {
         this.recordingActivityCallback =callback;
     }
-    public void setMainActivityCallback(final MainActivityCallback callback) {
+    public void setMainActivityCallback(final Observer<Event> callback) {
         this.mainActivityCallback =callback;
     }
 
@@ -120,7 +121,7 @@ public class CloudManager {
             }
         });
 
-            socket.on("Notification", new Emitter.Listener() {
+        socket.on("Notification", new Emitter.Listener() {
         @Override
         public void call(Object... args) {
            handleLiveData((args[0].toString()));
@@ -142,12 +143,14 @@ public class CloudManager {
                 if (mainActivityCallback==null) {
                     try {
                         sleep(1000);
-                        mainActivityCallback.GotInvitation(new Event(eventInvitationNotificationData.getEventData()));
+                        mainActivityCallback.onChanged(new Event(eventInvitationNotificationData.getEventData()));
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
 
-                }
+
+                }else
+                    mainActivityCallback.onChanged(new Event(eventInvitationNotificationData.getEventData()));
                 return;
             case UserJoinEvent:
                 UserJoinEventNotification userJoinEventNotification= ProductTypeConverters.getObjectFromString(data, UserJoinEventNotification.class);

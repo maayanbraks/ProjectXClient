@@ -46,6 +46,7 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Observer;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -992,7 +993,7 @@ public class Repository {
             CM.setRecordingCallback(callback);
 
         }
-    public void InitMainActivityCallback(final MainActivityCallback callback) {
+    public void InitMainActivityCallback(final android.arch.lifecycle.Observer<Event> callback) {
         CM.setMainActivityCallback(callback);
     }
 
