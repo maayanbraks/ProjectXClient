@@ -5,6 +5,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.AudioFormat;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Environment;
@@ -39,10 +40,7 @@ import java.util.List;
 import android.Manifest;
 
 import UpdateObjects.CloseEvent;
-import cafe.adriel.androidaudioconverter.AndroidAudioConverter;
-import cafe.adriel.androidaudioconverter.callback.IConvertCallback;
-import cafe.adriel.androidaudioconverter.callback.ILoadCallback;
-import cafe.adriel.androidaudioconverter.model.AudioFormat;
+
 
 public class RecordingActivity extends AppCompatActivity {
     private UserViewModel currentUser = null;
@@ -147,7 +145,7 @@ public class RecordingActivity extends AppCompatActivity {
             SetEventFromInvitation(event);
             FromInvitation=true;
         }
-        convertAccToWavInit(); //init the converter.
+//        convertAccToWavInit(); //init the converter.
         //
 //        if (!(eventIdTogetIn.equals(" "))) //means got enter by invite
 //        {
@@ -267,12 +265,12 @@ public class RecordingActivity extends AppCompatActivity {
 
 
             Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
-            try {
-                byte byteFile[]=ProductTypeConverters.convertFileToByte(convertFromAccToWav());
-            } catch (IOException e) {
-                Log.d("TAG","File in Stop Recording -Making bytefile"+e);
-                e.printStackTrace();
-            }
+//            try {
+//                byte byteFile[]=ProductTypeConverters.convertFileToByte(convertFromAccToWav());
+//            } catch (IOException e) {
+//                Log.d("TAG","File in Stop Recording -Making bytefile"+e);
+//                e.printStackTrace();
+//            }
             //TODO
             ////change the protocol in closeevent to Bytefile,
             Repository.instance.closeEvent(null,event.getId(), new CloseEventCallback() {
@@ -322,36 +320,36 @@ public class RecordingActivity extends AppCompatActivity {
             }
         return false;
     }
-    private File convertFromAccToWav() {
-        File flacFile = new File(Environment.getExternalStorageDirectory(), mFileName);
-        IConvertCallback callback = new IConvertCallback() {
-            @Override
-            public void onSuccess(File convertedFile) {
-                // So fast? Love it!
-                Log.d("TAG","On sucess in convertFromAccToWav ");
-                //run the func that convert into String and then send to Server
-            }
-            @Override
-            public void onFailure(Exception error) {
-                Log.d("TAG","On failure in convertFromAccToWav ");
-                // Oops! Something went wrong
-            }
-        };
-        AndroidAudioConverter.with(this)
-                // Your current audio file
-                .setFile(flacFile)
-
-                // Your desired audio format
-                .setFormat(AudioFormat.WAV)
-
-                // An callback to know when conversion is finished
-                // An callback to know when conversion is finished
-                .setCallback(callback)
-
-                // Start conversion
-                .convert();
-        return flacFile;
-    }
+//    private File convertFromAccToWav() {
+//        File flacFile = new File(Environment.getExternalStorageDirectory(), mFileName);
+//        IConvertCallback callback = new IConvertCallback() {
+//            @Override
+//            public void onSuccess(File convertedFile) {
+//                // So fast? Love it!
+//                Log.d("TAG","On sucess in convertFromAccToWav ");
+//                //run the func that convert into String and then send to Server
+//            }
+//            @Override
+//            public void onFailure(Exception error) {
+//                Log.d("TAG","On failure in convertFromAccToWav ");
+//                // Oops! Something went wrong
+//            }
+//        };
+//        AndroidAudioConverter.with(this)
+//                // Your current audio file
+//                .setFile(flacFile)
+//
+//                // Your desired audio format
+//                .setFormat(AudioFormat.WAV)
+//
+//                // An callback to know when conversion is finished
+//                // An callback to know when conversion is finished
+//                .setCallback(callback)
+//
+//                // Start conversion
+//                .convert();
+//        return flacFile;
+//    }
 
 //    private byte[] uploadFile() {
 //        Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
@@ -471,18 +469,18 @@ public class RecordingActivity extends AppCompatActivity {
         recordOrSave();
         //stop recording...
     }
-    public void convertAccToWavInit() {
-        AndroidAudioConverter.load(this, new ILoadCallback() {
-            @Override
-            public void onSuccess() {
-                // Great!
-            }
-            @Override
-            public void onFailure(Exception error) {
-                // FFmpeg is not supported by device
-            }
-        });
-    }
+//    public void convertAccToWavInit() {
+//        AndroidAudioConverter.load(this, new ILoadCallback() {
+//            @Override
+//            public void onSuccess() {
+//                // Great!
+//            }
+//            @Override
+//            public void onFailure(Exception error) {
+//                // FFmpeg is not supported by device
+//            }
+//        });
+//    }
 
 
 //    public void CheckRecordingStatus() {
