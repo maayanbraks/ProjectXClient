@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
+import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Event;
@@ -378,9 +379,15 @@ public class RecordingActivity extends AppCompatActivity {
 
     public void StopRecordingByAdmin() {
         //notify user about that
+<<<<<<< Updated upstream
         Toast.makeText(getApplication(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
         recordOrSave();
+=======
+        Toast.makeText(MyApp.getContext(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
+
+>>>>>>> Stashed changes
         //stop recording...
+        recordOrSave();
     }
 
     public void CheckRecordingStatus() {
