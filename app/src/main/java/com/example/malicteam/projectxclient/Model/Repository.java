@@ -36,7 +36,7 @@ import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.View.Dialogs.LogoutDialogFragment;
 import com.example.malicteam.projectxclient.ViewModel.FriendsViewModel;
-import com.google.firebase.auth.FirebaseAuth;
+//import com.google.firebase.auth.FirebaseAuth;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -182,13 +182,13 @@ public class Repository {
 //        return someUser.get(someUser.size() - 1);
 //    }
 
-    public void getUserById(int id, final CloudManager.CloudCallback<List<User>> callback) {
-        FirebaseModel.getUserById(id, callback);
-    }
-
-    public void getEventById(int id, final CloudManager.CloudCallback<List<Event>> callback) {
-        FirebaseModel.getEventById(id, callback);
-    }
+//    public void getUserById(int id, final CloudManager.CloudCallback<List<User>> callback) {
+//        FirebaseModel.getUserById(id, callback);
+//    }
+//
+//    public void getEventById(int id, final CloudManager.CloudCallback<List<Event>> callback) {
+//        FirebaseModel.getEventById(id, callback);
+//    }
 
 //    public void getEventRecordingStatus(int id, CloudManager.CloudCallback<List<Boolean>> callback) {
 //        FirebaseModel.getEventRecordingStatus(id, callback);
@@ -290,20 +290,20 @@ public class Repository {
 //    }
 
 
-    public void getEvents(int userId, CloudManager.CloudCallback<List<Event>> cloudCallback) {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        FirebaseModel.getEvents(userId, new CloudManager.CloudCallback<List<Event>>() {
-            @Override
-            public void onComplete(List<Event> data) {
-                cloudCallback.onComplete(data);
-            }
-
-            @Override
-            public void onCancel() {
-                cloudCallback.onCancel();
-            }
-        });
-    }
+//    public void getEvents(int userId, CloudManager.CloudCallback<List<Event>> cloudCallback) {
+//        FirebaseAuth auth = FirebaseAuth.getInstance();
+//        FirebaseModel.getEvents(userId, new CloudManager.CloudCallback<List<Event>>() {
+//            @Override
+//            public void onComplete(List<Event> data) {
+//                cloudCallback.onComplete(data);
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//                cloudCallback.onCancel();
+//            }
+//        });
+//    }
 
     private void updateFriendsDataInLocalStorage(List<User> data) {
         MyTask task = new MyTask();
@@ -339,79 +339,79 @@ public class Repository {
 //            }
 //        });
 //    }
-
-    public void changeUserDetails(String firstName, String lastName, String email, String phone, final CloudManager.CloudCallback<String> cloudCallback) {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        int userId = User.generateId(auth.getCurrentUser().getEmail());
-
-        String str = "";
-
-        if (firstName != null) {
-            FirebaseModel.setFirstName(userId, firstName);
-            str += "First Name ";
-        }
-        if (lastName != null) {
-            FirebaseModel.setLastName(userId, lastName);
-            str += "Last Name ";
-        }
-        if (email != null) {
-            FirebaseModel.setEmail(userId, email);
-            str += "Email ";
-        }
-        if (phone != null) {
-            FirebaseModel.setPhone(userId, phone);
-            str += "Phone ";
-        }
-
-        cloudCallback.onComplete(str);
-    }
-
-
-    public void setPictureUrl(Bitmap bitmap, final CloudManager.CloudCallback<Boolean> cloudCallback) {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        int id = User.generateId(auth.getCurrentUser().getEmail());
-        FirebaseModel.setPictureUrl(id, bitmap, cloudCallback);
-    }
-
-    public void saveRecord(String Path, String eventId, final Model.SaveAudioListener listener, CloudManager.CloudCallback callback) {
-        FirebaseModel.saveRecord(Path, eventId, listener, callback);
-    }
-
-    public void saveRecord(String userId, String Path, String eventId, final Model.SaveAudioListener listener, CloudManager.CloudCallback callback) {
-        FirebaseModel.saveRecord(userId, Path, eventId, listener, callback);
-    }
-
-    public void removeAccount(final CloudManager.CloudCallback<Boolean> cloudCallback) {
-        FirebaseModel.removeAccount(cloudCallback);
-    }
-
-    public void removeInvite(final CloudManager.CloudCallback<Boolean> callback, Invite invite) {
-        FirebaseModel.removeInvite(callback, invite);
-    }
-
-
-    public void addNewUserToDB(User user, final CloudManager.CloudCallback cloudCallback) {
-        FirebaseModel.addUser(user, cloudCallback);
-    }
-
-    public void addNewInvite(Invite invite, final CloudManager.CloudCallback callback) {
-        FirebaseModel.addInvite(invite);
-    }
-
-    public void getInvite(String id, final CloudManager.CloudCallback callback, FirebaseModel.GetInvitation invitation) {
-        FirebaseModel.getInvite(id, invitation);
-
-    }
-
-    public void setEventList(User user, CloudManager.CloudCallback callback) {
-        FirebaseModel.setEventList(user, callback);
-
-    }
-
-    public void setRecodrdingStatus(String eventId, CloudManager.CloudCallback callback) {
-        FirebaseModel.setRecordingStatus(eventId, callback);
-
-    }
+//
+//    public void changeUserDetails(String firstName, String lastName, String email, String phone, final CloudManager.CloudCallback<String> cloudCallback) {
+//        FirebaseAuth auth = FirebaseAuth.getInstance();
+//        int userId = User.generateId(auth.getCurrentUser().getEmail());
+//
+//        String str = "";
+//
+//        if (firstName != null) {
+//            FirebaseModel.setFirstName(userId, firstName);
+//            str += "First Name ";
+//        }
+//        if (lastName != null) {
+//            FirebaseModel.setLastName(userId, lastName);
+//            str += "Last Name ";
+//        }
+//        if (email != null) {
+//            FirebaseModel.setEmail(userId, email);
+//            str += "Email ";
+//        }
+//        if (phone != null) {
+//            FirebaseModel.setPhone(userId, phone);
+//            str += "Phone ";
+//        }
+//
+//        cloudCallback.onComplete(str);
+//    }
+//
+//
+//    public void setPictureUrl(Bitmap bitmap, final CloudManager.CloudCallback<Boolean> cloudCallback) {
+//        FirebaseAuth auth = FirebaseAuth.getInstance();
+//        int id = User.generateId(auth.getCurrentUser().getEmail());
+//        FirebaseModel.setPictureUrl(id, bitmap, cloudCallback);
+//    }
+//
+//    public void saveRecord(String Path, String eventId, final Model.SaveAudioListener listener, CloudManager.CloudCallback callback) {
+//        FirebaseModel.saveRecord(Path, eventId, listener, callback);
+//    }
+//
+//    public void saveRecord(String userId, String Path, String eventId, final Model.SaveAudioListener listener, CloudManager.CloudCallback callback) {
+//        FirebaseModel.saveRecord(userId, Path, eventId, listener, callback);
+//    }
+//
+//    public void removeAccount(final CloudManager.CloudCallback<Boolean> cloudCallback) {
+//        FirebaseModel.removeAccount(cloudCallback);
+//    }
+//
+//    public void removeInvite(final CloudManager.CloudCallback<Boolean> callback, Invite invite) {
+//        FirebaseModel.removeInvite(callback, invite);
+//    }
+//
+//
+//    public void addNewUserToDB(User user, final CloudManager.CloudCallback cloudCallback) {
+//        FirebaseModel.addUser(user, cloudCallback);
+//    }
+//
+//    public void addNewInvite(Invite invite, final CloudManager.CloudCallback callback) {
+//        FirebaseModel.addInvite(invite);
+//    }
+//
+//    public void getInvite(String id, final CloudManager.CloudCallback callback, FirebaseModel.GetInvitation invitation) {
+//        FirebaseModel.getInvite(id, invitation);
+//
+//    }
+//
+//    public void setEventList(User user, CloudManager.CloudCallback callback) {
+//        FirebaseModel.setEventList(user, callback);
+//
+//    }
+//
+//    public void setRecodrdingStatus(String eventId, CloudManager.CloudCallback callback) {
+//        FirebaseModel.setRecordingStatus(eventId, callback);
+//
+//    }
 
 //    public LiveData<List<User>> initFriendsList() {
 //        synchronized (this) {
@@ -430,85 +430,85 @@ public class Repository {
 //        return friendsLiveData;
 //    }
 
+//
+//    public void logout() {
+//        userLiveData = null;
+//        FirebaseAuth auth = FirebaseAuth.getInstance();
+//        auth.signOut();
+//    }
 
-    public void logout() {
-        userLiveData = null;
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        auth.signOut();
-    }
+//    public void getProfilePicture(String url, final CloudManager.CloudCallback<Bitmap> cloudCallback) {
+//        if (url == null || url.equals("")) {
+//            cloudCallback.onCancel();
+//        } else {
+//            //check if image exsist localy
+//            String fileName = URLUtil.guessFileName(url, null, null);
+//            Bitmap image = localStorage.loadImageFromFile(fileName);
+//
+//            if (image != null) {
+//                cloudCallback.onComplete(image);
+//            } else {
+//                FirebaseModel.getImage(url, new CloudManager.CloudCallback<Bitmap>() {
+//                    @Override
+//                    public void onComplete(Bitmap data) {
+//                        cloudCallback.onComplete(data);
+//                    }
+//
+//                    @Override
+//                    public void onCancel() {
+//                        cloudCallback.onCancel();
+//                    }
+//                });
+//            }
+//        }
+//    }
 
-    public void getProfilePicture(String url, final CloudManager.CloudCallback<Bitmap> cloudCallback) {
-        if (url == null || url.equals("")) {
-            cloudCallback.onCancel();
-        } else {
-            //check if image exsist localy
-            String fileName = URLUtil.guessFileName(url, null, null);
-            Bitmap image = localStorage.loadImageFromFile(fileName);
-
-            if (image != null) {
-                cloudCallback.onComplete(image);
-            } else {
-                FirebaseModel.getImage(url, new CloudManager.CloudCallback<Bitmap>() {
-                    @Override
-                    public void onComplete(Bitmap data) {
-                        cloudCallback.onComplete(data);
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        cloudCallback.onCancel();
-                    }
-                });
-            }
-        }
-    }
-
-    //Default user (connected user)
-    public void getProfilePicture(final CloudManager.CloudCallback<Bitmap> cloudCallback) {
-        String url = userLiveData.getValue().getPictureUrl();
-        if (url == null || url.equals("")) {
-            cloudCallback.onCancel();
-        } else {
-            //check if image exsist localy
-            String fileName = URLUtil.guessFileName(url, null, null);
-            Bitmap image = localStorage.loadImageFromFile(fileName);
-
-            if (image != null) {
-                cloudCallback.onComplete(image);
-            } else {
-                FirebaseModel.getImage(url, new CloudManager.CloudCallback<Bitmap>() {
-                    @Override
-                    public void onComplete(Bitmap data) {
-                        cloudCallback.onComplete(data);
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        cloudCallback.onCancel();
-                    }
-                });
-            }
-        }
-    }
-
-    public void saveProfilePicture(Bitmap bitmap, String email, final CloudManager.CloudCallback cloudCallback) {
-
-        FirebaseModel.saveImage(bitmap, User.generateId(email), new Model.SaveImageListener() {
-            @Override
-            public void complete(String url) {
-                String fileName = URLUtil.guessFileName(url, null, null);
-                localStorage.saveImageToFile(bitmap, fileName);
-                cloudCallback.onComplete(url);
-                Log.d("sad", "profile pic saved locally & onFirebase & added to gallery");
-            }
-
-            @Override
-            public void fail() {
-                cloudCallback.onCancel();
-            }
-        });
-    }
-
+//    //Default user (connected user)
+//    public void getProfilePicture(final CloudManager.CloudCallback<Bitmap> cloudCallback) {
+//        String url = userLiveData.getValue().getPictureUrl();
+//        if (url == null || url.equals("")) {
+//            cloudCallback.onCancel();
+//        } else {
+//            //check if image exsist localy
+//            String fileName = URLUtil.guessFileName(url, null, null);
+//            Bitmap image = localStorage.loadImageFromFile(fileName);
+//
+//            if (image != null) {
+//                cloudCallback.onComplete(image);
+//            } else {
+//                FirebaseModel.getImage(url, new CloudManager.CloudCallback<Bitmap>() {
+//                    @Override
+//                    public void onComplete(Bitmap data) {
+//                        cloudCallback.onComplete(data);
+//                    }
+//
+//                    @Override
+//                    public void onCancel() {
+//                        cloudCallback.onCancel();
+//                    }
+//                });
+//            }
+//        }
+//    }
+//
+//    public void saveProfilePicture(Bitmap bitmap, String email, final CloudManager.CloudCallback cloudCallback) {
+//
+//        FirebaseModel.saveImage(bitmap, User.generateId(email), new Model.SaveImageListener() {
+//            @Override
+//            public void complete(String url) {
+//                String fileName = URLUtil.guessFileName(url, null, null);
+//                localStorage.saveImageToFile(bitmap, fileName);
+//                cloudCallback.onComplete(url);
+//                Log.d("sad", "profile pic saved locally & onFirebase & added to gallery");
+//            }
+//
+//            @Override
+//            public void fail() {
+//                cloudCallback.onCancel();
+//            }
+//        });
+//    }
+//
 
     private void addPictureToGallery(File imageFile) {
 //add the picture to the gallery so we dont need to manage the cache size
@@ -557,15 +557,15 @@ public class Repository {
 //        }
 //        return eventsData;
 //    }
-
-    public void addEvent(Event event) {
-        //TODO add locally DB
-        //TODO create Content file and save locally
-        //TODO save firebase content
-        String url = "";
-
-        FirebaseModel.addNewEvent(event);
-    }
+//
+//    public void addEvent(Event event) {
+//        //TODO add locally DB
+//        //TODO create Content file and save locally
+//        //TODO save firebase content
+//        String url = "";
+//
+//        FirebaseModel.addNewEvent(event);
+//    }
 
 //    public File getContentFile(){
 //

@@ -7,8 +7,8 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+//import com.google.firebase.database.DatabaseReference;
+//import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONArray;
 

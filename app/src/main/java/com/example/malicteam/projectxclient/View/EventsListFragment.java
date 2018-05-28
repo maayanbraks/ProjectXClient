@@ -150,18 +150,18 @@ public class EventsListFragment extends Fragment {
     }
 
     private void refreshList() {
-        Repository.instance.getEvents(_userId, new CloudManager.CloudCallback<List<Event>>() {
-            @Override
-            public void onComplete(List<Event> data) {
-                eventsList = data;
-                if (adapter != null)
-                    adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancel() {
-            }
-        });
+//        Repository.instance.getEvents(_userId, new CloudManager.CloudCallback<List<Event>>() {
+//            @Override
+//            public void onComplete(List<Event> data) {
+//                eventsList = data;
+//                if (adapter != null)
+//                    adapter.notifyDataSetChanged();
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//            }
+//        });
     }
 
     public interface EventListListener {

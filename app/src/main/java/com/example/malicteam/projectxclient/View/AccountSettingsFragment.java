@@ -132,23 +132,23 @@ public class AccountSettingsFragment extends Fragment {
         }
     }
     private void initProfilePicture() {
-        Repository.instance.getProfilePicture(
-                new CloudManager.CloudCallback<Bitmap>() {
-                    @Override
-                    public void onComplete(Bitmap data) {
-                        if (data != null) {
-                            profilePicture.setImageBitmap(data);
-                        } else {
-                            profilePicture.setImageResource(R.drawable.outalk_logo);
-                        }
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        profilePicture.setImageResource(R.drawable.outalk_logo);
-                    }
-                }
-        );
+//        Repository.instance.getProfilePicture(
+//                new CloudManager.CloudCallback<Bitmap>() {
+//                    @Override
+//                    public void onComplete(Bitmap data) {
+//                        if (data != null) {
+//                            profilePicture.setImageBitmap(data);
+//                        } else {
+//                            profilePicture.setImageResource(R.drawable.outalk_logo);
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancel() {
+//                        profilePicture.setImageResource(R.drawable.outalk_logo);
+//                    }
+//                }
+//        );
     }
     private void initButtons(View view) {
         Button changeDetailsAccount = (Button) view.findViewById(R.id.changeButton_editAccount);
@@ -252,32 +252,32 @@ public class AccountSettingsFragment extends Fragment {
         });
     }
     private void saveProfilePicture(View view){
-        Repository.instance.saveProfilePicture(bitmap, viewModel.getUser().getValue().getEmail(), new CloudManager.CloudCallback<String>() {
-            @Override
-            public void onComplete(String url) {
-                if (url != null)
-                    Repository.instance.setPictureUrl(bitmap, new CloudManager.CloudCallback<Boolean>() {
-                        @Override
-                        public void onComplete(Boolean data) {
-                            if (data == true) {
-                                Button changePicture = (Button) view.findViewById(R.id.changePictureButton_editAccount);
-                                changePicture.setClickable(false);
-                                Toast.makeText(getActivity(), "Your picture uploaded", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-
-                        @Override
-                        public void onCancel() {
-
-                        }
-                    });
-                else
-                    Toast.makeText(getActivity(), "There is problem with the picture", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onCancel() {
-            }
-        });
+//        Repository.instance.saveProfilePicture(bitmap, viewModel.getUser().getValue().getEmail(), new CloudManager.CloudCallback<String>() {
+//            @Override
+//            public void onComplete(String url) {
+//                if (url != null)
+//                    Repository.instance.setPictureUrl(bitmap, new CloudManager.CloudCallback<Boolean>() {
+//                        @Override
+//                        public void onComplete(Boolean data) {
+//                            if (data == true) {
+//                                Button changePicture = (Button) view.findViewById(R.id.changePictureButton_editAccount);
+//                                changePicture.setClickable(false);
+//                                Toast.makeText(getActivity(), "Your picture uploaded", Toast.LENGTH_SHORT).show();
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onCancel() {
+//
+//                        }
+//                    });
+//                else
+//                    Toast.makeText(getActivity(), "There is problem with the picture", Toast.LENGTH_SHORT).show();
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//            }
+//        });
     }
 }

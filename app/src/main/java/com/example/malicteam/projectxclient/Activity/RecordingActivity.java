@@ -285,8 +285,8 @@ public class RecordingActivity extends AppCompatActivity {
         partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
 //        mFileName += "/outalk" + event.getId() + ".acc";
         SetActivity();
-        //  CheckRecordingStatus();
-        //check if me as admin
+//        CheckRecordingStatus();
+//        check if me as admin
     }
 
     public void SetActivity() {
@@ -306,10 +306,10 @@ public class RecordingActivity extends AppCompatActivity {
         if (!(CheckMeAdmin())) {
             recordingButton.setClickable(false);
             playingButton.setClickable(false);
-
-        } else {
-            startRecordOrSaveIt();
         }
+//        } else {
+//            startRecordOrSaveIt();
+//        }
     }
 
     public void userHasJoinTheEvent(int userId) {

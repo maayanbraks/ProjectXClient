@@ -23,21 +23,21 @@ public class RemoveAccountDialogFragment extends DialogFragment{
         builder.setMessage("Are you sure you want be removed???\n")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Repository.instance.removeAccount(new CloudManager.CloudCallback<Boolean>() {
-                            @Override
-                            public void onComplete(Boolean data) {
-                                if(data != null) {
-                                    startActivity(new Intent(getActivity().getApplicationContext(), LoginActivity.class));
-                                    Toast.makeText(getActivity().getApplicationContext(), "We will miss you :(", Toast.LENGTH_LONG).show();
-                                    getActivity().finish();
-                                }
-                            }
-
-                            @Override
-                            public void onCancel() {
-                                Toast.makeText(getActivity().getApplicationContext(), "Cancel", Toast.LENGTH_LONG).show();
-                            }
-                        });
+//                        Repository.instance.removeAccount(new CloudManager.CloudCallback<Boolean>() {
+//                            @Override
+//                            public void onComplete(Boolean data) {
+//                                if(data != null) {
+//                                    startActivity(new Intent(getActivity().getApplicationContext(), LoginActivity.class));
+//                                    Toast.makeText(getActivity().getApplicationContext(), "We will miss you :(", Toast.LENGTH_LONG).show();
+//                                    getActivity().finish();
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onCancel() {
+//                                Toast.makeText(getActivity().getApplicationContext(), "Cancel", Toast.LENGTH_LONG).show();
+//                            }
+//                        });
                     }
                 })
                 .setNegativeButton("Cancel and Stay login", new DialogInterface.OnClickListener() {
