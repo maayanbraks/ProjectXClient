@@ -123,13 +123,13 @@ public class Event implements Serializable {
     {
         this.isRecording = true;
         //this.content = eventData.get;
-        this.title ="lala";
+        this.title =eventData.getTitle();
         this.participats = ProductTypeConverters.GenerateListUserFromListDataUser(eventData.getParticipants());
-        this.description = "lalall";
-        this.adminId = adminId;
+        this.description = eventData.getDescription();
+        this.adminId = eventData.getAdminMail();
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:MM:SS");
         Date d = new Date();
-        this.date = eventData.getDateCreated().toString();
+        this.date = eventData.getDateCreated();
         this.id = eventData.getId();
         this.EventStartTime = " ";
         this.recordURL = " ";

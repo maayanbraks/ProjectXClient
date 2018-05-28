@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.malicteam.projectxclient.Common.Callbacks.FriendsListCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Model.CloudManager;
@@ -25,7 +26,7 @@ import com.example.malicteam.projectxclient.R;
 import ResponsesEntitys.UserData;
 
 public class FriendDetailsFragment extends Fragment {
-    private OnFragmentInteractionListener mListener;
+    private FriendsListFragment.FriendsFragmentInteraction mListener;
     private User user = null;
     private ImageView profilePicture;
     private Bitmap bitmap = null;
@@ -73,20 +74,21 @@ public class FriendDetailsFragment extends Fragment {
                     builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Repository.instance.deleteFromFriends(user.getId(), new CloudManager.CloudCallback<Boolean>() {
-                                @Override
-                                public void onComplete(Boolean data) {
-                                    if (data) {
-                                        Toast.makeText(MyApp.getContext(), "Deleted", Toast.LENGTH_SHORT).show();
-                                    } else
-                                        Toast.makeText(MyApp.getContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
-                                }
-
-                                @Override
-                                public void onCancel() {
-                                    dialog.cancel();
-                                }
-                            });
+                            mListener.deleteFriend(user);
+//                            Repository.instance.deleteFromFriends(user.getId(), new CloudManager.CloudCallback<Boolean>() {
+//                                @Override
+//                                public void onComplete(Boolean data) {
+//                                    if (data) {
+//                                        Toast.makeText(MyApp.getContext(), "Deleted", Toast.LENGTH_SHORT).show();
+//                                    } else
+//                                        Toast.makeText(MyApp.getContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
+//                                }
+//
+//                                @Override
+//                                public void onCancel() {
+//                                    dialog.cancel();
+//                                }
+//                            });
 
                         }
                     })
@@ -102,21 +104,14 @@ public class FriendDetailsFragment extends Fragment {
         });
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
-
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof FriendsListFragment.FriendsFragmentInteraction) {
+            mListener = (FriendsListFragment.FriendsFragmentInteraction)context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement NewEventInteraction");
         }
     }
 
@@ -124,11 +119,6 @@ public class FriendDetailsFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 
     private void initDetails(User user, View view) {

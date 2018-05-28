@@ -29,6 +29,12 @@ public class User implements Serializable {
     private String lastName;
     private String lastLogin;
     private String phoneNumber;
+
+    @NonNull
+    public int getId() {
+        return id;
+    }
+
     private String email;
     private String friendsIds;
     private String eventsIds;
@@ -113,6 +119,7 @@ public class User implements Serializable {
         Date date = new Date();
         this.lastLogin = dateFormat.format(date);
         this.pictureUrl = userdata.getPictureURL();
+        this.id=132;
         //this.eventsIds = new LinkedList<Integer>();
 
 //        if (friendsIds != null)
@@ -276,9 +283,9 @@ public class User implements Serializable {
         this.lastName = lastName;
     }
 
-    public int getId() {
-        return 123;
-    }
+//    public int getId() {
+//        return 123;
+//    }
 
     public void setId() {
         this.id = generateId(email);

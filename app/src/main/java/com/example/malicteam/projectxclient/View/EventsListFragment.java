@@ -18,6 +18,7 @@ import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.Repository;
+import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.R;
 
 import java.util.LinkedList;
@@ -130,7 +131,7 @@ public class EventsListFragment extends Fragment {
             mListener = (EventListListener) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnFragmentInteractionListener");
+                    + " must implement NewEventInteraction");
         }
 
         _userId = getArguments().getInt(Consts.USER_ID);
@@ -202,9 +203,15 @@ public class EventsListFragment extends Fragment {
                 });
                 TextView _nameEvent = view.findViewById(R.id._nameEvent);
                 TextView _date = view.findViewById(R.id._date);
+                TextView _parti = view.findViewById(R.id._participates);
 
                 _nameEvent.setText(event.getTitle());
                 _date.setText(event.getDate());
+                String participants = _parti.getText().toString() + " ";
+                for (User u : event.getParticipats()) {
+                    participants += u.getFirstName() + " " + u.getLastName() + "\n";
+                }
+                _parti.setText(participants);
             }
 
             return view;

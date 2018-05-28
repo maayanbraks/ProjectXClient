@@ -29,8 +29,8 @@ public class LoginActivity extends Activity {
     private Button btnSignup, btnLogin, btnReset;
 
 
-    private final String DEFAULT_USER = "GalMail";
-    private final String DEFAULT_PASSWORD = "B";
+    private final String DEFAULT_USER = "RoeeMail";
+    private final String DEFAULT_PASSWORD = "F";
 
 
 
@@ -90,6 +90,8 @@ public class LoginActivity extends Activity {
         //get Inputs
         String email = inputEmail.getText().toString();
         String password = inputPassword.getText().toString();
+
+
 
 
         //DEFAULT

@@ -6,8 +6,7 @@ package com.example.malicteam.projectxclient.Common.Callbacks;
 
 
 public interface AddEventCallback<T>{
-    void onSuccees(Boolean bool);
+    void onSuccees(T data);
     void userIsNotExist();
     void technicalError();
-
 }

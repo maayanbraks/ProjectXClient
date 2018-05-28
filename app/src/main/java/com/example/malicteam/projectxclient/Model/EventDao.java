@@ -20,8 +20,8 @@ public interface EventDao {
 //    @Query("SELECT * FROM events WHERE events.participats LIKE '%'+:userId+'%' ")
 //    List<Event> getAllUserEvents(int userId);
 
-    @Query("SELECT * FROM events WHERE events.id = :eventId")
-    Event getEvent(int eventId);
+//    @Query("SELECT * FROM events WHERE events.id = :eventId")
+//    Event getEvent(int eventId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void saveEvent(Event event);

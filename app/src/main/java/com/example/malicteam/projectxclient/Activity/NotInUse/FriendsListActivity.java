@@ -54,7 +54,7 @@
 ////
 ////        friendsViewModel = ViewModelProviders.of(this).get(FriendsViewModel.class);
 ////        friendsViewModel.init(userId);
-////        friendsViewModel.getFriends().observe(this, new Observer<List<User>>() {
+////        friendsViewModel.initFriendsList().observe(this, new Observer<List<User>>() {
 ////            @Override
 ////            public void onChanged(@Nullable List<User> users) {
 ////                friendsList = users;

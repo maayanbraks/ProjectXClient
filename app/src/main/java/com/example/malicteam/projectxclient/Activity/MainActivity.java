@@ -33,9 +33,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.malicteam.projectxclient.Common.Callbacks.AddEventCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.AgreeToEventCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.DeclineToEventCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.MainActivityCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.CloudManager;
+import com.example.malicteam.projectxclient.View.Dialogs.AddFriendFragment;
 import com.example.malicteam.projectxclient.View.NewEventFragment;
 import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
 import com.example.malicteam.projectxclient.Common.Consts;
@@ -53,19 +61,22 @@ import java.util.List;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.Model.Repository;
+import com.example.malicteam.projectxclient.ViewModel.FriendsViewModel;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
 import Notifications.EventInvitationNotificationData;
-
+import ResponsesEntitys.UserData;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.EventListListener,
-        FriendsListFragment.friendsFragmentInteraction, NewEventFragment.OnFragmentInteractionListener, FriendDetailsFragment.OnFragmentInteractionListener, EventDetailsFragment.OnFragmentInteractionListener,
-        ResetPasswordFragment.ResetPasswordListener {
+        FriendsListFragment.FriendsFragmentInteraction, NewEventFragment.NewEventInteraction, EventDetailsFragment.OnFragmentInteractionListener,
+        ResetPasswordFragment.ResetPasswordListener, AddFriendFragment.AddFriendInteraction {
 
     private final Class _mainFragmentClass = EventsListFragment.class;
+    private final int _mainNavId = R.id.nav_events_list;
+
 
     //    private List<Event> eventsList = new Link
     private TextView userNameHeader;
@@ -73,9 +84,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private MenuItem currentItem = null;//holds the current item that checked (for un checked it a
     private UserViewModel currentUser = null;
+    private FriendsViewModel currentFriendsList = null;
     private int userId;
     private View headerLayout;
     private DrawerLayout mDrawer;
+
     //New Server
 //    private User mUser = null;
 
@@ -84,56 +97,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//
-//        ListView eventListView = (ListView) findViewById(R.id._listOfEvents);
-//        adapter = new EventAdapter();
-//        eventListView.setAdapter(adapter);
-
-        // User myuser = (User) getIntent().getSerializableExtra(Consts.USER);
-//         User myuser = new User("Eden","Charcon","alkal","Sharkonz@gmail.com",null,null,    1,1);
-
-//        mUser = (User) getIntent().getSerializableExtra(Consts.USER);
-//        userId = mUser.getId();
-
-
-        //invitation code:
-//        Repository.instance.getInvite("" + userId, new CloudManager.CloudCallback<Invite>() {
-//            @Override
-//            public void onComplete(Invite invite) {
-//                Invitation(invite);
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//
-//            }
-//        }, new FirebaseModel.GetInvitation() {
-//            @Override
-//            public void onComplete(Invite invite) {
-//                Invitation(invite);
-//            }
-//        });
-        //End of - invitation code
-
-        //Get Events
-//        Repository.instance.getEvents(userId, new CloudManager.CloudCallback<List<Event>>() {
-//            @Override
-//            public void onComplete(List<Event> data) {
-//                eventsList = data;
-//                if (adapter != null)
-//                    adapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//            }
-//        });
-
-        try {
-            CloudManager cd = new CloudManager();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -167,6 +130,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+
         //Permission
         boolean hasPermission = (ContextCompat.checkSelfPermission(this,
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
@@ -175,6 +139,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             ActivityCompat.requestPermissions(this, new String[]{
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, Consts.REQUEST_WRITE_STORAGE);
         }
+
+//        Repository.instance.InitMainActivityCallback(new MainActivityCallback() {
+//            @Override
+//            public void GotInvitation(Event event) {
+//                GetInvation(event);אל
+//            }
+//        });
+        Repository.instance.InitMainActivityCallback(new Observer<Event>() {
+            @Override
+            public void onChanged(Event data) {
+                GetInvation(data);
+            }
+        });
 
 //        eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            @Override
@@ -223,6 +200,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void loadMainFragment() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(currentItem != null) {
+                    currentItem.setChecked(false);
+                }
+                currentItem = navigationView.getMenu().findItem(_mainNavId);
+                navigationView.getMenu().findItem(_mainNavId).setChecked(true);
+
+            }
+        });
+
         Bundle bundle = new Bundle();
         bundle.putSerializable(Consts.USER, currentUser.getUser().getValue());
         Fragment mainFragment = null;
@@ -270,41 +259,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void openExitAlert(){
-//        AlertDialog.Builder builder = new AlertDialog.Builder(FriendsListActivity.this);
-//        builder.setTitle("Add New Friend");
-//        builder.setMessage("Enter Email:");
-//        builder.setView(input);
-//        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                emailString = input.getText().toString();
-//                Repository.instance.addFriend(emailString, new CloudManager.CloudCallback<Boolean>() {
-//                    @Override
-//                    public void onComplete(Boolean data) {
-//                        if (data) {
-//                            Toast.makeText(getApplicationContext(), "Added", Toast.LENGTH_SHORT).show();
-//                            refreshList();
-//                        } else
-//                            Toast.makeText(getApplicationContext(), "Cannot add to your friends right now, please try later...", Toast.LENGTH_LONG).show();
-//                    }
-//
-//                    @Override
-//                    public void onCancel() {
-//                        dialog.cancel();
-//                    }
-//                });
-//            }
-//        });
-//        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.cancel();
-//            }
-//        });
-//
-//        AlertDialog d = builder.create();
-//        d.show();
+    private void openExitAlert() {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         // set title
         alertDialogBuilder.setTitle("What?! Do you want to exit?");
@@ -435,7 +390,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setCancelable(false)
                 .setNegativeButton("Decline", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                      //  declineToInvite(invite);
+                        //  declineToInvite(invite);
                         //Todo make delined to invite
                         // dialog.cancel();
                     }
@@ -443,7 +398,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d("TAG", "You have agreed invite");
-                     //   agreeToInvite(invite);
+                        //   agreeToInvite(invite);
                         //Todo make Agree to evnet
                         // GetInEvent(invite.getEventId());
                         // MainActivity.this.finish();
@@ -460,12 +415,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    public void agreeToInvite(EventInvitationNotificationData eventInvitationNotificationData) {
+    public void agreeToInvite(Event event) {
         //TODO get in to event
         //tell server we agreed
 
         //get in to event.
-        getInEvent(new Event(eventInvitationNotificationData.getEventData()));
+
+        Repository.instance.AgreeToInvite(event.getId(), new AgreeToEventCallback<Boolean>() {
+            @Override
+            public void onSuccees(Boolean data) {
+                getInEvent(event);
+            }
+
+            @Override
+            public void NoPendingEvents() {
+                Toast.makeText(MyApp.getContext(), "Error:NoPendingEvents", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void UserIsNotExist() {
+                Toast.makeText(MyApp.getContext(), "Error:UserIsNotExist", Toast.LENGTH_SHORT).show();
+            }
+        });
+
 
 //        Repository.instance.removeInvite(new FirebaseModel.Callback<Boolean>() {
 //            @Override
@@ -473,7 +445,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            }
 //        }, invite);
         //Add event to myeventlist/
-        Log.d("TAG", "invitegetevnetid=" + eventInvitationNotificationData.getEventId());
+        Log.d("TAG", "invitegetevnetid=" + event.getId());
 //        currentUser.getUser().getValue().addEventToList(Integer.valueOf(eventInvitationNotificationData.getEventId()));
         //update the userDatabase
 //        Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudCallback() {
@@ -489,10 +461,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        });
     }
 
-    public static void declineToInvite(EventInvitationNotificationData eventInvitationNotificationData) {
+    public static void declineToInvite(Event event) {
         //TODO
         //tell server we declined.
+        Repository.instance.DeclineToInvite(event.getId(), new DeclineToEventCallback<Boolean>() {
+            @Override
+            public void onSuccees(Boolean data) {
+                Toast.makeText(MyApp.getContext(), "Refused.", Toast.LENGTH_SHORT).show();
+            }
 
+            @Override
+            public void TechnicalError() {
+                Toast.makeText(MyApp.getContext(), "Error:TechnicalError", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void NoPendingEvents() {
+                Toast.makeText(MyApp.getContext(), "Error:NoPendingEvents", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void UserIsNotExist() {
+                Toast.makeText(MyApp.getContext(), "Error:UserIsNotExist", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         //delete from invite DB
 //        Repository.instance.removeInvite(new CloudManager.CloudCallback<Boolean>() {
@@ -509,8 +501,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void getInEvent(Event event) {
+
         Intent intent;
         intent = new Intent(getApplicationContext(), RecordingActivity.class);
+        intent.putExtra(Consts.USER, currentUser.getUser().getValue());
         intent.putExtra("eventFromInvitation", event);
         // Log.d("Tag","eventID="+eventId);
         startActivity(intent);
@@ -537,8 +531,33 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void deleteFriend(User friend, List<User> friendsList) {
+    public void deleteFriend(User friend) {
+        List<User> friendsListTemp = currentFriendsList.getFriendsList().getValue();
+        friendsListTemp.remove(friend);
+        Repository.instance.EditFriendList(ProductTypeConverters.GenerateListUserToListMails(friendsListTemp), new EditFriendListCallback() {
+            @Override
+            public void onSuccees() {
+                //Delete from local list
+                Repository.instance.deleteFromFriends(friend);
+//                currentFriendsList.getFriendsList().getValue().remove(friend);
+//                for (int i = 0; i < currentFriendsList.getFriendsList().getValue().size(); i++) {
+//                    if (friend.getEmail().equals(friendsList.get(i).getEmail()))
+//                        friendsList.remove(i);
+//                }
+                makeToastLong(friend.getFirstName() + " " + friend.getLastName() + " was Deleted");
+                // Log.d("TAG","lalaala"+nunu);
+            }
 
+            @Override
+            public void UserIsNotExist() {
+                Toast.makeText(MyApp.getContext(), "User is not exist", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void error() {
+                Toast.makeText(MyApp.getContext(), "ERROR.", Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
@@ -574,7 +593,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 ////        builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
 ////            @Override
 ////            public void onClick(DialogInterface dialog, int which) {
-////                Repository.instance.EditFriendList(ProductTypeConverters.GenerateListUserToListMails(friendsList),new EditFriendListCallback() {
+////                Repository.instance.EditFriendList(ProductTypeConverters.GenerateListUserToListMails(currentFriendsList),new EditFriendListCallback() {
 ////                    @Override
 ////                    public void onSuccees() {
 ////
@@ -638,21 +657,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 });
     }
 
-    public void GetInvation(EventInvitationNotificationData eventInvitationNotificationData) {
+    public void GetInvation(Event event) {
 
         //todo
         //open dialog with information
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MyApp.getContext());
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
 
         // set title
-        alertDialogBuilder.setTitle("You got new Invitation, from " + ProductTypeConverters.getAdminFirstNameByEmail(eventInvitationNotificationData.getEventData()) +"");
+        alertDialogBuilder.setTitle("You got new Invitation, from " + event.getAdminId());
 
         // set dialog message
         alertDialogBuilder
                 .setCancelable(false)
                 .setNegativeButton("Decline", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        declineToInvite(eventInvitationNotificationData);
+                        declineToInvite(event);
                         //Todo make delined to invite
                         // dialog.cancel();
                     }
@@ -660,7 +679,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d("TAG", "You have agreed invite");
-                        agreeToInvite(eventInvitationNotificationData);
+                        agreeToInvite(event);
                         //Todo make Agree to evnet
                         // GetInEvent(invite.getEventId());
                         // MainActivity.this.finish();
@@ -669,16 +688,171 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 });
 
         // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
+        runOnUiThread(new Runnable() {
+                          @Override
+                          public void run() {
+                              AlertDialog alertDialog = alertDialogBuilder.create();
+                                  alertDialog.show();
+////                              }
+//
+                         }
+                     });
 
         // show it
-        if (!((Activity) MyApp.getContext()).isFinishing()) {
-            alertDialog.show();
+
+
         }
 
 
+    @Override
+    public void addFriend() {
+        AddFriendFragment addFriendDialog = new AddFriendFragment();
+        addFriendDialog.show(getSupportFragmentManager(), "addFriendDialog");
+//        Repository.instance.addFriend("MaayanMail", new AddFriendCallback<User>() {
+//            @Override
+//            public void onSuccees(User data) {
+////                Log.d("TAG", "friendlistsizeBeforeAdding=" + currentFriendsList.size());
+////                currentFriendsList.add(data);
+////                Log.d("TAG", "friendlistsizeafteradding=" + currentFriendsList.size());
+////                refreshList();
+////                Log.d("TAG", "n addfriend-->friendlistFragment ---> aasdasd" + data.getFirstName());
+//            }
+//
+//            @Override
+//            public void userIsNotExist() {
+//                Log.d("TAG", "n addfriend-->friendlistFragment ---> userIsNotExist");
+//            }
+//
+//            @Override
+//            public void friendIsNotExist() {
+//                Log.d("TAG", "n addfriend-->friendlistFragment ---> friendIsNotExist");
+//            }
+//
+//            @Override
+//            public void bothUsersEquals() {
+//                Log.d("TAG", "n addfriend-->friendlistFragment ---> bothUsersEquals");
+//            }
+//
+//            @Override
+//            public void alreadyFriends() {
+//                Log.d("TAG", "n addfriend-->friendlistFragment ---> alreadyFriends");
+//            }
+//        });
+    }
+
+    @Override
+    public void addFriend(String friendsEmail) {
+        Repository.instance.addFriend(friendsEmail, new AddFriendCallback<Boolean>() {
+            @Override
+            public void onSuccees(Boolean data) {
+                if (data)
+                    makeToastShort("Added");
+//                Log.d("TAG", "friendlistsizeBeforeAdding=" + currentFriendsList.size());
+//                currentFriendsList.add(data);
+//                Log.d("TAG", "friendlistsizeafteradding=" + currentFriendsList.size());
+//                refreshList();
+//                Log.d("TAG", "n addfriend-->friendlistFragment ---> aasdasd" + data.getFirstName());
+            }
+
+            @Override
+            public void userIsNotExist() {
+                Log.d("TAG", "n addfriend-->friendlistFragment ---> userIsNotExist");
+            }
+
+            @Override
+            public void friendIsNotExist() {
+                Log.d("TAG", "n addfriend-->friendlistFragment ---> friendIsNotExist");
+            }
+
+            @Override
+            public void bothUsersEquals() {
+                Log.d("TAG", "n addfriend-->friendlistFragment ---> bothUsersEquals");
+            }
+
+            @Override
+            public void alreadyFriends() {
+                Log.d("TAG", "n addfriend-->friendlistFragment ---> alreadyFriends");
+            }
+        });
+    }
+
+//    @Override
+//    public void initFriendsList(FriendsViewModel.FriendsViewModelCallback<List<User>> callback) {
+//        currentFriendsList = ViewModelProviders.of(this).get(FriendsViewModel.class);
+//        currentFriendsList.getFriendsList().observe(this, new Observer<List<User>>() {
+//            @Override
+//            public void onChanged(@Nullable List<User> users) {
+//                callback.onComplete(users);
+//            }
+//        });
+//    }
+
+    @Override
+    public void initFriendsList(Observer<List<User>> observer) {
+        currentFriendsList = ViewModelProviders.of(this).get(FriendsViewModel.class);
+        currentFriendsList.getFriendsList().observe(this, new Observer<List<User>>() {
+            @Override
+            public void onChanged(@Nullable List<User> users) {
+                observer.onChanged(users);
+            }
+        });
+    }
+
+    @Override
+    public void isUserExist(String parti, AddEventCallback<String> callback) {
+        Repository.instance.getUserIfExist(parti, new isUserExistResponeCallback() {
+            @Override
+            public void onSuccees(UserData data) {
+                User user = new User(data);
+                String maketoast = "Adding" + user.getFirstName() + " " + user.getLastName();
+                makeToastShort(maketoast);
+                // Toast.makeText(MyApp.getContext(), maketoast, Toast.LENGTH_LONG);
+                callback.onSuccees(user.getFirstName());
+            }
+
+            @Override
+            public void userIsNotExist() {
+                // Toast.makeText(MyApp.getContext(), "User is not exist,please try again.", Toast.LENGTH_SHORT).show();
+                Log.d("TAG", "In addevent-->neweventfragment----> Technical userIsNotExist");
+            }
+
+            @Override
+            public void friendIsNotExist() {
+                //Toast.makeText(MyApp.getContext(), "User is not exist,please try again.", Toast.LENGTH_SHORT).show();
+                Log.d("TAG", "In addevent-->neweventfragment----> friendIsNotExist");
+
+            }
+
+        });
+    }
+
+    @Override
+    public void makeToastShort(String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
+    @Override
+    public void makeToastLong(String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
 
+    @Override
+    public void startRecording(Event event) {
+        loadMainFragment();//For supply home page after click 'Back' from Recording Activity
+        Intent intent = new Intent(MyApp.getContext(), RecordingActivity.class);
+        intent.putExtra(Consts.SEND_EVENT ,event);
+        intent.putExtra(Consts.USER, currentUser.getUser().getValue());
+        startActivity(intent);
+    }
 }
