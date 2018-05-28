@@ -92,17 +92,17 @@ public class RecordingActivity extends AppCompatActivity {
     private void listenToParticipents() {
         Repository.instance.InitCallbacksForCloudManeger(new RecordingActivityCallback() {
             @Override
-            public void userJoinEvent(int userId) {
-                userHasJoinTheEvent(userId);
+            public void userJoinEvent(User user) {
+                userHasJoinTheEvent(user);
             }
 
             @Override
-            public void userLeftEvent(int userId) {
-                userHasLeftTheEvent((userId));
+            public void userLeftEvent(User user) {
+                userHasLeftTheEvent(user);
             }
 
             @Override
-            public void eventClosed(int eventId) {
+            public void eventClosed(Event event) {
                 StopRecordingByAdmin();
             }
 
@@ -312,29 +312,38 @@ public class RecordingActivity extends AppCompatActivity {
         }
     }
 
-    public void userHasJoinTheEvent(int userId) {
-        for (int i = 0; i < event.getParticipats().size(); i++) {
+    public void userHasJoinTheEvent(User user) {
+        TextView partici = findViewById(R.id.participants_recording);
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
 //                    Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName()+" "+event.getParticipats().get(i).getLastName()+",just joined", Toast.LENGTH_LONG).show();
-                    Toast.makeText(getApplication(), userId + ",just joined", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplication(), user.getFirstName() + ",just joined", Toast.LENGTH_LONG).show();
+                    event.addToParticipats(user);
+                    partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
+
                 }
             });
 //            if (event.getParticipats().get(i).get()==userId)
             //{
 
-        }
     }
 
-    public void userHasLeftTheEvent(int userId) {
-        for (int i = 0; i < event.getParticipats().size(); i++) {
-            if (event.getParticipats().get(i).getId() == userId) {
-                Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName() + " " + event.getParticipats().get(i).getLastName() + ",just left", Toast.LENGTH_LONG).show();
+
+    public void userHasLeftTheEvent(User user) {
+        TextView partici = findViewById(R.id.participants_recording);
+        {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                        Toast.makeText(getApplication(), user.getFirstName()+ ",just left", Toast.LENGTH_LONG).show();
+                    event.delToParticipats(user);
+                    partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
+
+                    }
+                });
             }
         }
-    }
-
     public void SetEventFromNewActivity() {
         SetActivity();
     }

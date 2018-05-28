@@ -56,7 +56,6 @@ public class CloudManager {
             Log.d("TAG", "Cloud Manager CTOR -> " + e.getMessage());
         }
     }
-
     //Primitives Methods
     public Socket getSocket() {
         return socket;
@@ -160,15 +159,15 @@ public class CloudManager {
                 return;
             case UserJoinEvent:
                 UserJoinEventNotification userJoinEventNotification = ProductTypeConverters.getObjectFromString(data, UserJoinEventNotification.class);
-                recordingActivityCallback.userJoinEvent(userJoinEventNotification.getUserId());
+                recordingActivityCallback.userJoinEvent(new User(userJoinEventNotification.getUserData()));
                 return;
             case UserLeaveEvent:
                 UserLeaveEventNotification userLeaveEventNotification = ProductTypeConverters.getObjectFromString(data, UserLeaveEventNotification.class);
-                recordingActivityCallback.userLeftEvent(userLeaveEventNotification.getUserId());
+                recordingActivityCallback.userLeftEvent(new User(userLeaveEventNotification.getUserData()));
                 return;
             case EventClosed:
                 EventCloseNotificationData eventCloseNotificationData = ProductTypeConverters.getObjectFromString(data, EventCloseNotificationData.class);
-                recordingActivityCallback.eventClosed(eventCloseNotificationData.getEventId());
+                recordingActivityCallback.eventClosed(new Event(eventCloseNotificationData.getEventData()));
                 return;
             default:
                 return;
