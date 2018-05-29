@@ -160,15 +160,15 @@ public class CloudManager {
                 return;
             case UserJoinEvent:
                 UserJoinEventNotification userJoinEventNotification = ProductTypeConverters.getObjectFromString(data, UserJoinEventNotification.class);
-                recordingActivityCallback.userJoinEvent(userJoinEventNotification.getUserId());
+                //recordingActivityCallback.userJoinEvent(userJoinEventNotification.getUserId());
                 return;
             case UserLeaveEvent:
                 UserLeaveEventNotification userLeaveEventNotification = ProductTypeConverters.getObjectFromString(data, UserLeaveEventNotification.class);
-                recordingActivityCallback.userLeftEvent(userLeaveEventNotification.getUserId());
+              // recordingActivityCallback.userLeftEvent(userLeaveEventNotification.getUserId());
                 return;
             case EventClosed:
                 EventCloseNotificationData eventCloseNotificationData = ProductTypeConverters.getObjectFromString(data, EventCloseNotificationData.class);
-                recordingActivityCallback.eventClosed(eventCloseNotificationData.getEventId());
+               // recordingActivityCallback.eventClosed(eventCloseNotificationData.getEventId());
                 return;
             default:
                 return;
