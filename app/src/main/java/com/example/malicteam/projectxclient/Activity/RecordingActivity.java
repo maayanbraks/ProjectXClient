@@ -27,8 +27,6 @@ import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Event;
-import com.example.malicteam.projectxclient.Model.FirebaseModel;
-import com.example.malicteam.projectxclient.Model.Model;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.R;
@@ -135,7 +133,7 @@ public class RecordingActivity extends AppCompatActivity {
                     }
                 });
 
-        if (getIntent().getSerializableExtra("sendNewEvent") != null) {
+        if (getIntent().getSerializableExtra(Consts.SEND_EVENT) != null) {
             eventtemp = (Event) getIntent().getSerializableExtra(Consts.SEND_EVENT);
             event = eventtemp;
             SetEventFromNewActivity();
@@ -271,7 +269,7 @@ public class RecordingActivity extends AppCompatActivity {
 //            } catch (IOException e) {
 //                Log.d("TAG", "File in Stop Recording -Making bytefile" + e);
 //                e.printStackTrace();
-            }
+
             //TODO
             ////change the protocol in closeevent to Bytefile,
             Repository.instance.closeEvent(null, event.getId(), mFileName, new CloseEventCallback() {
@@ -298,9 +296,10 @@ public class RecordingActivity extends AppCompatActivity {
                 }
             });
         }
-        Log.d("TAG", "Stop recording func");
-
     }
+
+
+
 
 
     private void StopRecording() {
@@ -315,8 +314,10 @@ public class RecordingActivity extends AppCompatActivity {
 //        if (userId != Consts.DEFAULT_UID) {
 //            Log.d("TAG", "userId=" + userId);
 //            Log.d("TAG", "event.getadminID=" + event.getAdminId());
+        Log.d("TAG","chekc if me admin"+myUser.getEmail().equals(event.getAdminId()));
         if ((myUser.getEmail()).equals(event.getAdminId())) {
             //Log.d("TAG","EQUAL");
+
             return true;
         }
         return false;
@@ -353,8 +354,6 @@ public class RecordingActivity extends AppCompatActivity {
 //                .convert();
 //        return flacFile;
 //    }
-
-
 
 
 //    private byte[] uploadFile() {
@@ -398,19 +397,19 @@ public class RecordingActivity extends AppCompatActivity {
 //            public void onComplete(List<Event> EventList) {
 //                if (EventList.size() != 0) //
 //                {
-                    //getting event informatio
-                event=eventtemp;
-                    // setting the layout from the event information
-                    TextView _eventTitle = findViewById(R.id.recording_title);
-                    TextView Date = findViewById(R.id.recording_date);
-                    TextView partici = findViewById(R.id.participants_recording);
-                    _eventTitle.setText(event.getTitle());
-                    Date.setText(event.getDate());
+        //getting event informatio
+        event = eventtemp;
+        // setting the layout from the event information
+        TextView _eventTitle = findViewById(R.id.recording_title);
+        TextView Date = findViewById(R.id.recording_date);
+        TextView partici = findViewById(R.id.participants_recording);
+        _eventTitle.setText(event.getTitle());
+        Date.setText(event.getDate());
 //                    partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
-                    mFileName += "/outalk" + event.getId() + ".acc";
-                    SetActivity();
-                  //  CheckRecordingStatus();
-                    //check if me as admin
+        mFileName += "/outalk" + event.getId() + ".acc";
+        SetActivity();
+        //  CheckRecordingStatus();
+        //check if me as admin
 
         //
 
@@ -442,19 +441,20 @@ public class RecordingActivity extends AppCompatActivity {
 
 
     }
+
     public void userHasJoinTheEvent(User user) {
-        Log.d("TAG","In userhasjointheEvent func");
+        Log.d("TAG", "In userhasjointheEvent func");
         TextView partici = findViewById(R.id.participants_recording);
 //        for (int i=0;i<event.getParticipats().size();i++)
 //        {
 //            if (event.getParticipats().get(i).get()==userId)
-            //{
-              //  Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName()+" "+event.getParticipats().get(i).getLastName()+",just joined", Toast.LENGTH_LONG).show();
-            //}
-            makeToastLong(user.getFirstName()+" " +user.getLastName()+",just joined");
+        //{
+        //  Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName()+" "+event.getParticipats().get(i).getLastName()+",just joined", Toast.LENGTH_LONG).show();
+        //}
+        makeToastLong(user.getFirstName() + " " + user.getLastName() + ",just joined");
 
-            if (!(event.getParticipats().contains(user)))
-                event.addToParticipats(user);
+        if (!(event.getParticipats().contains(user)))
+            event.addToParticipats(user);
 
         runOnUiThread(new Runnable() {
 
@@ -465,7 +465,7 @@ public class RecordingActivity extends AppCompatActivity {
 
             }
         });
-        }
+    }
 
     public void userHasLeftTheEvent(User user) {
         TextView partici = findViewById(R.id.participants_recording);
@@ -473,8 +473,8 @@ public class RecordingActivity extends AppCompatActivity {
 //        {
 //            if (event.getParticipats().get(i).getId()==userId)
 //            {
-        makeToastLong(user.getFirstName()+" "+user.getFirstName()+",just left");
-            event.delFromParticipats(user);
+        makeToastLong(user.getFirstName() + " " + user.getFirstName() + ",just left");
+        event.delFromParticipats(user);
         runOnUiThread(new Runnable() {
 
             @Override
@@ -546,6 +546,7 @@ public class RecordingActivity extends AppCompatActivity {
         });
 
     }
+
     public void makeToastLong(String message) {
         runOnUiThread(new Runnable() {
             @Override
