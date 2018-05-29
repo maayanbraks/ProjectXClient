@@ -191,7 +191,7 @@ public class NewEventFragment extends Fragment {
                 //check with server is userExist---->if do --->
                 mListener.isUserExist(parti, new AddEventCallback<String>() {
                     @Override
-                    public void onSuccees(String data) {
+                    public void onSuccees(String data) {//TODO WTF
                         if (invitedPpl.equals(" "))
                             invitedPpl = data;
                         UsersInvites.add(parti);
@@ -271,24 +271,24 @@ public class NewEventFragment extends Fragment {
         void startRecording(Event event);
     }
 
-    private void sendInvites(String eventId) {
-        Log.d("TAG", "usrinvites=" + UsersInvites);
-        // String invites = UsersInvites;
-        //String[] items = invites.split(",");
-//        for (String item : items) {
-//            Invite invite = new Invite(eventId, item, "" + userId);
-//            Repository.instance.addNewInvite(invite, new CloudManager.CloudCallback<Invite>() {
-//                @Override
-//                public void onComplete(Invite invite) {
-//                    Log.d("TAG", "succeed adding new invite.");
-//                }
-//
-//                @Override
-//                public void onCancel() {
-//                }
-//            });
-//        }
-    }
+//    private void sendInvites(String eventId) {
+//        Log.d("TAG", "usrinvites=" + UsersInvites);
+//        // String invites = UsersInvites;
+//        //String[] items = invites.split(",");
+////        for (String item : items) {
+////            Invite invite = new Invite(eventId, item, "" + userId);
+////            Repository.instance.addNewInvite(invite, new CloudManager.CloudCallback<Invite>() {
+////                @Override
+////                public void onComplete(Invite invite) {
+////                    Log.d("TAG", "succeed adding new invite.");
+////                }
+////
+////                @Override
+////                public void onCancel() {
+////                }
+////            });
+////        }
+//    }
 
     private void InviteTextViewEdit(View view) {
         getActivity().runOnUiThread(new Runnable() {

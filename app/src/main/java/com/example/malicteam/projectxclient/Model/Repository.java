@@ -893,7 +893,7 @@ public class Repository {
     }
 
 
-    public void getEventsFromServer(final EventListCallback<List<Event>> callback) {
+    public void   getEventsFromServer(final EventListCallback<List<Event>> callback) {
         //Init the get friends/contacts list of  User (by email).
         EventsListRequestData eventsListRequestData = new EventsListRequestData(userLiveData.getValue().getEmail());
         //send request
