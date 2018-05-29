@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Activity.LoginActivity;
 import com.example.malicteam.projectxclient.R;
-import com.google.firebase.auth.FirebaseAuth;
+//import com.google.firebase.auth.FirebaseAuth;
 
 
 public class LogoutDialogFragment extends DialogFragment {
@@ -24,7 +24,7 @@ public class LogoutDialogFragment extends DialogFragment {
                 "If you logout, you cant enjoy from full service.")
                 .setPositiveButton("Yes, Log me out", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        FirebaseAuth.getInstance().signOut();
+//                        FirebaseAuth.getInstance().signOut();
                         Intent intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class);
                         Toast.makeText(getActivity(), getString(R.string.massage_logout), Toast.LENGTH_LONG).show();
                     }

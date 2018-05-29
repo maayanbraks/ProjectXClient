@@ -14,7 +14,7 @@ import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
+//import com.google.firebase.auth.FirebaseAuth;
 
 
 public class ResetPasswordDialogFragment extends DialogFragment {
@@ -46,21 +46,21 @@ public class ResetPasswordDialogFragment extends DialogFragment {
 
     private void reset() {
         ProgressBar progressBar = (ProgressBar) getActivity().findViewById(R.id.progressBar);
-
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        progressBar.setVisibility(View.VISIBLE);
-        auth.sendPasswordResetEmail(auth.getCurrentUser().getEmail())
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(MyApp.getContext(), "Check Your Email.", Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(MyApp.getContext(), "Failed to send reset email!", Toast.LENGTH_SHORT).show();
-                        }
-                        progressBar.setVisibility(View.GONE);
-                    }
-                });
+//
+//        FirebaseAuth auth = FirebaseAuth.getInstance();
+//        progressBar.setVisibility(View.VISIBLE);
+//        auth.sendPasswordResetEmail(auth.getCurrentUser().getEmail())
+//                .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        if (task.isSuccessful()) {
+//                            Toast.makeText(MyApp.getContext(), "Check Your Email.", Toast.LENGTH_LONG).show();
+//                        } else {
+//                            Toast.makeText(MyApp.getContext(), "Failed to send reset email!", Toast.LENGTH_SHORT).show();
+//                        }
+//                        progressBar.setVisibility(View.GONE);
+//                    }
+//                });
     }
 
 //    @Override

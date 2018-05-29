@@ -39,21 +39,21 @@ public class ChangeDetailsFragment extends DialogFragment {
         builder.setMessage(str)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Repository.instance.changeUserDetails(_first, _last, _email, _phone, new CloudManager.CloudCallback<String>() {
-                            @Override
-                            public void onComplete(String data) {
-                                if (data != null && data != "")
-                                    Toast.makeText(getActivity().getApplicationContext(), "Your profile was changed.\n"+data+" was changed.", Toast.LENGTH_LONG).show();
-                                else
-                                    Toast.makeText(getActivity().getApplicationContext(), "There is problem", Toast.LENGTH_LONG).show();
-                                getActivity().finish();
-                            }
-
-                            @Override
-                            public void onCancel() {
-
-                            }
-                        });
+//                        Repository.instance.changeUserDetails(_first, _last, _email, _phone, new CloudManager.CloudCallback<String>() {
+//                            @Override
+//                            public void onComplete(String data) {
+//                                if (data != null && data != "")
+//                                    Toast.makeText(getActivity().getApplicationContext(), "Your profile was changed.\n"+data+" was changed.", Toast.LENGTH_LONG).show();
+//                                else
+//                                    Toast.makeText(getActivity().getApplicationContext(), "There is problem", Toast.LENGTH_LONG).show();
+//                                getActivity().finish();
+//                            }
+//
+//                            @Override
+//                            public void onCancel() {
+//
+//                            }
+//                        });
                     }
                 })
                 .setNegativeButton("NO! Cancel.", new DialogInterface.OnClickListener() {

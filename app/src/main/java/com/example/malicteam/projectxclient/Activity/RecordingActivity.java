@@ -1,16 +1,10 @@
 package com.example.malicteam.projectxclient.Activity;
 
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
-import android.content.Intent;
+import android.Manifest;
 import android.content.pm.PackageManager;
 import android.media.AudioFormat;
 import android.media.MediaPlayer;
-import android.media.MediaRecorder;
-import android.os.Environment;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -25,12 +19,12 @@ import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCa
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
-import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Event;
+import com.example.malicteam.projectxclient.Model.IRecorder;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
+import com.example.malicteam.projectxclient.Model.WavRecorder;
 import com.example.malicteam.projectxclient.R;
-import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,58 +36,68 @@ import UpdateObjects.CloseEvent;
 
 
 public class RecordingActivity extends AppCompatActivity {
-    private UserViewModel currentUser = null;
-    private boolean mStartPlaying = true;
-    private String eventIdTogetIn;
-    private ImageButton recordingButton;
-    private boolean mStartRecording = true;
-    private static final String LOG_TAG = "AudioRecordTest";
-    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
-    private static String mFileName = null;
-    private ImageButton playingButton;
-    Event eventtemp;
-    private MediaRecorder mRecorder = null;
-    private Event event;
-    private MediaPlayer mPlayer = null;
+    private final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
+    private final String[] permissions = {Manifest.permission.RECORD_AUDIO};
+    private boolean mStartToPlayMedia = true;//if true - next click should start playing
+    private IRecorder recorder = null;
+    private String mFileName = null;
     private User myUser;
-    private Boolean FromInvitation;
+    private MediaPlayer mPlayer = null;
 
+    private ImageButton playingButton;
+    private ImageButton recordingButton;
+
+    private Event event;
+    private Event eventTemp;
+    private Boolean fromInvitation;
     private boolean permissionToRecordAccepted = false;
-    private String[] permissions = {Manifest.permission.RECORD_AUDIO};
-
+    private final String LOG_TAG = "AudioRecordTest";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording);
-        myUser = (User) getIntent().getSerializableExtra(Consts.USER);
-        //        currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
-//        currentUser.getUser().observe(this, new Observer<User>() {
-//            @Override
-//            public void onChanged(@Nullable User user) {
-//                if (user != null) {
-//        myUser = user;
-//
-//                }
-//            }
-//        });
-        eventIdTogetIn = " ";
-
-        mFileName = getExternalCacheDir().getAbsolutePath();
+        //get permission
         ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
+        //get user
+        myUser = (User) getIntent().getSerializableExtra(Consts.USER);
+        //final file name
+        mFileName = getExternalCacheDir().getAbsolutePath() + "/" + String.valueOf(Math.abs(System.currentTimeMillis())).hashCode() + ".wav";
+        //Init recorder
+        recorder = new WavRecorder(mFileName);
+        listenToParticipents();
+        initEvent();
+        initButtons();
+//        startRecordOrSaveIt();
+        initView();
+    }
 
-        TextView backButton = (TextView) findViewById(R.id.back_btn_recording);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!mStartPlaying)
-                    stopPlaying();
-                if (!mStartRecording)
-                    recordOrSave();
+    private void initView(){
+        TextView onAir = findViewById(R.id.onAir_recording);
+        //Recording Button + "On Air" image
+        if(recorder.isRecording()){//if recording now
+            recordingButton.setImageResource(android.R.drawable.ic_menu_save);
+            onAir.setVisibility(View.VISIBLE);
+            playingButton.setClickable(false);
+            playingButton.setVisibility(View.INVISIBLE);
+        }
+        else{
+            recordingButton.setImageResource(android.R.drawable.ic_btn_speak_now);
+            onAir.setVisibility(View.INVISIBLE);
+            playingButton.setImageResource(android.R.drawable.ic_media_play);
+            playingButton.setClickable(true);
+            playingButton.setVisibility(View.VISIBLE);
+        }
+        //Playing Button
+        if(!mStartToPlayMedia){//if next click should be pause
+            playingButton.setImageResource(android.R.drawable.ic_media_pause);
+        }
+        else{
+            playingButton.setImageResource(android.R.drawable.ic_media_play);
+        }
+    }
 
-                finish();
-            }
-        });
+    private void listenToParticipents() {
         Repository.instance.InitCallbacksForCloudManeger(new RecordingActivityCallback() {
             @Override
             public void userJoinEvent(User user) {
@@ -111,85 +115,79 @@ public class RecordingActivity extends AppCompatActivity {
             }
 
         });
-        recordingButton = (ImageButton) findViewById(R.id.btnStop);
+    }
+
+    private void initEvent() {
+        if (getIntent().getSerializableExtra(Consts.SEND_EVENT) != null) {//Does it should be Conts.Event
+            eventTemp = (Event) getIntent().getSerializableExtra(Consts.SEND_EVENT);
+            event = eventTemp;
+            SetEventFromNewActivity();
+            fromInvitation = false;
+        }
+        if (getIntent().getSerializableExtra("eventFromInvitation") != null) {
+            event = (Event) getIntent().getSerializableExtra("eventFromInvitation");
+            SetEventFromInvitation(event);
+            fromInvitation = true;
+        }
+    }
+
+    private void initButtons() {
+        TextView backButton = (TextView) findViewById(R.id.back_btn_recording);
+        backButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!mStartToPlayMedia)
+                    stopPlaying();
+                if (recorder.isRecording())
+                    startRecordOrSaveIt();
+
+                finish();
+            }
+        });
+        recordingButton = (ImageButton) findViewById(R.id.buttonRecordStart);
         // Set layout only if admin or not
         recordingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (CheckMeAdmin()) {
-                    recordOrSave();
+                    startRecordOrSaveIt();
                 }
             }
         });
 
-        playingButton = (ImageButton) findViewById(R.id.btnStart);
+        playingButton = (ImageButton) findViewById(R.id.buttonPlayStart);
         playingButton.setOnClickListener(
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (mStartPlaying && CheckMeAdmin()) {
+                        if (mStartToPlayMedia && CheckMeAdmin()) {
                             playOrPause();
                         }
                     }
                 });
-
-        if (getIntent().getSerializableExtra(Consts.SEND_EVENT) != null) {
-            eventtemp = (Event) getIntent().getSerializableExtra(Consts.SEND_EVENT);
-            event = eventtemp;
-            SetEventFromNewActivity();
-            FromInvitation = false;
-        }
-        if (getIntent().getSerializableExtra("eventFromInvitation") != null) {
-            event = (Event) getIntent().getSerializableExtra("eventFromInvitation");
-            SetEventFromInvitation(event);
-            FromInvitation = true;
-        }
-        //convertAccToWavInit(); //init the converter.
-        //
-//        if (!(eventIdTogetIn.equals(" "))) //means got enter by invite
-//        {
-//            SetEventFromInvitation(eventtemp);
-//        }
-
     }
 
-
     private void playOrPause() {
-        //Sisso's Recored
         /*
         //Maayan Note: I added && mStartRecording for prevent play and hear together.
          */
-        if (mStartPlaying && mStartRecording) {//if to start playing
-            playingButton.setImageResource(android.R.drawable.ic_media_pause);
-            mStartPlaying = false;
+        if (mStartToPlayMedia && !recorder.isRecording()) {//if to start playing
+            mStartToPlayMedia = false;
             startPlaying();
         } else {
-            recordingButton.setImageResource(android.R.drawable.ic_media_play);
-            mStartPlaying = true;
+            mStartToPlayMedia = true;
             stopPlaying();
         }
+        initView();
     }
 
-    private void recordOrSave() {
-        //Sisso's Recored
-        TextView onAir = findViewById(R.id.onAir_recording);
-        if (mStartRecording) {//if to start record
-            recordingButton.setImageResource(android.R.drawable.ic_menu_save);
-            onAir.setVisibility(View.VISIBLE);
-            mStartRecording = false;
-            playingButton.setImageResource(android.R.drawable.ic_media_play);
-            playingButton.setClickable(false);
-            playingButton.setVisibility(View.INVISIBLE);
+    private void startRecordOrSaveIt() {
+        if (!recorder.isRecording()) {
             startRecording();
         } else {
-            recordingButton.setImageResource(android.R.drawable.ic_btn_speak_now);
-            mStartRecording = true;
-            onAir.setVisibility(View.INVISIBLE);
-            playingButton.setClickable(true);
-            playingButton.setVisibility(View.VISIBLE);
             stopRecording();
-//            uploadFile();
         }
+        initView();
     }
 
     @Override
@@ -203,23 +201,12 @@ public class RecordingActivity extends AppCompatActivity {
         if (!permissionToRecordAccepted) finish();
     }
 
-
-    private void onRecord(boolean start) {
-        if (start) {
-            startRecording();
-        } else {
-            stopRecording();
-        }
+    public void StopRecordingByAdmin() {
+        //notify user about that
+        Toast.makeText(getApplication(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
+        startRecordOrSaveIt();
+        //stop recording...
     }
-
-    private void onPlay(boolean start) {
-        if (start) {
-            startPlaying();
-        } else {
-            stopPlaying();
-        }
-    }
-
 
     private void startPlaying() {
         mPlayer = new MediaPlayer();
@@ -239,156 +226,54 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
     private void startRecording() {
-        mRecorder = new MediaRecorder();
-        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS);
-        mRecorder.setOutputFile(mFileName);
-        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-
-        try {
-            mRecorder.prepare();
-        } catch (IOException e) {
-            Log.e(LOG_TAG, "prepare() failed");
-        }
-
-        mRecorder.start();
+        recorder.startRecording();
     }
 
     private void stopRecording() {
-        mRecorder.stop();
-        mRecorder.release();
-        mRecorder = null;
+        recorder.stopRecording();
         if (CheckMeAdmin()) {
-            setRecordingStatus();
-            //closeevent();
-
-
-            Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
-//            try {
-////                byte byteFile[] = ProductTypeConverters.convertFileToByte(convertFromAccToWav());
-//            } catch (IOException e) {
-//                Log.d("TAG", "File in Stop Recording -Making bytefile" + e);
-//                e.printStackTrace();
-
-            //TODO
-            ////change the protocol in closeevent to Bytefile,
-            Repository.instance.closeEvent(null, event.getId(), mFileName, new CloseEventCallback() {
-
-                @Override
-                public void onSuccees() {
-
-                    Toast.makeText(getApplication(), "File upload successful", Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void UserIsNotExist() {
-                    Toast.makeText(getApplication(), "Error:UserIsNotExist", Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void EventIsNotExist() {
-                    Toast.makeText(getApplication(), "Error:EventIsNotExist", Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void TechnicalError() {
-                    Toast.makeText(getApplication(), "Error:TechnicalError", Toast.LENGTH_SHORT).show();
-                }
-            });
+            shareEvent();
         }
+        Log.d("TAG", "Stop recording func");
     }
 
+    private void shareEvent(){
+        Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
+        Repository.instance.closeEvent(null, event.getId(), mFileName, new CloseEventCallback() {
+            @Override
+            public void onSuccees() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getApplication(), "File upload successful", Toast.LENGTH_SHORT).show();
+                        new File(mFileName).delete();
+                    }
+                });
+            }
 
+            @Override
+            public void UserIsNotExist() {
+                Toast.makeText(getApplication(), "Error:UserIsNotExist", Toast.LENGTH_SHORT).show();
+            }
 
+            @Override
+            public void EventIsNotExist() {
+                Toast.makeText(getApplication(), "Error:EventIsNotExist", Toast.LENGTH_SHORT).show();
+            }
 
-
-    private void StopRecording() {
-        //TODO stop service of recording
-    }
-
-    private void SaveConversation() {
-        //TODO save pdf file
+            @Override
+            public void TechnicalError() {
+                Toast.makeText(getApplication(), "Error:TechnicalError", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private boolean CheckMeAdmin() {
-//        if (userId != Consts.DEFAULT_UID) {
-//            Log.d("TAG", "userId=" + userId);
-//            Log.d("TAG", "event.getadminID=" + event.getAdminId());
-        Log.d("TAG","chekc if me admin"+myUser.getEmail().equals(event.getAdminId()));
-        if ((myUser.getEmail()).equals(event.getAdminId())) {
-            //Log.d("TAG","EQUAL");
-
+        if ((String.valueOf(myUser.getId())).equals(event.getAdminId())) {
             return true;
         }
         return false;
     }
-
-//    private File convertFromAccToWav() {
-//        File flacFile = new File(Environment.getExternalStorageDirectory(), mFileName);
-//        IConvertCallback callback = new IConvertCallback() {
-//            @Override
-//            public void onSuccess(File convertedFile) {
-//                // So fast? Love it!
-//                Log.d("TAG", "On sucess in convertFromAccToWav ");
-//                //run the func that convert into String and then send to Server
-//            }
-//
-//            @Override
-//            public void onFailure(Exception error) {
-//                Log.d("TAG", "On failure in convertFromAccToWav ");
-//                // Oops! Something went wrong
-//            }
-//        };
-//        AndroidAudioConverter.with(this)
-//                // Your current audio file
-//                .setFile(flacFile)
-//
-//                // Your desired audio format
-//                .setFormat(AudioFormat.WAV)
-//
-//                // An callback to know when conversion is finished
-//                // An callback to know when conversion is finished
-//                .setCallback(callback)
-//
-//                // Start conversion
-//                .convert();
-//        return flacFile;
-//    }
-
-
-//    private byte[] uploadFile() {
-//        Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
-//        try {
-//             byte byteFile[]=ProductTypeConverters.convertFileToByte(convertFromAccToWav());
-//            return byteFile;
-//             //todo
-//            //Send the byteFile to Sahar
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-////        Repository.instance.saveRecord(String.valueOf(userId), mFileName, "" + event.getId(), new Model.SaveAudioListener() {
-////                @Override
-////                public void complete(String url) {
-//////                Toast.makeText(getApplication(), "Upload as succeed" , Toast.LENGTH_SHORT).show();
-//////                event.setRecordURL(url);
-////            }
-////
-////            @Override
-////            public void fail() {
-////                Toast.makeText(getApplication(), "Upload failed.", Toast.LENGTH_SHORT).show();
-////            }
-////        }, new CloudManager.CloudCallback<Boolean>() {
-////            @Override
-////            public void onComplete(Boolean data) {
-////
-////            }
-////
-////            @Override
-////            public void onCancel() {
-////
-////            }
-////        });
-//    }
 
     public void SetEventFromInvitation(Event eventtemp) {
 //        Repository.instance.getEventById(Integer.valueOf(eventid), new CloudManager.CloudCallback<List<Event>>() {
@@ -405,23 +290,18 @@ public class RecordingActivity extends AppCompatActivity {
         TextView partici = findViewById(R.id.participants_recording);
         _eventTitle.setText(event.getTitle());
         Date.setText(event.getDate());
-//                    partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
-        mFileName += "/outalk" + event.getId() + ".acc";
+        partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
+//        mFileName += "/outalk" + event.getId() + ".acc";
         SetActivity();
-        //  CheckRecordingStatus();
-        //check if me as admin
-
-        //
-
-
+//        CheckRecordingStatus();
+//        check if me as admin
     }
 
-
     public void SetActivity() {
-        recordingButton = (ImageButton) findViewById(R.id.btnStop);
+        recordingButton = (ImageButton) findViewById(R.id.buttonRecordStart);
         TextView eventTitle = findViewById(R.id.recording_title);
         TextView partici = findViewById(R.id.participants_recording);
-        playingButton = findViewById(R.id.btnStart);
+        playingButton = findViewById(R.id.buttonPlayStart);
         eventTitle.setText(event.getTitle());
         String time[] = event.getDate().split(" "); //16/01/2018 12:08
         TextView startTime = findViewById(R.id.recording_date);
@@ -429,17 +309,15 @@ public class RecordingActivity extends AppCompatActivity {
 //        startTime.setText(time[1]);
 //        startDate.setText(time[0]);
         partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
-        mFileName += "/outalk" + event.getId() + ".acc";
+//        mFileName += "/outalk" + event.getId() + ".acc";
 
         if (!(CheckMeAdmin())) {
             recordingButton.setClickable(false);
             playingButton.setClickable(false);
-
-        } else {
-            recordOrSave();
         }
-
-
+//        } else {
+//            startRecordOrSaveIt();
+//        }
     }
 
     public void userHasJoinTheEvent(User user) {
@@ -451,7 +329,7 @@ public class RecordingActivity extends AppCompatActivity {
         //{
         //  Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName()+" "+event.getParticipats().get(i).getLastName()+",just joined", Toast.LENGTH_LONG).show();
         //}
-        makeToastLong(user.getFirstName() + " " + user.getLastName() + ",just joined");
+        Toast.makeText(getApplication(), user.getFirstName() + " " + user.getLastName() + ",just joined", Toast.LENGTH_LONG).show();
 
         if (!(event.getParticipats().contains(user)))
             event.addToParticipats(user);
@@ -473,7 +351,7 @@ public class RecordingActivity extends AppCompatActivity {
 //        {
 //            if (event.getParticipats().get(i).getId()==userId)
 //            {
-        makeToastLong(user.getFirstName() + " " + user.getFirstName() + ",just left");
+        Toast.makeText(getApplication(), user.getFirstName() + " " + user.getFirstName() + ",just left", Toast.LENGTH_LONG).show();
         event.delFromParticipats(user);
         runOnUiThread(new Runnable() {
 
@@ -490,73 +368,5 @@ public class RecordingActivity extends AppCompatActivity {
 
     public void SetEventFromNewActivity() {
         SetActivity();
-
-    }
-
-    public void StopRecordingByAdmin() {
-        //notify user about that
-        makeToastLong("The admin has stop the record.");
-        //Toast.makeText(getApplication(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
-        recordOrSave();
-        //stop recording...
-    }
-//    public void convertAccToWavInit() {
-//        AndroidAudioConverter.load(this, new ILoadCallback() {
-//            @Override
-//            public void onSuccess() {
-//                // Great!
-//            }
-//            @Override
-//            public void onFailure(Exception error) {
-//                // FFmpeg is not supported by device
-//            }
-//        });
-//    }
-
-
-//    public void CheckRecordingStatus() {
-//        Repository.instance.getEventRecordingStatus(event.getId(), new CloudManager.CloudCallback<List<Boolean>>() {
-//            @Override
-//            public void onComplete(List<Boolean> data) {
-//                if ((data.get(0) == false) && (!(CheckMeAdmin()))) {
-//                    Log.d("TAG", "Stop recording byadmin func");
-//                    StopRecordingByAdmin();
-//                }
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//
-//            }
-//        });
-//    }
-
-    public void setRecordingStatus() {
-        Log.d("TAG", "SetRecordingStatus func in recordingacitivty");
-        Repository.instance.setRecodrdingStatus(String.valueOf(event.getId()), new CloudManager.CloudCallback() {
-            @Override
-            public void onComplete(Object data) {
-
-            }
-
-            @Override
-            public void onCancel() {
-
-            }
-        });
-
-    }
-
-    public void makeToastLong(String message) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
-            }
-        });
-
     }
 }
-
-
-

@@ -38,7 +38,6 @@ import ResponsesEntitys.UserData;
 
 public class NewEventFragment extends Fragment {
     private NewEventInteraction mListener;
-    private int userId;
     private UserViewModel currentUser = null;
     private List<String> UsersInvites;
     private Button startRecord;
@@ -71,7 +70,6 @@ public class NewEventFragment extends Fragment {
         UsersInvites = new LinkedList<String>();
         invitedPpl = new String(" ");
 
-        userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
 //        currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
 //        currentUser.init(userId, true);
 //        currentUser.getUser().observe(this, new Observer<User>() {
@@ -277,24 +275,24 @@ public class NewEventFragment extends Fragment {
         void startRecording(Event event);
     }
 
-    private void sendInvites(String eventId) {
-        Log.d("TAG", "usrinvites=" + UsersInvites);
-        // String invites = UsersInvites;
-        //String[] items = invites.split(",");
-//        for (String item : items) {
-//            Invite invite = new Invite(eventId, item, "" + userId);
-//            Repository.instance.addNewInvite(invite, new CloudManager.CloudCallback<Invite>() {
-//                @Override
-//                public void onComplete(Invite invite) {
-//                    Log.d("TAG", "succeed adding new invite.");
-//                }
-//
-//                @Override
-//                public void onCancel() {
-//                }
-//            });
-//        }
-    }
+//    private void sendInvites(String eventId) {
+//        Log.d("TAG", "usrinvites=" + UsersInvites);
+//        // String invites = UsersInvites;
+//        //String[] items = invites.split(",");
+////        for (String item : items) {
+////            Invite invite = new Invite(eventId, item, "" + userId);
+////            Repository.instance.addNewInvite(invite, new CloudManager.CloudCallback<Invite>() {
+////                @Override
+////                public void onComplete(Invite invite) {
+////                    Log.d("TAG", "succeed adding new invite.");
+////                }
+////
+////                @Override
+////                public void onCancel() {
+////                }
+////            });
+////        }
+//    }
 
     private void InviteTextViewEdit(View view) {
         getActivity().runOnUiThread(new Runnable() {

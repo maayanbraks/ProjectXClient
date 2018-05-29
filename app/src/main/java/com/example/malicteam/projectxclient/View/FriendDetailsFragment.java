@@ -134,24 +134,24 @@ public class FriendDetailsFragment extends Fragment {
         phoneNumber.setText(user.getPhoneNumber());
 
         //Profile Picture
-        Repository.instance.getProfilePicture(user.getPictureUrl(),
-                new CloudManager.CloudCallback<Bitmap>() {
-                    @Override
-                    public void onComplete(Bitmap data) {
-                        if (data != null) {
-                            profilePicture.setImageBitmap(data);
-                        } else {
-                            profilePicture.setImageResource(R.drawable.outalk_logo);
-                        }
-                    }
+//        Repository.instance.getProfilePicture(user.getPictureUrl(),
+//                new CloudManager.CloudCallback<Bitmap>() {
+//                    @Override
+//                    public void onComplete(Bitmap data) {
+//                        if (data != null) {
+//                            profilePicture.setImageBitmap(data);
+//                        } else {
+//                            profilePicture.setImageResource(R.drawable.outalk_logo);
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancel() {
+//                        profilePicture.setImageResource(R.drawable.outalk_logo);
+//                    }
+//                }
 
-                    @Override
-                    public void onCancel() {
-                        profilePicture.setImageResource(R.drawable.outalk_logo);
-                    }
-                }
-
-        );
+//        );
     }
 
 

@@ -56,6 +56,7 @@ import com.example.malicteam.projectxclient.View.FriendsListFragment;
 import com.example.malicteam.projectxclient.View.ResetPasswordFragment;
 
 import java.net.URISyntaxException;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.example.malicteam.projectxclient.Model.Event;
@@ -65,7 +66,7 @@ import com.example.malicteam.projectxclient.ViewModel.FriendsViewModel;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
+//import com.google.firebase.auth.FirebaseAuth;
 
 import Notifications.EventInvitationNotificationData;
 import ResponsesEntitys.UserData;
@@ -76,9 +77,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private final Class _mainFragmentClass = EventsListFragment.class;
     private final int _mainNavId = R.id.nav_events_list;
-
-
-    //    private List<Event> eventsList = new Link
     private TextView userNameHeader;
     private TextView userEmailHeader;
     private NavigationView navigationView;
@@ -88,10 +86,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int userId;
     private View headerLayout;
     private DrawerLayout mDrawer;
-
-    //New Server
-//    private User mUser = null;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,7 +115,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     userNameHeader.setText(user.getFirstName() + " " + user.getLastName());
                     userEmailHeader.setText(user.getEmail());
                     userId = user.getId();
-//                    refreshList();
                 } else {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);
@@ -146,17 +139,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 GetInvation(data);
             }
         });
-
-//        eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(Adapte
-// rView<?> parent, View view, int position, long id) {
-//                Event event = eventsList.get(position);
-//                Intent intent = new Intent(getApplicationContext(), EventDetails.class);
-//                intent.putExtra(Consts.SEND_EVENT, event);
-//                startActivity(intent);
-//            }
-//        });
 
         //End of
         //Floating add button
@@ -189,7 +171,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mDrawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        //Show Events list as main screen
+        //Show main screen
         loadMainFragment();
     }
 
@@ -291,7 +273,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.logout_actionMenu) {
-            Repository.instance.logout();
+//            Repository.instance.logout();
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
         }
@@ -351,24 +333,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void updateProfilePicture(String url) {
         ImageView profilePic = (ImageView) headerLayout.findViewById(R.id.userPic_head);
-        Repository.instance.getProfilePicture(
-                new CloudManager.CloudCallback<Bitmap>() {
-                    @Override
-                    public void onComplete(Bitmap data) {
-                        try {
-                            profilePic.setImageBitmap(data);
-                        } catch (Exception e) {
-                            profilePic.setImageResource(R.drawable.outalk_logo);
-                        }
-                    }
+//        Repository.instance.getProfilePicture(
+//                new CloudManager.CloudCallback<Bitmap>() {
+//                    @Override
+//                    public void onComplete(Bitmap data) {
+//                        try {
+//                            profilePic.setImageBitmap(data);
+//                        } catch (Exception e) {
+//                            profilePic.setImageResource(R.drawable.outalk_logo);
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancel() {
+//                        profilePic.setImageResource(R.drawable.outalk_logo);
+//                    }
+//                }
 
-                    @Override
-                    public void onCancel() {
-                        profilePic.setImageResource(R.drawable.outalk_logo);
-                    }
-                }
-
-        );
+//        );
     }
 
     /////////////////////////////////////////////////////////////////////////
@@ -634,21 +616,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public void sendResetPassword(String email) {
         ProgressBar progressBar = (ProgressBar) findViewById(R.id.mainProgressBar);
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        auth.sendPasswordResetEmail(email)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(MainActivity.this, "We have sent you instructions to reset your password!", Toast.LENGTH_SHORT).show();
-                            finish();
-                        } else {
-                            Toast.makeText(MainActivity.this, "Failed to send reset email!", Toast.LENGTH_SHORT).show();
-                        }
-
-                        progressBar.setVisibility(View.GONE);
-                    }
-                });
+//        FirebaseAuth auth = FirebaseAuth.getInstance();
+//        auth.sendPasswordResetEmail(email)
+//                .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                        if (task.isSuccessful()) {
+//                            Toast.makeText(MainActivity.this, "We have sent you instructions to reset your password!", Toast.LENGTH_SHORT).show();
+//                            finish();
+//                        } else {
+//                            Toast.makeText(MainActivity.this, "Failed to send reset email!", Toast.LENGTH_SHORT).show();
+//                        }
+//
+//                        progressBar.setVisibility(View.GONE);
+//                    }
+//                });
     }
 
     public void GetInvation(Event event) {
