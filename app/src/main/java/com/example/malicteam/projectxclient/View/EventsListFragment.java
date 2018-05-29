@@ -19,6 +19,7 @@ import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.Repository;
+import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.R;
 
 import java.util.LinkedList;

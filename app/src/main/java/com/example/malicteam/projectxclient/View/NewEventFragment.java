@@ -68,7 +68,7 @@ public class NewEventFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_new_event, container, false);
-        UsersInvites=new LinkedList<String>();
+        UsersInvites = new LinkedList<String>();
         invitedPpl = new String(" ");
 
         userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
@@ -123,22 +123,19 @@ public class NewEventFragment extends Fragment {
                 Date date = new Date();
                 String dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime());
                 event = new Event(null, title, null, description, "" + userId, dateFormat, null);
-                List<User> participats=new LinkedList<>();
+                List<User> participats = new LinkedList<>();
                 participats.add(myUser);
                 UsersInvites.add(myUser.getEmail());
                 event.setParticipats(participats);
 //                    sendInvites("" + event.getId());
                 //Repository.instance.addEvent(event);
                 //UsersInvites.add(myUser.getEmail());
-               // event.addToParticipats(myUser);
-                Repository.instance.addEvent(UsersInvites,event, new AddEventCallback<Boolean>() {
+                // event.addToParticipats(myUser);
+                Repository.instance.addEvent(UsersInvites, event, new AddEventCallback<Boolean>() {
                     @Override
                     public void onSuccees(Boolean data) {
                         if (data) {
-                            Intent intent = new Intent(MyApp.getContext(), RecordingActivity.class);
-                            intent.putExtra("sendNewEvent", event);
-                            intent.putExtra(Consts.USER, myUser);
-                            startActivity(intent);
+                            mListener.startRecording(event);
                         }
                         //   try {
                         //  currentUser.getUser().getValue().addEventToList(Integer.valueOf(event.getId()));
@@ -166,7 +163,7 @@ public class NewEventFragment extends Fragment {
 
                     @Override
                     public void technicalError() {
-                     //   Toast.makeText(getActivity(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
+                        //   Toast.makeText(getActivity(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
                         Log.d("TAG", "In addevent-->neweventfragment ---> Technical error");
                     }
                 });
@@ -200,24 +197,25 @@ public class NewEventFragment extends Fragment {
                                                if (data.equals(myUser.getEmail()))
                                                {
                                                    Log.d("TAG","You cant add yourself to event");
-                                               } else if(invitedPpl.equals(" "))
+                                               } else if(invitedPpl.equals(" ")) {
                                                    invitedPpl = data;
-                                               UsersInvites.add(parti);
-                                               InviteTextViewEdit(view);
+                                                   UsersInvites.add(parti);
+                                                   InviteTextViewEdit(view);
+                                               }
                                               // Log.d("TAG", "In addevent-->neweventfragment----> OnSucess");
                                               // Log.d("TAG", "Sucseed found user, added him");
                                            }
 
-                                           @Override
-                                           public void userIsNotExist() {
+                    @Override
+                    public void userIsNotExist() {
 
-                                           }
+                    }
 
-                                           @Override
-                                           public void technicalError() {
+                    @Override
+                    public void technicalError() {
 
-                                           }
-                                       });
+                    }
+                });
 //
 //                                       Repository.instance.getUserIfExist(parti, new isUserExistResponeCallback() {
 //                                           @Override
@@ -247,9 +245,9 @@ public class NewEventFragment extends Fragment {
 //                                           }
 //
 //                                       });
-                                   }
+            }
 
-                               });
+        });
         // Inflate the layout for this fragment
         return view;
     }
@@ -273,14 +271,15 @@ public class NewEventFragment extends Fragment {
     }
 
 
-    public interface NewEventInteraction extends BasicInteractionInterface{
+    public interface NewEventInteraction extends BasicInteractionInterface {
         // TODO: Update argument type and name
-                void isUserExist(String parti, AddEventCallback<String> callback);
+        void isUserExist(String parti, AddEventCallback<String> callback);
+        void startRecording(Event event);
     }
 
     private void sendInvites(String eventId) {
         Log.d("TAG", "usrinvites=" + UsersInvites);
-       // String invites = UsersInvites;
+        // String invites = UsersInvites;
         //String[] items = invites.split(",");
 //        for (String item : items) {
 //            Invite invite = new Invite(eventId, item, "" + userId);
@@ -303,14 +302,14 @@ public class NewEventFragment extends Fragment {
             public void run() {
 
 //                    try {
-                    thereIsParti = true;
-                    TextView _invites = view.findViewById(R.id.newEvent_Invites);
+                thereIsParti = true;
+                TextView _invites = view.findViewById(R.id.newEvent_Invites);
 
-                    _invites.setText("Participats:" + invitedPpl);
+                _invites.setText("Participats:" + invitedPpl);
 //                    } catch (Exception e) {
 //                        Log.d("TAg", e.getMessage());
 //                    }
-                }
+            }
 
         });
 

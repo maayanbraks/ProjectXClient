@@ -9,14 +9,14 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:gravity="center"
         android:orientation="vertical"
+        android:layout_marginTop="16dp"
         android:padding="@dimen/activity_horizontal_margin">
 
         <android.support.design.widget.TextInputLayout
-            android:padding="2dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:padding="2dp">
 
             <EditText
                 android:id="@+id/new_event_title"
@@ -31,10 +31,10 @@
         </android.support.design.widget.TextInputLayout>
 
         <LinearLayout
-            android:padding="2dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:padding="2dp">
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="0dp"
@@ -59,26 +59,37 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="ADD"
-                android:src="@android:drawable/ic_menu_add"
                 android:backgroundTint="@color/appBackground"
-                android:tint="@color/colorPrimary"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:src="@android:drawable/ic_menu_send"
+                android:text="ADD"
+                android:tint="@color/colorPrimary" />
+
+            <ImageButton
+                android:id="@+id/openFriendsList_NewEvent_Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:backgroundTint="@color/appBackground"
+                android:gravity="center"
+                android:src="@android:drawable/ic_menu_my_calendar"
+                android:text="ADD"
+                android:tint="@color/colorPrimary" />
 
 
         </LinearLayout>
 
         <TextView
-            android:paddingTop="4dp"
             android:id="@+id/newEvent_Invites"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingTop="4dp"
             android:text="Invites:" />
 
         <android.support.design.widget.TextInputLayout
-            android:padding="2dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:padding="2dp">
 
             <EditText
                 android:id="@+id/new_event_description"
@@ -127,15 +138,15 @@
         </LinearLayout>
 
         <Button
-            android:padding="2dp"
             android:id="@+id/new_event_start"
             style="?android:textAppearanceSmall"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:background="@color/colorAccent"
+            android:padding="2dp"
             android:text="Start record"
-            android:textColor="@android:color/black"
+            android:textColor="@android:color/white"
             android:textStyle="bold" />
     </LinearLayout>
 

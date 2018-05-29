@@ -7,7 +7,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.InstrumentationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -76,7 +75,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ResetPasswordFragment.ResetPasswordListener, AddFriendFragment.AddFriendInteraction {
 
     private final Class _mainFragmentClass = EventsListFragment.class;
-    private Class _currentFragmentClass = _mainFragmentClass;
+    private final int _mainNavId = R.id.nav_events_list;
+
 
     //    private List<Event> eventsList = new Link
     private TextView userNameHeader;
@@ -97,7 +97,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        CloudManager cd = new CloudManager();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -147,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 GetInvation(data);
             }
         });
+
 //        eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            @Override
 //            public void onItemClick(Adapte
@@ -184,11 +184,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //Draw
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        for (int i = 0; i < navigationView.getMenu().size(); i++) {
-            if (navigationView.getMenu().getItem(i).getClass().getName().equals(_currentFragmentClass.getName())) {
-                navigationView.getMenu().getItem(i).setChecked(true);
-            }
-        }
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         mDrawer.addDrawerListener(toggle);
@@ -199,6 +194,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void loadMainFragment() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(currentItem != null) {
+                    currentItem.setChecked(false);
+                }
+                currentItem = navigationView.getMenu().findItem(_mainNavId);
+                navigationView.getMenu().findItem(_mainNavId).setChecked(true);
+
+            }
+        });
+
         Bundle bundle = new Bundle();
         bundle.putSerializable(Consts.USER, currentUser.getUser().getValue());
         Fragment mainFragment = null;
@@ -247,41 +254,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void openExitAlert() {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(FriendsListActivity.this);
-//        builder.setTitle("Add New Friend");
-//        builder.setMessage("Enter Email:");
-//        builder.setView(input);
-//        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                emailString = input.getText().toString();
-//                Repository.instance.addFriend(emailString, new CloudManager.CloudCallback<Boolean>() {
-//                    @Override
-//                    public void onComplete(Boolean data) {
-//                        if (data) {
-//                            Toast.makeText(getApplicationContext(), "Added", Toast.LENGTH_SHORT).show();
-
-//                            record_fabreshList();
-//                        } else
-//                            Toast.makeText(getApplicationContext(), "Cannot add to your friends right now, please try later...", Toast.LENGTH_LONG).show();
-//                    }
-//
-//                    @Override
-//                    public void onCancel() {
-//                        dialog.cancel();
-//                    }
-//                });
-//            }
-//        });
-//        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//            @Override
-//            public void onClick(DialogInterface dialog, int which) {
-//                dialog.cancel();
-//            }
-//        });
-//
-//        AlertDialog d = builder.create();
-//        d.show();
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         // set title
         alertDialogBuilder.setTitle("What?! Do you want to exit?");
@@ -418,7 +390,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 })
                 .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
-
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d("TAG", "You have agreed invite");
                         //   agreeToInvite(invite);
@@ -441,14 +412,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void agreeToInvite(Event event) {
         //TODO get in to event
         //tell server we agreed
-        //event.addToParticipats(currentUser.getUser().getValue());
+
         //get in to event.
 
         Repository.instance.AgreeToInvite(event.getId(), new AgreeToEventCallback<Boolean>() {
             @Override
             public void onSuccees(Boolean data) {
-
-
                 getInEvent(event);
             }
 
@@ -470,7 +439,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            }
 //        }, invite);
         //Add event to myeventlist/
-        //Log.d("TAG", "invitegetevnetid=" + event.getId());
+        Log.d("TAG", "invitegetevnetid=" + event.getId());
 //        currentUser.getUser().getValue().addEventToList(Integer.valueOf(eventInvitationNotificationData.getEventId()));
         //update the userDatabase
 //        Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudCallback() {
@@ -703,7 +672,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 })
                 .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        //Log.d("TAG", "You have agreed invite");
+                        Log.d("TAG", "You have agreed invite");
                         agreeToInvite(event);
                         //Todo make Agree to evnet
                         // GetInEvent(invite.getEventId());
@@ -870,6 +839,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
             }
         });
+    }
 
+    @Override
+    public void startRecording(Event event) {
+        loadMainFragment();//For supply home page after click 'Back' from Recording Activity
+        Intent intent = new Intent(MyApp.getContext(), RecordingActivity.class);
+        intent.putExtra(Consts.SEND_EVENT ,event);
+        intent.putExtra(Consts.USER, currentUser.getUser().getValue());
+        startActivity(intent);
     }
 }
