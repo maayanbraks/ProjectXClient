@@ -457,9 +457,11 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
     public void userHasLeftTheEvent(int userId) {
-        for (int i = 0; i < event.getParticipats().size(); i++) {
-            if (event.getParticipats().get(i).getId() == userId) {
-                Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName() + " " + event.getParticipats().get(i).getLastName() + ",just left", Toast.LENGTH_LONG).show();
+        for (int i=0;i<event.getParticipats().size();i++)
+        {
+            if (event.getParticipats().get(i).getId()==userId)
+            {
+                Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName()+" "+event.getParticipats().get(i).getLastName()+",just left", Toast.LENGTH_LONG).show();
             }
         }
     }
