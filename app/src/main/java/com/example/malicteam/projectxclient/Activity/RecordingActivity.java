@@ -97,17 +97,17 @@ public class RecordingActivity extends AppCompatActivity {
         });
         Repository.instance.InitCallbacksForCloudManeger(new RecordingActivityCallback() {
             @Override
-            public void userJoinEvent(int userId) {
-                userHasJoinTheEvent(userId);
+            public void userJoinEvent(User user) {
+                userHasJoinTheEvent(user);
             }
 
             @Override
-            public void userLeftEvent(int userId) {
-                userHasLeftTheEvent((userId));
+            public void userLeftEvent(User user) {
+                userHasLeftTheEvent((user));
             }
 
             @Override
-            public void eventClosed(int eventId) {
+            public void eventClosed(Event event) {
                 StopRecordingByAdmin();
             }
 
@@ -400,7 +400,7 @@ public class RecordingActivity extends AppCompatActivity {
                     TextView partici = findViewById(R.id.participants_recording);
                     _eventTitle.setText(event.getTitle());
                     Date.setText(event.getDate());
-                    partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
+//                    partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
                     mFileName += "/outalk" + event.getId() + ".acc";
                     SetActivity();
                   //  CheckRecordingStatus();
@@ -438,24 +438,50 @@ public class RecordingActivity extends AppCompatActivity {
 
 
     }
-    public void userHasJoinTheEvent(int userId) {
-        for (int i=0;i<event.getParticipats().size();i++)
-        {
+    public void userHasJoinTheEvent(User user) {
+        Log.d("TAG","In userhasjointheEvent func");
+        TextView partici = findViewById(R.id.participants_recording);
+//        for (int i=0;i<event.getParticipats().size();i++)
+//        {
 //            if (event.getParticipats().get(i).get()==userId)
             //{
-                Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName()+" "+event.getParticipats().get(i).getLastName()+",just joined", Toast.LENGTH_LONG).show();
+              //  Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName()+" "+event.getParticipats().get(i).getLastName()+",just joined", Toast.LENGTH_LONG).show();
             //}
-            Toast.makeText(getApplication(), userId+",just joined", Toast.LENGTH_LONG).show();
-        }
-    }
-    public void userHasLeftTheEvent(int userId) {
-        for (int i=0;i<event.getParticipats().size();i++)
-        {
-            if (event.getParticipats().get(i).getId()==userId)
-            {
-                Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName()+" "+event.getParticipats().get(i).getLastName()+",just left", Toast.LENGTH_LONG).show();
+            makeToastLong(user.getFirstName()+" " +user.getLastName()+",just joined");
+
+            if (!(event.getParticipats().contains(user)))
+                event.addToParticipats(user);
+
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+
+                partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
+
             }
+        });
         }
+
+    public void userHasLeftTheEvent(User user) {
+        TextView partici = findViewById(R.id.participants_recording);
+//        for (int i=0;i<event.getParticipats().size();i++)
+//        {
+//            if (event.getParticipats().get(i).getId()==userId)
+//            {
+        makeToastLong(user.getFirstName()+" "+user.getFirstName()+",just left");
+            event.delFromParticipats(user);
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+
+                partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
+
+            }
+        });
+
+//        }
     }
 
     public void SetEventFromNewActivity() {
@@ -465,7 +491,8 @@ public class RecordingActivity extends AppCompatActivity {
 
     public void StopRecordingByAdmin() {
         //notify user about that
-        Toast.makeText(getApplication(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
+        makeToastLong("The admin has stop the record.");
+        //Toast.makeText(getApplication(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
         recordOrSave();
         //stop recording...
     }
@@ -511,6 +538,15 @@ public class RecordingActivity extends AppCompatActivity {
             @Override
             public void onCancel() {
 
+            }
+        });
+
+    }
+    public void makeToastLong(String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
             }
         });
 

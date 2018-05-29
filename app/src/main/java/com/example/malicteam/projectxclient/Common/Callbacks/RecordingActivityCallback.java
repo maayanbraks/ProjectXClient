@@ -1,6 +1,8 @@
 package com.example.malicteam.projectxclient.Common.Callbacks;
 
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
+import com.example.malicteam.projectxclient.Model.Event;
+import com.example.malicteam.projectxclient.Model.User;
 
 import Notifications.UserJoinEventNotification;
 import Notifications.UserLeaveEventNotification;
@@ -10,8 +12,8 @@ import Notifications.UserLeaveEventNotification;
  */
 
 public interface RecordingActivityCallback {
-    void userJoinEvent(int userId);
-    void userLeftEvent(int userId);
-    void eventClosed(int eventId);
+    void userJoinEvent(User user);
+    void userLeftEvent(User user);
+    void eventClosed(Event event);
 
 }

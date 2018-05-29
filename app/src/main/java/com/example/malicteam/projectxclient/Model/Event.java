@@ -155,6 +155,10 @@ public class Event implements Serializable {
     {
         this.participats.add(user);
     }
+    public void delFromParticipats(User user)
+    {
+        this.participats.remove(user);
+    }
     public String getTitle() {
         return title;
     }

@@ -197,12 +197,15 @@ public class NewEventFragment extends Fragment {
                                        mListener.isUserExist(parti, new AddEventCallback<String>() {
                                            @Override
                                            public void onSuccees(String data) {
-                                               if(invitedPpl.equals(" "))
+                                               if (data.equals(myUser.getEmail()))
+                                               {
+                                                   Log.d("TAG","You cant add yourself to event");
+                                               } else if(invitedPpl.equals(" "))
                                                    invitedPpl = data;
                                                UsersInvites.add(parti);
                                                InviteTextViewEdit(view);
-                                               Log.d("TAG", "In addevent-->neweventfragment----> OnSucess");
-                                               Log.d("TAG", "Sucseed found user, added him");
+                                              // Log.d("TAG", "In addevent-->neweventfragment----> OnSucess");
+                                              // Log.d("TAG", "Sucseed found user, added him");
                                            }
 
                                            @Override

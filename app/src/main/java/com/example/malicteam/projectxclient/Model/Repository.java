@@ -8,6 +8,7 @@ import ResponsesEntitys.UserData;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -66,11 +67,8 @@ public class Repository {
     private LocalStorageManager localStorage = new LocalStorageManager();
 
     public Repository() {
-        try {
             CM = new CloudManager();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+
     }
 
 //    public LiveData<User> getUser(int id) {
@@ -753,7 +751,7 @@ public class Repository {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
-                Log.d("TAG","oiasdjadjdjkaspdojaspdojasdojassdoj+gettype="+responseData.getType());
+               // Log.d("TAG","oiasdjadjdjkaspdojaspdojasdojassdoj+gettype="+responseData.getType());
                 switch (responseData.getType()) {
                     case Error:
                         ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
@@ -768,7 +766,7 @@ public class Repository {
                                 break;
                         }
                     case IsUserExistResponse:
-                        Log.d("TAG","IsUserExistResponeseoasjdsodjdsjdodjasd");
+                     //   Log.d("TAG","IsUserExistResponeseoasjdsodjdsjdodjasd");
                         IsUserExistResponseData response = ProductTypeConverters.getObjectFromString(data, IsUserExistResponseData.class);
                         callback.onSuccees(response.getUserData());
                         break;
@@ -785,7 +783,7 @@ public class Repository {
     }
     public void closeEvent(String[] protocol,int eventId,final CloseEventCallback callback) {
         //Init the get friends/contacts list of  User (by email).
-        CloseEventRequestData closeEventRequestData = new CloseEventRequestData(userLiveData.getValue().getEmail(),eventId,new String[]{""});
+        CloseEventRequestData closeEventRequestData = new CloseEventRequestData(userLiveData.getValue().getEmail(),eventId,null);
 
         //send request
         CM.sendToServer("Request", closeEventRequestData, new CloudManager.CloudCallback<String>() {
@@ -919,9 +917,9 @@ public class Repository {
     }
     public void AgreeToInvite(int eventId,final AgreeToEventCallback<Boolean> callback) {
         //Init the get friends/contacts list of  User (by email).
-        JoinEventRequestData joinEventRequestData = new JoinEventRequestData(userLiveData.getValue().getEmail(),eventId);
+        ConfirmEventRequestData confirmEventRequestData = new ConfirmEventRequestData(userLiveData.getValue().getEmail(),eventId);
         //send request
-        CM.sendToServer("Request", joinEventRequestData, new CloudManager.CloudCallback<String>() {
+        CM.sendToServer("Request", confirmEventRequestData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
@@ -992,7 +990,7 @@ public class Repository {
             CM.setRecordingCallback(callback);
 
         }
-    public void InitMainActivityCallback(final MainActivityCallback callback) {
+    public void InitMainActivityCallback(final Observer<Event> callback) {
         CM.setMainActivityCallback(callback);
     }
 

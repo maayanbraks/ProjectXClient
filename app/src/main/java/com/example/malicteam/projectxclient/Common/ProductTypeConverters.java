@@ -58,12 +58,15 @@ public class ProductTypeConverters {
     }
     public static String GenerateStringFromList(List<String> list) {
         String newlist="";
-        if (list != null){
             for (String num : list) {
+                if (!(list.equals(""))){
                 newlist = newlist + "," + num;
+
             }
+                else newlist=""+num;
            //newlist=newlist.substring(0,newlist.length()-1);
         }
+
 
         return newlist;
     }
@@ -81,6 +84,7 @@ public class ProductTypeConverters {
         List<User> users=new LinkedList<>();
         for (int i=0;i<usersData.size();i++)
         {
+        //    Log.d("TAG","userdata="+usersData.get(i).getFirstName());
             users.add(new User(usersData.get(i)));
         }
         return users;

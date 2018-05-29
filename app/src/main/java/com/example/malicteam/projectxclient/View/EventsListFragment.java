@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.example.malicteam.projectxclient.Common.Callbacks.EventListCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Common.MyApp;
+import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.Repository;
@@ -95,13 +96,14 @@ public class EventsListFragment extends Fragment {
 
                 @Override
                 public void UserIsNotExist() {
-                    Toast.makeText(MyApp.getContext(), "User not exist,try again.", Toast.LENGTH_SHORT).show();
+               //    Toast.makeText(MyApp.getContext(), "User not exist,try again.", Toast.LENGTH_SHORT).show();
                     Log.d("TAG", "In getEventFromServer->EventListFragment --->UserIsNotExist");
                 }
 
                 @Override
                 public void userMustToLogin() {
-                    Toast.makeText(MyApp.getContext(), "You must log in first", Toast.LENGTH_SHORT).show();
+
+//                    Toast.makeText(MyApp.getContext(), "You must log in first", Toast.LENGTH_SHORT).show();
                     Log.d("TAG", "In getEventFromServer->EventListFragment --->userMustToLogin");
                 }
             });
@@ -202,12 +204,15 @@ public class EventsListFragment extends Fragment {
                 });
                 TextView _nameEvent = view.findViewById(R.id._nameEvent);
                 TextView _date = view.findViewById(R.id._date);
-
+                TextView _participats = view.findViewById(R.id._participates);
                 _nameEvent.setText(event.getTitle());
+                _participats.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
                 _date.setText(event.getDate());
             }
 
             return view;
         }
+
     }
+
 }

@@ -97,11 +97,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        try {
-            CloudManager cd = new CloudManager();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
+        CloudManager cd = new CloudManager();
 
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -145,10 +141,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, Consts.REQUEST_WRITE_STORAGE);
         }
 
-        Repository.instance.InitMainActivityCallback(new MainActivityCallback() {
+        Repository.instance.InitMainActivityCallback(new Observer<Event>() {
             @Override
-            public void GotInvitation(Event event) {
-                GetInvation(event);
+            public void onChanged(Event data) {
+                GetInvation(data);
             }
         });
 //        eventListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -264,7 +260,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //                    public void onComplete(Boolean data) {
 //                        if (data) {
 //                            Toast.makeText(getApplicationContext(), "Added", Toast.LENGTH_SHORT).show();
-//                            refreshList();
+
+//                            record_fabreshList();
 //                        } else
 //                            Toast.makeText(getApplicationContext(), "Cannot add to your friends right now, please try later...", Toast.LENGTH_LONG).show();
 //                    }
@@ -421,6 +418,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 })
                 .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
+
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d("TAG", "You have agreed invite");
                         //   agreeToInvite(invite);
@@ -443,12 +441,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void agreeToInvite(Event event) {
         //TODO get in to event
         //tell server we agreed
-
+        //event.addToParticipats(currentUser.getUser().getValue());
         //get in to event.
 
         Repository.instance.AgreeToInvite(event.getId(), new AgreeToEventCallback<Boolean>() {
             @Override
             public void onSuccees(Boolean data) {
+
+
                 getInEvent(event);
             }
 
@@ -470,7 +470,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //            }
 //        }, invite);
         //Add event to myeventlist/
-        Log.d("TAG", "invitegetevnetid=" + event.getId());
+        //Log.d("TAG", "invitegetevnetid=" + event.getId());
 //        currentUser.getUser().getValue().addEventToList(Integer.valueOf(eventInvitationNotificationData.getEventId()));
         //update the userDatabase
 //        Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudCallback() {
@@ -703,7 +703,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 })
                 .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Log.d("TAG", "You have agreed invite");
+                        //Log.d("TAG", "You have agreed invite");
                         agreeToInvite(event);
                         //Todo make Agree to evnet
                         // GetInEvent(invite.getEventId());
