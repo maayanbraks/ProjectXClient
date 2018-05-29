@@ -1,0 +1,39 @@
+Index: app/src/main/java/com/example/malicteam/projectxclient/Model/Repository.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/malicteam/projectxclient/Model/Repository.java	(revision f6b4c9eb1db6e589717d1b09fcd1eb2bf076d104)
++++ app/src/main/java/com/example/malicteam/projectxclient/Model/Repository.java	(revision )
+@@ -924,7 +924,7 @@
+ 
+ 
+     public void addEvent(List<String> usersMails,Event event,final AddEventCallback<Boolean> callback) {
+-        CreateEventRequestData createEventRequestData = new CreateEventRequestData(userLiveData.getValue().getEmail(),ProductTypeConverters.GenerateListUserToListMails(event.getParticipats()),event.getTitle(), event.getDescription());
++        CreateEventRequestData createEventRequestData = new CreateEventRequestData(userLiveData.getValue().getEmail(),usersMails,event.getTitle(), event.getDescription());
+         CM.sendToServer("Request", createEventRequestData, new CloudManager.CloudCallback<String>() {
+             @Override
+             public void onComplete(String response) {
+Index: app/src/main/java/com/example/malicteam/projectxclient/View/NewEventFragment.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+--- app/src/main/java/com/example/malicteam/projectxclient/View/NewEventFragment.java	(revision f6b4c9eb1db6e589717d1b09fcd1eb2bf076d104)
++++ app/src/main/java/com/example/malicteam/projectxclient/View/NewEventFragment.java	(revision )
+@@ -125,6 +125,7 @@
+                 event = new Event(null, title, null, description, "" + userId, dateFormat, null);
+                 List<User> participats=new LinkedList<>();
+                 participats.add(myUser);
++                UsersInvites.add(myUser.getEmail());
+                 event.setParticipats(participats);
+ //                    sendInvites("" + event.getId());
+                 //Repository.instance.addEvent(event);
+@@ -198,6 +199,7 @@
+                                            public void onSuccees(String data) {
+                                                if(invitedPpl.equals(" "))
+                                                    invitedPpl = data;
++                                               UsersInvites.add(parti);
+                                                InviteTextViewEdit(view);
+                                                Log.d("TAG", "In addevent-->neweventfragment----> OnSucess");
+                                                Log.d("TAG", "Sucseed found user, added him");
