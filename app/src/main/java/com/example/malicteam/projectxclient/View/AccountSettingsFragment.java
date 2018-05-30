@@ -29,7 +29,12 @@ import com.example.malicteam.projectxclient.R;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
 public class AccountSettingsFragment extends Fragment {
-    private OnFragmentInteractionListener mListener;
+    public interface AccountSettingsInteraction {
+        void logout();
+        void wantToEditAccount(String newFirstName, String newLastName, String newEmail, String newPhone);
+    }
+
+    private AccountSettingsInteraction mListener;
     private UserViewModel viewModel = null;
     private int _userId;
     private String newFirstName = null;
@@ -65,31 +70,23 @@ public class AccountSettingsFragment extends Fragment {
             this._userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
             viewModel = ViewModelProviders.of(this).get(UserViewModel.class);
             //viewModel.initUser(_userId, true);
-//            viewModel.getUser().observe(this, new Observer<User>() {
-//                @Override
-//                public void onChanged(@Nullable User user) {
-//                    initDetails(user, view);
-//                }
-//            });
-//        }
+            viewModel.getUser().observe(this, new Observer<User>() {
+                @Override
+                public void onChanged(@Nullable User user) {
+                    initDetails(view);
+                }
+            });
             initButtons(view);
-            // Inflate the layout for this fragment
-            return view;
+            initDetails(view);
         }
         return view;
-    }
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
     }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof AccountSettingsInteraction) {
+            mListener = (AccountSettingsInteraction) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement NewEventInteraction");
@@ -102,17 +99,13 @@ public class AccountSettingsFragment extends Fragment {
         mListener = null;
     }
 
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
-
 
     /*
     * PRIVATES METHODS:
     */
-    private void initDetails(User user, View view) {
-        if (viewModel.getUser() != null) {
+    private void initDetails(View view) {
+        User user = viewModel.getUser().getValue();
+        if (user != null) {
             EditText firstName = (EditText) view.findViewById(R.id.firstName_editAccount);
             EditText lastName = (EditText) view.findViewById(R.id.lastName_editAccount);
             EditText email = (EditText) view.findViewById(R.id.email_editAccount);
@@ -131,6 +124,7 @@ public class AccountSettingsFragment extends Fragment {
                 profilePic.setImageResource(R.drawable.outalk_logo);
         }
     }
+
     private void initProfilePicture() {
 //        Repository.instance.getProfilePicture(
 //                new CloudManager.CloudCallback<Bitmap>() {
@@ -150,6 +144,7 @@ public class AccountSettingsFragment extends Fragment {
 //                }
 //        );
     }
+
     private void initButtons(View view) {
         Button changeDetailsAccount = (Button) view.findViewById(R.id.changeButton_editAccount);
         changeDetailsAccount.setOnClickListener(new View.OnClickListener() {
@@ -169,14 +164,15 @@ public class AccountSettingsFragment extends Fragment {
                 if (!((EditText) view.findViewById(R.id.phoneNumber_editAccount)).getText().toString().equals(viewModel.getUser().getValue().getPhoneNumber()))
                     newPhone = ((EditText) view.findViewById(R.id.phoneNumber_editAccount)).getText().toString();
 
-                Bundle bundle = new Bundle();
-                bundle.putString(Consts.FIRST_NAME, newFirstName);
-                bundle.putString(Consts.LAST_NAME, newLastName);
-                bundle.putString(Consts.EMAIL, newEmail);
-                bundle.putString(Consts.PHONE_NUMBER, newPhone);
-                ChangeDetailsFragment changeDialog = new ChangeDetailsFragment();
-                changeDialog.setArguments(bundle);
-                changeDialog.show(getActivity().getSupportFragmentManager(), "ChangeDetailsDialog");
+                mListener.wantToEditAccount(newFirstName, newLastName, newEmail, newPhone);
+//                Bundle bundle = new Bundle();
+//                bundle.putString(Consts.FIRST_NAME, newFirstName);
+//                bundle.putString(Consts.LAST_NAME, newLastName);
+//                bundle.putString(Consts.EMAIL, newEmail);
+//                bundle.putString(Consts.PHONE_NUMBER, newPhone);
+//                ChangeDetailsFragment changeDialog = new ChangeDetailsFragment();
+//                changeDialog.setArguments(bundle);
+//                changeDialog.show(getActivity().getSupportFragmentManager(), "ChangeDetailsDialog");
             }
         });
 
@@ -200,7 +196,7 @@ public class AccountSettingsFragment extends Fragment {
         signOutButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Todo signout from account settings
+                mListener.logout();
 //                LogoutDialogFragment logoutDialog = new LogoutDialogFragment();
 //                logoutDialog.show(getActivity().getSupportFragmentManager(), "LogoutDialog");
 //                Intent intent = new Intent(AccountSettingsActivity.this, MainActivity.class);
@@ -251,7 +247,8 @@ public class AccountSettingsFragment extends Fragment {
             }
         });
     }
-    private void saveProfilePicture(View view){
+
+    private void saveProfilePicture(View view) {
 //        Repository.instance.saveProfilePicture(bitmap, viewModel.getUser().getValue().getEmail(), new CloudManager.CloudCallback<String>() {
 //            @Override
 //            public void onComplete(String url) {
