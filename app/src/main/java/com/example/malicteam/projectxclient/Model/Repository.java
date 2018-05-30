@@ -28,6 +28,7 @@ import com.example.malicteam.projectxclient.Common.Callbacks.DeclineToEventCallb
 import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.EventListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.FriendsListCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.LeaveEventCallBack;
 import com.example.malicteam.projectxclient.Common.Callbacks.LogInCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.MainActivityCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
@@ -949,6 +950,40 @@ public class Repository {
                         switch (errorResponseData.getErrorType()) {
                             case UserIsNotExist:
                                 callback.UserIsNotExist();
+                                break;
+                            case NoPendingEvents:
+                                callback.NoPendingEvents();
+                                break;
+                            default:
+                                break;
+                        }
+                    case Boolean:
+                        callback.onSuccees(true);
+                        break;
+
+                    default:
+                        return;
+                }
+            }
+            @Override
+            public void onCancel() {
+            }
+        });
+    }
+    public void leaveEventRequest(int eventId, final LeaveEventCallBack<Boolean> callback) {
+        //Init the get friends/contacts list of  User (by email).
+        LeaveEventRequestData leaveEventRequestData = new LeaveEventRequestData(userLiveData.getValue().getEmail(),eventId);
+        //send request
+        CloudManager.instance.sendToServer("Request", leaveEventRequestData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String data) {
+                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
+                switch (responseData.getType()) {
+                    case Error:
+                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
+                        switch (errorResponseData.getErrorType()) {
+                            case TechnicalError:
+                                callback.TechnicalError();
                                 break;
                             case NoPendingEvents:
                                 callback.NoPendingEvents();
