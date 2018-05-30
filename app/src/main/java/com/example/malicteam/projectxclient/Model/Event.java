@@ -52,11 +52,20 @@ public class Event implements Serializable {
 
     @Ignore
     private List<User> participats;
-    private String recordURL;
     private String adminId;
     private String description;
     private String EventStartTime;
     private boolean isRecording;
+
+    public boolean isConverted() {
+        return isConverted;
+    }
+
+    public void setConverted(boolean converted) {
+        isConverted = converted;
+    }
+
+    private boolean isConverted;
     private static final long serialVersionUID = 1L;
 
     public Event() {
@@ -65,15 +74,15 @@ public class Event implements Serializable {
         //       this.content = "";
         this.date = "";
         participats = new LinkedList<User>();
-        this.recordURL = "";
         this.adminId = "";
         this.description = "";
         this.EventStartTime = "";
         this.isRecording = true;
+        this.isConverted=false;
     }
 
     @Ignore
-    public Event(String content, String title, List<User> participats, String description, String adminId, String time, String url) {
+    public Event(String content, String title, List<User> participats, String description, String adminId, String time) {
         this.isRecording = true;
         //    this.content = content;
         this.title = title;
@@ -85,11 +94,10 @@ public class Event implements Serializable {
         this.date = dateFormat.format(d);
         this.id = Math.abs((this.adminId + this.date).hashCode());
         EventStartTime = time;
-        this.recordURL = url;
 
     }
 
-    public Event(String content, String title, List<User> participats, String description, String adminId, String time, int id, String url) {
+    public Event(String content, String title, List<User> participats, String description, String adminId, String time, int id) {
         this.isRecording = true;
         //     this.content = content;
         this.title = title;
@@ -101,12 +109,11 @@ public class Event implements Serializable {
         this.date = dateFormat.format(d);
         this.id = id;
         this.EventStartTime = time;
-        this.recordURL = url;
 
     }
 
     @Ignore
-    public Event(String content, String title, List<User> participats, String description, String adminId, String time, String id, String url) {
+    public Event(String content, String title, List<User> participats, String description, String adminId, String time, String id) {
         this.isRecording = true;
         //      this.content = content;
         this.title = title;
@@ -118,7 +125,6 @@ public class Event implements Serializable {
         this.date = dateFormat.format(d);
         this.id = Integer.valueOf(id);
         this.EventStartTime = time;
-        this.recordURL = url;
 
     }
 
@@ -133,8 +139,11 @@ public class Event implements Serializable {
         Date d = new Date();
         this.date = eventData.getDateCreated();
         this.id = eventData.getId();
-        this.EventStartTime = " ";
-        this.recordURL = " ";
+        //TODO
+        //set the starttime to eventdata starttime
+        this.EventStartTime = " " ;
+        this.isConverted=eventData.getIsConverted();
+        this.isRecording=eventData.getIsRecording();
     }
 
     public String getEventStartTime() {
@@ -185,9 +194,6 @@ public class Event implements Serializable {
         this.description = description;
     }
 
-    public void setRecordURL(String recordURL) {
-        this.recordURL = recordURL;
-    }
 
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -201,9 +207,6 @@ public class Event implements Serializable {
         this.id = id;
     }
 
-    public String getRecordURL() {
-        return recordURL;
-    }
 
     public boolean isRecording() {
         return isRecording;
@@ -221,7 +224,6 @@ public class Event implements Serializable {
                 ", title='" + title + '\'' +
                 ", date='" + date + '\'' +
                 ", usersIds='" + participats + '\'' +
-                ", recordURL='" + recordURL + '\'' +
                 ", adminId='" + adminId + '\'' +
                 ", description='" + description + '\'' +
                 ", EventStartTime='" + EventStartTime + '\'' +

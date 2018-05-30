@@ -240,5 +240,14 @@ public class CloudManager {
         Log.d("TAG", "sendLoginEvent " + jsonString);
         socket.emit("Login", jsonString);
     }
-
+    public void registerRequest(Object obj, final CloudCallback<String> cloudManagerCallback) {
+        localCallbackCloudManager = cloudManagerCallback;
+        String jsonString = ProductTypeConverters.getStringFromObject(obj);
+        Log.d("TAG", "Register " + jsonString);
+        socket.emit("Register", jsonString);
+    }
+    public void disconnect() {
+        socket.disconnect();
+        socket=null;
+    }
 }

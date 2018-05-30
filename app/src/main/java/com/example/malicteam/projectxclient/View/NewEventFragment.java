@@ -122,7 +122,7 @@ public class NewEventFragment extends Fragment {
                 String dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime());
                 event = new Event(null, title,new LinkedList<User>(), description, myUser.getEmail(), dateFormat, null);
                 List<User> participats = new LinkedList<>();
-                participats.add(myUser);
+                //participats.add(myUser);
                 UsersInvites.add(myUser.getEmail());
                 event.setParticipats(participats);
 //                    sendInvites("" + event.getId());

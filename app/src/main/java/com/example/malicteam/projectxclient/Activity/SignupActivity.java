@@ -207,7 +207,12 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     private void makeToastLong(String message) {
-        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG);
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private boolean checkInputs(String fName, String lName, String password, String email, String phoneNumber) {
