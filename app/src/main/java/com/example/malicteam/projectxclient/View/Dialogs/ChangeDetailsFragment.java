@@ -15,12 +15,11 @@ import com.example.malicteam.projectxclient.Model.Repository;
 
 public class ChangeDetailsFragment extends DialogFragment {
     public interface DetailsDialogInteraction {
-        void edit(String firstName, String lastName, String email, String phone);
+        void edit(String firstName, String lastName, String phone);
     }
     private DetailsDialogInteraction mListener;
     private String _first = null;
     private String _last = null;
-    private String _email = null;
     private String _phone = null;
 
     @Override
@@ -45,8 +44,6 @@ public class ChangeDetailsFragment extends DialogFragment {
             str += " First Name, ";
         if (_last != null)
             str += " Last Name";
-        if (_email != null)
-            str += " Email";
         if (_phone != null)
             str += " Phone Number";
         str += " ?";
@@ -55,8 +52,8 @@ public class ChangeDetailsFragment extends DialogFragment {
         builder.setMessage(str)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mListener.edit(_first, _last, _email, _phone);
-//                        Repository.instance.changeUserDetails(_first, _last, _email, _phone, new CloudManager.CloudCallback<String>() {
+                        mListener.edit(_first, _last, _phone);
+//                        Repository.instance.changeUserDetails(_first, _last, _phone, new CloudManager.CloudCallback<String>() {
 //                            @Override
 //                            public void onComplete(String data) {
 //                                if (data != null && data != "")
@@ -87,7 +84,6 @@ public class ChangeDetailsFragment extends DialogFragment {
     private void getArgumentsAndInit() {
         _first = getArguments().getString(Consts.FIRST_NAME);
         _last = getArguments().getString(Consts.LAST_NAME);
-        _email = getArguments().getString(Consts.EMAIL);
         _phone = getArguments().getString(Consts.PHONE_NUMBER);
     }
 }

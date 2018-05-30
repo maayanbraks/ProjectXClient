@@ -291,7 +291,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = menuItem.getItemId();
         switch (id) {
             case R.id.nav_settings_account:
-                bundle.putInt(Consts.USER_ID, userId);
+                bundle.putSerializable(Consts.USER, currentUser.getUser().getValue());
                 fragmentClass = AccountSettingsFragment.class;
                 break;
             case R.id.nav_events_list:
@@ -846,11 +846,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void wantToEditAccount(String newFirstName, String newLastName, String newEmail, String newPhone) {
+    public void wantToEditAccount(String newFirstName, String newLastName, String newPhone) {
         Bundle bundle = new Bundle();
         bundle.putString(Consts.FIRST_NAME, newFirstName);
         bundle.putString(Consts.LAST_NAME, newLastName);
-        bundle.putString(Consts.EMAIL, newEmail);
         bundle.putString(Consts.PHONE_NUMBER, newPhone);
         ChangeDetailsFragment changeDialog = new ChangeDetailsFragment();
         changeDialog.setArguments(bundle);
@@ -858,8 +857,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void edit(String firstName, String lastName, String email, String phone) {
-        Repository.instance.editUser(firstName, lastName, email, phone, new EditUserCallback<Boolean>() {
+    public void edit(String firstName, String lastName, String phone) {
+        if(firstName == null)
+            firstName = currentUser.getUser().getValue().getFirstName();
+        if(lastName == null)
+            lastName = currentUser.getUser().getValue().getLastName();
+        if(phone == null)
+            phone = currentUser.getUser().getValue().getPhoneNumber();
+        Repository.instance.editUser(firstName, lastName, currentUser.getUser().getValue().getEmail(), phone, new EditUserCallback<Boolean>() {
             @Override
             public void onSuccees(Boolean data) {
                 makeToastShort("Your Details Were Updated");

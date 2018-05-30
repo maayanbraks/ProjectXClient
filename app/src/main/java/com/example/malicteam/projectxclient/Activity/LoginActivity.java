@@ -29,9 +29,8 @@ public class LoginActivity extends Activity {
     private Button btnSignup, btnLogin, btnReset;
 
 
-    private final String DEFAULT_USER = "SaharMail";
-    private final String DEFAULT_PASSWORD = "A";
-
+    private final String DEFAULT_USER = "RoeeMail";
+    private final String DEFAULT_PASSWORD = "F";
 
 
     @Override
@@ -92,25 +91,23 @@ public class LoginActivity extends Activity {
         String password = inputPassword.getText().toString();
 
 
+        if (TextUtils.isEmpty(email) && TextUtils.isEmpty(password)) {
+            //DEFAULT
+            email = DEFAULT_USER;
+            password = DEFAULT_PASSWORD;
 
-
-        //DEFAULT
-        email = DEFAULT_USER;
-        password = DEFAULT_PASSWORD;
-
-
-
-
-        //check the inputs
-        if (TextUtils.isEmpty(email)) {
-          // Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
-            makeToastLong("Enter email address!");
-            return;
-        }
-        if (TextUtils.isEmpty(password)) {
-            //Toast.makeText(getApplicationContext(), "Enter password!", Toast.LENGTH_SHORT).show();
-            makeToastLong("Enter password!");
-            return;
+        } else {
+            //check the inputs
+            if (TextUtils.isEmpty(email)) {
+                // Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
+                makeToastLong("Enter email address!");
+                return;
+            }
+            if (TextUtils.isEmpty(password)) {
+                //Toast.makeText(getApplicationContext(), "Enter password!", Toast.LENGTH_SHORT).show();
+                makeToastLong("Enter password!");
+                return;
+            }
         }
 
         progressBar.setVisibility(View.VISIBLE);
@@ -118,6 +115,13 @@ public class LoginActivity extends Activity {
 
         //CLOUD MANAGER - New Server (Sahar & Gal)
         Repository.instance.logIn(email, password, new LogInCallback<User>() {
+            @Override
+            public void IncorrectCredentials() {
+                Log.d("TAG", "In Login-->IncorrectCredentials");
+                //Toast.makeText(getApplicationContext(), getString(R.string.auth_failed), Toast.LENGTH_SHORT).show();
+                makeToastLong("IncorrectCredentials");
+            }
+
             @Override
             public void onBoolean(boolean bool) {
                 Log.d("TAG", "In Login-->LoginActivity ---> False");
@@ -128,14 +132,14 @@ public class LoginActivity extends Activity {
             @Override
             public void technicalError() {
                 Log.d("TAG", "In Login-->LoginActivity ---> Technical error");
-               // Toast.makeText(getApplicationContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getApplicationContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
                 makeToastLong("Technical error,please try again.");
             }
 
             @Override
             public void userIsNotExist() {
                 Log.d("TAG", "In Login-->LoginActivity ---> UserIsNotExist");
-             //   Toast.makeText(getApplicationContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
+                //   Toast.makeText(getApplicationContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
                 makeToastLong("Can`t find username.");
             }
 
@@ -223,6 +227,7 @@ public class LoginActivity extends Activity {
 //                    }
 //                });
     }
+
     private void makeToastLong(String message) {
         runOnUiThread(new Runnable() {
             @Override

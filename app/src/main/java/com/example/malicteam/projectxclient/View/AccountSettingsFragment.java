@@ -31,15 +31,13 @@ import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 public class AccountSettingsFragment extends Fragment {
     public interface AccountSettingsInteraction {
         void logout();
-        void wantToEditAccount(String newFirstName, String newLastName, String newEmail, String newPhone);
+        void wantToEditAccount(String newFirstName, String newLastName, String newPhone);
     }
 
     private AccountSettingsInteraction mListener;
     private UserViewModel viewModel = null;
-    private int _userId;
     private String newFirstName = null;
     private String newLastName = null;
-    private String newEmail = null;
     private String newPhone = null;
     private ImageView profilePicture;
     private Bitmap bitmap = null;
@@ -67,9 +65,8 @@ public class AccountSettingsFragment extends Fragment {
         if (getArguments() != null) {
             profilePicture = (ImageView) view.findViewById(R.id.userPic_editAccount);
 
-            this._userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
             viewModel = ViewModelProviders.of(this).get(UserViewModel.class);
-            //viewModel.initUser(_userId, true);
+            viewModel.initUser((User)getArguments().getSerializable(Consts.USER));
             viewModel.getUser().observe(this, new Observer<User>() {
                 @Override
                 public void onChanged(@Nullable User user) {
@@ -108,12 +105,10 @@ public class AccountSettingsFragment extends Fragment {
         if (user != null) {
             EditText firstName = (EditText) view.findViewById(R.id.firstName_editAccount);
             EditText lastName = (EditText) view.findViewById(R.id.lastName_editAccount);
-            EditText email = (EditText) view.findViewById(R.id.email_editAccount);
             EditText phoneNumber = (EditText) view.findViewById(R.id.phoneNumber_editAccount);
 
             firstName.setText(user.getFirstName());
             lastName.setText(user.getLastName());
-            email.setText(user.getEmail());
             phoneNumber.setText(user.getPhoneNumber());
 
             ImageView profilePic = (ImageView) view.findViewById(R.id.userPic_editAccount);
@@ -158,17 +153,13 @@ public class AccountSettingsFragment extends Fragment {
                 if (!((EditText) view.findViewById(R.id.lastName_editAccount)).getText().toString().equals(viewModel.getUser().getValue().getLastName()))
                     newLastName = ((EditText) view.findViewById(R.id.lastName_editAccount)).getText().toString();
 
-                if (!((EditText) view.findViewById(R.id.email_editAccount)).getText().toString().equals(viewModel.getUser().getValue().getEmail()))
-                    newEmail = ((EditText) view.findViewById(R.id.email_editAccount)).getText().toString();
-
                 if (!((EditText) view.findViewById(R.id.phoneNumber_editAccount)).getText().toString().equals(viewModel.getUser().getValue().getPhoneNumber()))
                     newPhone = ((EditText) view.findViewById(R.id.phoneNumber_editAccount)).getText().toString();
 
-                mListener.wantToEditAccount(newFirstName, newLastName, newEmail, newPhone);
+                mListener.wantToEditAccount(newFirstName, newLastName, newPhone);
 //                Bundle bundle = new Bundle();
 //                bundle.putString(Consts.FIRST_NAME, newFirstName);
 //                bundle.putString(Consts.LAST_NAME, newLastName);
-//                bundle.putString(Consts.EMAIL, newEmail);
 //                bundle.putString(Consts.PHONE_NUMBER, newPhone);
 //                ChangeDetailsFragment changeDialog = new ChangeDetailsFragment();
 //                changeDialog.setArguments(bundle);
@@ -222,17 +213,17 @@ public class AccountSettingsFragment extends Fragment {
             }
         });
 
-        Button deleteAccount = (Button) view.findViewById(R.id.deleteAccount_button);
-        deleteAccount.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                RemoveAccountDialogFragment removeAccountDialog = new RemoveAccountDialogFragment();
-                removeAccountDialog.show(getActivity().getSupportFragmentManager(), "RemoveAccountDialog");
-//                getActivity().getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.Layout_container, removeAccountDialog,"removeAccountDialog")
-//                        .addToBackStack(null)
-//                        .commit();
-            }
-        });
+//        Button deleteAccount = (Button) view.findViewById(R.id.deleteAccount_button);
+//        deleteAccount.setOnClickListener(new View.OnClickListener() {
+//            public void onClick(View v) {
+//                RemoveAccountDialogFragment removeAccountDialog = new RemoveAccountDialogFragment();
+//                removeAccountDialog.show(getActivity().getSupportFragmentManager(), "RemoveAccountDialog");
+////                getActivity().getSupportFragmentManager().beginTransaction()
+////                        .replace(R.id.Layout_container, removeAccountDialog,"removeAccountDialog")
+////                        .addToBackStack(null)
+////                        .commit();
+//            }
+//        });
 
 
         Button changePicture = (Button) view.findViewById(R.id.changePictureButton_editAccount);

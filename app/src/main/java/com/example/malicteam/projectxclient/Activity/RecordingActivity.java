@@ -2,7 +2,6 @@ package com.example.malicteam.projectxclient.Activity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.media.AudioFormat;
 import android.media.MediaPlayer;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -17,7 +16,6 @@ import android.widget.Toast;
 import com.example.malicteam.projectxclient.Common.Callbacks.CloseEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
-import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.IRecorder;
@@ -28,11 +26,6 @@ import com.example.malicteam.projectxclient.R;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-
-import android.Manifest;
-
-import UpdateObjects.CloseEvent;
 
 
 public class RecordingActivity extends AppCompatActivity {
@@ -72,16 +65,15 @@ public class RecordingActivity extends AppCompatActivity {
         initView();
     }
 
-    private void initView(){
+    private void initView() {
         TextView onAir = findViewById(R.id.onAir_recording);
         //Recording Button + "On Air" image
-        if(recorder.isRecording()){//if recording now
+        if (recorder.isRecording()) {//if recording now
             recordingButton.setImageResource(android.R.drawable.ic_menu_save);
             onAir.setVisibility(View.VISIBLE);
             playingButton.setClickable(false);
             playingButton.setVisibility(View.INVISIBLE);
-        }
-        else{
+        } else {
             recordingButton.setImageResource(android.R.drawable.ic_btn_speak_now);
             onAir.setVisibility(View.INVISIBLE);
             playingButton.setImageResource(android.R.drawable.ic_media_play);
@@ -89,10 +81,9 @@ public class RecordingActivity extends AppCompatActivity {
             playingButton.setVisibility(View.VISIBLE);
         }
         //Playing Button
-        if(!mStartToPlayMedia){//if next click should be pause
+        if (!mStartToPlayMedia) {//if next click should be pause
             playingButton.setImageResource(android.R.drawable.ic_media_pause);
-        }
-        else{
+        } else {
             playingButton.setImageResource(android.R.drawable.ic_media_play);
         }
     }
@@ -131,17 +122,27 @@ public class RecordingActivity extends AppCompatActivity {
         }
     }
 
+    private void backClicked() {
+        if (!mStartToPlayMedia)
+            stopPlaying();
+        if (recorder.isRecording())
+            startRecordOrSaveIt();
+
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        backClicked();
+    }
+
     private void initButtons() {
         TextView backButton = (TextView) findViewById(R.id.back_btn_recording);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!mStartToPlayMedia)
-                    stopPlaying();
-                if (recorder.isRecording())
-                    startRecordOrSaveIt();
-
-                finish();
+                backClicked();
             }
         });
         recordingButton = (ImageButton) findViewById(R.id.buttonRecordStart);
@@ -149,7 +150,7 @@ public class RecordingActivity extends AppCompatActivity {
         recordingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (CheckMeAdmin()) {
+                if (checkMeAdmin()) {
                     startRecordOrSaveIt();
                 }
             }
@@ -160,7 +161,7 @@ public class RecordingActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (mStartToPlayMedia && CheckMeAdmin()) {
+                        if (mStartToPlayMedia && checkMeAdmin()) {
                             playOrPause();
                         }
                     }
@@ -231,13 +232,15 @@ public class RecordingActivity extends AppCompatActivity {
 
     private void stopRecording() {
         recorder.stopRecording();
-        if (CheckMeAdmin()) {
+        if (checkMeAdmin()) {
             shareEvent();
+        } else {
+//            leaveEvent();
         }
         Log.d("TAG", "Stop recording func");
     }
 
-    private void shareEvent(){
+    private void shareEvent() {
         Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
         Repository.instance.closeEvent(null, event.getId(), mFileName, new CloseEventCallback() {
             @Override
@@ -268,7 +271,7 @@ public class RecordingActivity extends AppCompatActivity {
         });
     }
 
-    private boolean CheckMeAdmin() {
+    private boolean checkMeAdmin() {
         if ((myUser.getEmail()).equals(event.getAdminId())) {
             return true;
         }
@@ -311,7 +314,7 @@ public class RecordingActivity extends AppCompatActivity {
         partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
 //        mFileName += "/outalk" + event.getId() + ".acc";
 
-        if (!(CheckMeAdmin())) {
+        if (!(checkMeAdmin())) {
             recordingButton.setClickable(false);
             playingButton.setClickable(false);
         }
