@@ -1072,7 +1072,7 @@ public class Repository {
 
     public void createUser(User user, String credential, CreateUserCallback<Boolean> callback) {
         CreateUserRequestData createUserRequestData = new CreateUserRequestData(user.getEmail(), credential, user.getFirstName(), user.getLastName(), user.getPhoneNumber(), null, null);
-        CloudManager.instance.sendToServer("Request", createUserRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.registerRequest(createUserRequestData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);

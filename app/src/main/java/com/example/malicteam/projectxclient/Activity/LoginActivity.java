@@ -29,8 +29,8 @@ public class LoginActivity extends Activity {
     private Button btnSignup, btnLogin, btnReset;
 
 
-    private final String DEFAULT_USER = "SaharMail";
-    private final String DEFAULT_PASSWORD = "A";
+    private final String DEFAULT_USER = "EdenMail";
+    private final String DEFAULT_PASSWORD = "D";
 
 
 
@@ -103,11 +103,13 @@ public class LoginActivity extends Activity {
 
         //check the inputs
         if (TextUtils.isEmpty(email)) {
-            Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
+          // Toast.makeText(getApplicationContext(), "Enter email address!", Toast.LENGTH_SHORT).show();
+            makeToastLong("Enter email address!");
             return;
         }
         if (TextUtils.isEmpty(password)) {
-            Toast.makeText(getApplicationContext(), "Enter password!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getApplicationContext(), "Enter password!", Toast.LENGTH_SHORT).show();
+            makeToastLong("Enter password!");
             return;
         }
 
@@ -119,33 +121,30 @@ public class LoginActivity extends Activity {
             @Override
             public void onBoolean(boolean bool) {
                 Log.d("TAG", "In Login-->LoginActivity ---> False");
-                Toast.makeText(getApplicationContext(), getString(R.string.auth_failed), Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), getString(R.string.auth_failed), Toast.LENGTH_SHORT).show();
+                makeToastLong(getString(R.string.auth_failed));
             }
 
             @Override
             public void technicalError() {
                 Log.d("TAG", "In Login-->LoginActivity ---> Technical error");
-                Toast.makeText(getApplicationContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(getApplicationContext(), "Technical error,please try again.", Toast.LENGTH_SHORT).show();
+                makeToastLong("Technical error,please try again.");
             }
 
             @Override
             public void userIsNotExist() {
                 Log.d("TAG", "In Login-->LoginActivity ---> UserIsNotExist");
-                Toast.makeText(getApplicationContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
+             //   Toast.makeText(getApplicationContext(), "Can`t find username.", Toast.LENGTH_SHORT).show();
+                makeToastLong("Can`t find username.");
             }
 
             @Override
             public void login(User data) {
-                Log.d("TAG", "Login succefull");
-                //TODO
-                // toast and then new intent
- //               Toast.makeText(MyApp.getContext(), "logging in...", Toast.LENGTH_SHORT).show();
-                // create intent
+
+                makeToastLong("Login succefull");
+
                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                // Get UserDate Object from Server
-                // loginResponseData = ProductTypeConverters.getObjectFromString(data.toString(), LoginResponseData.class);
-                // Convert to User Object
-//                User myUser = new User(loginResponseData.getFirstName(), loginResponseData.getLastName(), loginResponseData.getPhone(), email, null, null, 1, loginResponseData.getId());
                 intent.putExtra(Consts.USER, data);
                 startActivity(intent);
                 finish();
@@ -153,7 +152,8 @@ public class LoginActivity extends Activity {
 
             @Override
             public void UseIsAllReadyLoggedIn() {
-                Log.d("TAG", "In Login-->LoginActivity ---> UseIsAllReadyLoggedIn");
+
+                makeToastLong("User is allready Logged in");
                 //Toast.makeText(MyApp.getContext(), "User is already loogged in.", Toast.LENGTH_SHORT).show();
             }
 //            @Override
@@ -222,6 +222,14 @@ public class LoginActivity extends Activity {
 //                        }
 //                    }
 //                });
+    }
+    private void makeToastLong(String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
 

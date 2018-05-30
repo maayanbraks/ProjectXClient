@@ -60,7 +60,7 @@ public class ProductTypeConverters {
         String newlist="";
             for (String num : list) {
                 if (!(list.equals(""))){
-                newlist = newlist + "," + num;
+                        newlist = newlist + "," + num;
 
             }
                 else newlist=""+num;

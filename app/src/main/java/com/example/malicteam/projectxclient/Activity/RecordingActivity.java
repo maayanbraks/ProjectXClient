@@ -269,7 +269,7 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
     private boolean CheckMeAdmin() {
-        if ((String.valueOf(myUser.getId())).equals(event.getAdminId())) {
+        if ((myUser.getEmail()).equals(event.getAdminId())) {
             return true;
         }
         return false;
