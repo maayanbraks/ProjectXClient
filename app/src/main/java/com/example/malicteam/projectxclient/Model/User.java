@@ -70,31 +70,6 @@ public class User implements Serializable {
             this.eventsIds = "{}";
     }
 
-    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds, long lastUpdated, int id, float dataSetTime) {
-        //Login Ctor
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.id = id;
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date date = new Date();
-        this.lastLogin = dateFormat.format(date);
-        this.pictureUrl = null;
-        this.lastUpdated = lastUpdated;
-        this.dataSetTime = dataSetTime;
-
-        if (friendsIds != null)
-            this.friendsIds = ProductTypeConverters.toString(friendsIds);
-        else
-            this.friendsIds = "{}";
-
-        if (eventsIds != null)
-            this.eventsIds = ProductTypeConverters.toString(eventsIds);
-        else
-            this.eventsIds = "{}";
-    }
-
     public User(UserData userdata) {
         this.firstName = userdata.getFirstName();
         this.lastName = userdata.getLastName();
