@@ -7,14 +7,21 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.malicteam.projectxclient.Common.Callbacks.EventDetailCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
+import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.R;
 
+import java.util.List;
+
+import ResponsesEntitys.ProtocolLine;
+
 public class EventDetailsFragment extends Fragment {
-    private OnFragmentInteractionListener mListener;
+    private EventDetailsInteraction mListener;
 
     public EventDetailsFragment() {
         // Required empty public constructor
@@ -43,32 +50,42 @@ public class EventDetailsFragment extends Fragment {
         TextView _date = view.findViewById(R.id.details_date);
         TextView _participates = view.findViewById(R.id.details_partici);
         TextView desc = view.findViewById(R.id.details_descp);
+        TextView protocol = view.findViewById(R.id.protocolText);
+        mListener.getProtocol(event.getId(), new EventDetailCallback() {
+            @Override
+            public void onSuccees(List<ProtocolLine> list) {
+                getActivity().runOnUiThread(new Runnable() {
+                                  @Override
+                                  public void run() {
+                                      protocol.setText(ProductTypeConverters.FromProtocolToString(list));
+                                  }
+                              });
 
+            }
+        });
 
         title.setText(event.getTitle());
         _date.setText(event.getDate());
-        String part = "Participats: ";
+        String part = "Participats: "+event.getParticipats().toString();
 //        for (int num : event.getUsersIds()) {
 //            part.concat(Integer.toString(num));
 //        }
-        _participates.setText("part");
+        //TODO sadsaddsddsasada
+        _participates.setText("Participats:"+event.getParticipatsNames());
         desc.setText("Description:" + event.getDescription());
         // Inflate the layout for this fragment
+
         return view;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
+
+
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof EventDetailsInteraction) {
+            mListener = (EventDetailsInteraction) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement NewEventInteraction");
@@ -82,8 +99,8 @@ public class EventDetailsFragment extends Fragment {
     }
 
 
-    public interface OnFragmentInteractionListener {
+    public interface EventDetailsInteraction {
+        void getProtocol(int eventId, final EventDetailCallback callback);
         // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
     }
 }

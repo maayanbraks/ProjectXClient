@@ -363,25 +363,19 @@ public class User implements Serializable {
 
     @Override
     public String toString() {
-        String str = "";
-        str += "First Name: " + firstName + "\n";
-        str += "Last Name: " + lastName + "\n";
-        str += "Email: " + email + "\n";
-        str += "Phone: " + phoneNumber + "\n";
-        str += "Id: " + id + "\n";
-        str += "Date: " + lastLogin + "\n";
-        if (pictureUrl != null)
-            str += "PictureUrl:" + pictureUrl + "\n";
-
-        int size = 0;
-        size = (friendsIds.split(",").length - 1);
-        str += "Friends Count:" + size + "\n";
-        str += "Friends:" + friendsIds;
-        size = (eventsIds.split(",").length - 1);
-        str += "Events Count:" + size + "\n";
-        str += "Events:" + eventsIds;
-
-        return str;
-
+        return "User{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", lastLogin='" + lastLogin + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", email='" + email + '\'' +
+                ", friendsIds='" + friendsIds + '\'' +
+                ", eventsIds='" + eventsIds + '\'' +
+                ", pictureUrl='" + pictureUrl + '\'' +
+                ", admin=" + admin +
+                ", lastUpdated=" + lastUpdated +
+                '}';
     }
 }
+

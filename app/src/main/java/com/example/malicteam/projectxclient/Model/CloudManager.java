@@ -7,15 +7,13 @@ import android.util.Log;
 //import com.github.nkzawa.socketio.client.IO;
 //import com.github.nkzawa.socketio.client.Socket;
 
-import com.example.malicteam.projectxclient.Activity.MainActivity;
-import com.example.malicteam.projectxclient.Activity.RecordingActivity;
-import com.example.malicteam.projectxclient.Common.Callbacks.MainActivityCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 
 import Notifications.EventCloseNotificationData;
 import Notifications.EventInvitationNotificationData;
 import Notifications.NotificationData;
+import Notifications.ProtocolReadyNotificationData;
 import Notifications.UserJoinEventNotification;
 import Notifications.UserLeaveEventNotification;
 import io.socket.client.IO;
@@ -43,7 +41,8 @@ public class CloudManager {
     private final String SERVER_ADDRESS = "http://193.106.55.95:8080";
     private CloudCallback<String> localCallbackCloudManager;
     private RecordingActivityCallback recordingActivityCallback;
-    private Observer<Event> mainActivityCallback;
+    private Observer<Event> mainActivityInvitesCallback;
+    private Observer<Integer> mainActivityProtocolCallback;
     private Socket socket;
     static final int PORT = 8888;
     private boolean isConnected;
@@ -82,8 +81,9 @@ public class CloudManager {
         this.recordingActivityCallback = callback;
     }
 
-    public void setMainActivityCallback(final Observer<Event> callback) {
-        this.mainActivityCallback = callback;
+    public void setMainActivityCallback(final Observer<Event> invitesCallback, final Observer<Integer> protocolCallback) {
+        this.mainActivityInvitesCallback = invitesCallback;
+        this.mainActivityProtocolCallback = protocolCallback;
     }
 
 
@@ -148,10 +148,10 @@ public class CloudManager {
             case EventInvitation:
                 EventInvitationNotificationData eventInvitationNotificationData = ProductTypeConverters.getObjectFromString(data, EventInvitationNotificationData.class);
                 //MainActivity.GetInvation(eventInvitationNotificationData);
-                if (mainActivityCallback == null) {
+                if (mainActivityInvitesCallback == null) {
                     try {
                         sleep(1000);
-                        mainActivityCallback.onChanged(new Event(eventInvitationNotificationData.getEventData()));
+                        mainActivityInvitesCallback.onChanged(new Event(eventInvitationNotificationData.getEventData()));
                         return;
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -159,7 +159,7 @@ public class CloudManager {
 
                 }else
                 {
-                    mainActivityCallback.onChanged(new Event(eventInvitationNotificationData.getEventData()));
+                    mainActivityInvitesCallback.onChanged(new Event(eventInvitationNotificationData.getEventData()));
                     return;
                 }
 
@@ -214,6 +214,21 @@ public class CloudManager {
                     recordingActivityCallback.eventClosed(new Event(eventCloseNotificationData.getEventData()));
                     return;
                 }
+            case ProtocolIsReady:
+                ProtocolReadyNotificationData protocolReadyNotificationData = ProductTypeConverters.getObjectFromString(data, ProtocolReadyNotificationData.class);
+                if (mainActivityInvitesCallback == null) {
+                    try {
+                        sleep(1000);
+                        mainActivityProtocolCallback.onChanged(protocolReadyNotificationData.getEventData().getId());
+                        return;
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }else
+                {
+                    mainActivityProtocolCallback.onChanged(protocolReadyNotificationData.getEventData().getId());
+                    return;
+                }
 
 
             default:
@@ -248,6 +263,11 @@ public class CloudManager {
     }
     public void disconnect() {
         socket.disconnect();
-        socket=null;
+//        IO.Options opts = new IO.Options();
+//        try {
+//            socket = IO.socket(SERVER_ADDRESS, opts);
+//        } catch (URISyntaxException e) {
+//            e.printStackTrace();
+//        }
     }
 }

@@ -145,7 +145,23 @@ public class Event implements Serializable {
         this.isConverted=eventData.getIsConverted();
         this.isRecording=eventData.getIsRecording();
     }
-
+    public String getParticipatsNames(){
+        String namesOfParticipats="";
+            if (participats!=null)
+            {
+                for (int i=0;i<participats.size();i++)
+                {
+                    if (i==0) {
+                        namesOfParticipats=participats.get(i).getFirstName();
+                                            }
+                    else {
+                        namesOfParticipats=namesOfParticipats+","+participats.get(i).getFirstName();
+                    }
+                }
+                return namesOfParticipats;
+            }
+            return null;
+    }
     public String getEventStartTime() {
         return EventStartTime;
     }
@@ -219,14 +235,15 @@ public class Event implements Serializable {
     @Override
     public String toString() {
         return "Event{" +
-                "isRecording=" + isRecording +
-                ", id=" + id +
+                "id=" + id +
                 ", title='" + title + '\'' +
                 ", date='" + date + '\'' +
-                ", usersIds='" + participats + '\'' +
+                ", participats=" + participats +
                 ", adminId='" + adminId + '\'' +
                 ", description='" + description + '\'' +
                 ", EventStartTime='" + EventStartTime + '\'' +
+                ", isRecording=" + isRecording +
+                ", isConverted=" + isConverted +
                 '}';
     }
 }

@@ -8,4 +8,5 @@ import com.example.malicteam.projectxclient.Model.Event;
 
 public interface MainActivityCallback {
     void GotInvitation(Event event);
+
 }

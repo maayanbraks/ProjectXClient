@@ -39,13 +39,16 @@ import com.example.malicteam.projectxclient.Common.Callbacks.AgreeToEventCallbac
 import com.example.malicteam.projectxclient.Common.Callbacks.DeclineToEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.EditUserCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.EventDetailCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.MainActivityCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.ProtocolRequestCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.View.Dialogs.AddFriendFragment;
 import com.example.malicteam.projectxclient.View.Dialogs.ChangeDetailsFragment;
+import com.example.malicteam.projectxclient.View.Dialogs.LogoutDialogFragment;
 import com.example.malicteam.projectxclient.View.NewEventFragment;
 import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
 import com.example.malicteam.projectxclient.Common.Consts;
@@ -71,10 +74,11 @@ import com.google.android.gms.tasks.Task;
 //import com.google.firebase.auth.FirebaseAuth;
 
 import Notifications.EventInvitationNotificationData;
+import ResponsesEntitys.ProtocolLine;
 import ResponsesEntitys.UserData;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.AccountSettingsInteraction, EventsListFragment.EventListListener,
-        FriendsListFragment.FriendsFragmentInteraction, NewEventFragment.NewEventInteraction, EventDetailsFragment.OnFragmentInteractionListener,
+        FriendsListFragment.FriendsFragmentInteraction, NewEventFragment.NewEventInteraction, EventDetailsFragment.EventDetailsInteraction,
         ResetPasswordFragment.ResetPasswordListener, AddFriendFragment.AddFriendInteraction, ChangeDetailsFragment.DetailsDialogInteraction {
 
     private final Class _mainFragmentClass = EventsListFragment.class;
@@ -88,6 +92,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int userId;
     private View headerLayout;
     private DrawerLayout mDrawer;
+
+    public List<ProtocolLine> getData() {
+        return data;
+    }
+
+    public void setData(List<ProtocolLine> data) {
+        this.data = data;
+    }
+
+    private List<ProtocolLine> data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,12 +149,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, Consts.REQUEST_WRITE_STORAGE);
         }
 
-        Repository.instance.InitMainActivityCallback(new Observer<Event>() {
-            @Override
-            public void onChanged(Event data) {
-                GetInvation(data);
-            }
-        });
+        Repository.instance.InitMainActivityCallback(new Observer<Event>() {//Invite ObserverS
+                                                         @Override
+                                                         public void onChanged(Event data) {
+                                                             GetInvation(data);
+                                                         }
+                                                     },
+                new Observer<Integer>() {//Protocol is ready
+                    @Override
+                    public void onChanged(@Nullable Integer eventId) {
+//TODO send to eventListFragment -->change the event TO isCONVERTED=TRUE;
+                        makeToastLong("Event id="+eventId+" protocol is ready");
+
+                    }
+                });
 
         //End of
         //Floating add button
@@ -308,7 +330,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.nav_logout:
                 logout();
-                break;
+                return true;
 
             default:
                 break;
@@ -491,12 +513,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         startActivity(intent);
     }
 
-
-    //Fragments Interaction
-    @Override
-    public void onFragmentInteraction(Uri uri) {
-        //TODO: Acoount
-    }
 
     //FriendsList interface
     @Override
@@ -863,6 +879,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onSuccees(Boolean data) {
                 makeToastShort("Your Details Were Updated");
+            }
+        });
+    }
+
+
+    @Override
+    public void getProtocol(int eventId, final EventDetailCallback callback) {
+        Repository.instance.getProtocol(eventId, new ProtocolRequestCallback<List<ProtocolLine>>() {
+            @Override
+            public void TechnicalError() {
+                makeToastLong("Technical Error.");
+            }
+
+            @Override
+            public void ProtocolIsNotExist() {
+                makeToastLong("Protocol is not exist.");
+            }
+
+            @Override
+            public void onSuccees(List<ProtocolLine> data) {
+                for (int i = 0; i < data.size(); i++) {
+                    Log.d("Protocol", data.get(i).getName() + ":" + data.get(i).getText());
+                }
+                callback.onSuccees(data);
             }
         });
     }

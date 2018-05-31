@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import ResponsesEntitys.EventData;
+import ResponsesEntitys.ProtocolLine;
 import ResponsesEntitys.UserData;
 
 /**
@@ -124,5 +125,18 @@ public class ProductTypeConverters {
         fis.close();
 
         return bytesArray;
+    }
+    public static String FromProtocolToString(List<ProtocolLine> list) {
+        String protocol;
+        protocol = "";
+        if (list != null) {
+
+
+            for (int i = 0; i < list.size(); i++) {
+                protocol += list.get(i).getName() + ": " + list.get(i).getText() + "\n";
+            }
+            return protocol;
+        }
+        return null;
     }
 }

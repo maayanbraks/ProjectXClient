@@ -204,7 +204,7 @@ public class RecordingActivity extends AppCompatActivity {
 
     public void StopRecordingByAdmin() {
         //notify user about that
-        Toast.makeText(getApplication(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
+       // Toast.makeText(getApplication(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
         startRecordOrSaveIt();
         //stop recording...
     }
@@ -239,7 +239,7 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
     private void shareEvent(){
-        Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
+       // Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
         Repository.instance.closeEvent(null, event.getId(), mFileName, new CloseEventCallback() {
             @Override
             public void onSuccees() {
@@ -351,7 +351,7 @@ public class RecordingActivity extends AppCompatActivity {
         //{
         //  Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName()+" "+event.getParticipats().get(i).getLastName()+",just joined", Toast.LENGTH_LONG).show();
         //}
-        Toast.makeText(getApplication(), user.getFirstName() + " " + user.getLastName() + ",just joined", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplication(), user.getFirstName() + " " + user.getLastName() + ",just joined", Toast.LENGTH_LONG).show();
 
         if (!(event.getParticipats().contains(user)))
             event.addToParticipats(user);
@@ -373,7 +373,7 @@ public class RecordingActivity extends AppCompatActivity {
 //        {
 //            if (event.getParticipats().get(i).getId()==userId)
 //            {
-        Toast.makeText(getApplication(), user.getFirstName() + " " + user.getFirstName() + ",just left", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplication(), user.getFirstName() + " " + user.getFirstName() + ",just left", Toast.LENGTH_LONG).show();
         event.delFromParticipats(user);
         runOnUiThread(new Runnable() {
 
