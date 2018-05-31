@@ -569,46 +569,6 @@ public class Repository {
         }
         return bitmap;
     }
-    //END of Image (Profile Picture)
-
-    //Events
-//    public LiveData<List<Event>> getEvents() {
-////
-////        List<Event> localEventsList = RoomDatabaseManager.getInstance().getEventsList();
-////        if(localEventsList != null){
-////            data.setValue(localEventsList);
-////        }
-//        synchronized (this) {
-//            if (eventsData == null) {
-//                eventsData = new MutableLiveData<>();
-//                FirebaseAuth auth = FirebaseAuth.getInstance();
-//                FirebaseModel.getEventsAndObserve(userLiveData.getValue().getId(), new FirebaseModel.CloudCallback<List<Event>>() {
-//                    @Override
-//                    public void onComplete(List<Event> data) {
-//                        if (data != null)
-//                            eventsData.setValue(data);
-//                    }
-//                });
-//            }
-//        }
-//        return eventsData;
-//    }
-//
-//    public void addEvent(Event event) {
-//        //TODO add locally DB
-//        //TODO create Content file and save locally
-//        //TODO save firebase content
-//        String url = "";
-//
-//        FirebaseModel.addNewEvent(event);
-//    }
-
-//    public File getContentFile(){
-//
-//        //TODO get content image
-//
-//    }
-
 
     //New Server Methods
     public void logIn(String username, String password, final LogInCallback<User> callback) {
@@ -643,7 +603,7 @@ public class Repository {
                         callback.onBoolean(booleanResponseData.getFlag());
                     case Login:
                         LoginResponseData loginResponseData = ProductTypeConverters.getObjectFromString(response, LoginResponseData.class);
-                        User user = new User(loginResponseData.getFirstName(), loginResponseData.getLastName(), loginResponseData.getPhone(), loginRequestData.getUserEmail(), null, null, 1, loginResponseData.getId(),0);
+                        User user = new User(loginResponseData.getUserData());
                         callback.login(user);
                     default:
                         break;
