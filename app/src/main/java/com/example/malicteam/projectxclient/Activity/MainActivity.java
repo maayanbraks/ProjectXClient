@@ -38,12 +38,14 @@ import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.AgreeToEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.DeclineToEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.EditUserCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.MainActivityCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.View.Dialogs.AddFriendFragment;
+import com.example.malicteam.projectxclient.View.Dialogs.ChangeDetailsFragment;
 import com.example.malicteam.projectxclient.View.NewEventFragment;
 import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
 import com.example.malicteam.projectxclient.Common.Consts;
@@ -71,9 +73,9 @@ import com.google.android.gms.tasks.Task;
 import Notifications.EventInvitationNotificationData;
 import ResponsesEntitys.UserData;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.OnFragmentInteractionListener, EventsListFragment.EventListListener,
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.AccountSettingsInteraction, EventsListFragment.EventListListener,
         FriendsListFragment.FriendsFragmentInteraction, NewEventFragment.NewEventInteraction, EventDetailsFragment.OnFragmentInteractionListener,
-        ResetPasswordFragment.ResetPasswordListener, AddFriendFragment.AddFriendInteraction {
+        ResetPasswordFragment.ResetPasswordListener, AddFriendFragment.AddFriendInteraction, ChangeDetailsFragment.DetailsDialogInteraction {
 
     private final Class _mainFragmentClass = EventsListFragment.class;
     private final int _mainNavId = R.id.nav_events_list;
@@ -179,7 +181,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(currentItem != null) {
+                if (currentItem != null) {
                     currentItem.setChecked(false);
                 }
                 currentItem = navigationView.getMenu().findItem(_mainNavId);
@@ -303,6 +305,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_events_new:
                 bundle.putSerializable(Consts.USER, currentUser.getUser().getValue());
                 fragmentClass = NewEventFragment.class;
+                break;
+            case R.id.nav_logout:
+                logout();
                 break;
 
             default:
@@ -665,19 +670,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // create alert dialog
         runOnUiThread(new Runnable() {
-                          @Override
-                          public void run() {
-                              AlertDialog alertDialog = alertDialogBuilder.create();
-                                  alertDialog.show();
+            @Override
+            public void run() {
+                AlertDialog alertDialog = alertDialogBuilder.create();
+                alertDialog.show();
 ////                              }
 //
-                         }
-                     });
+            }
+        });
 
         // show it
 
 
-        }
+    }
 
 
     @Override
@@ -827,8 +832,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void startRecording(Event event) {
         loadMainFragment();//For supply home page after click 'Back' from Recording Activity
         Intent intent = new Intent(MyApp.getContext(), RecordingActivity.class);
-        intent.putExtra(Consts.SEND_EVENT ,event);
+        intent.putExtra(Consts.SEND_EVENT, event);
         intent.putExtra(Consts.USER, currentUser.getUser().getValue());
         startActivity(intent);
+    }
+
+    @Override
+    public void logout() {
+        Repository.instance.disconnectFromServer();
+        Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+    @Override
+    public void wantToEditAccount(String newFirstName, String newLastName, String newEmail, String newPhone) {
+        Bundle bundle = new Bundle();
+        bundle.putString(Consts.FIRST_NAME, newFirstName);
+        bundle.putString(Consts.LAST_NAME, newLastName);
+        bundle.putString(Consts.EMAIL, newEmail);
+        bundle.putString(Consts.PHONE_NUMBER, newPhone);
+        ChangeDetailsFragment changeDialog = new ChangeDetailsFragment();
+        changeDialog.setArguments(bundle);
+        changeDialog.show(getSupportFragmentManager(), "ChangeDetailsDialog");
+    }
+
+    @Override
+    public void edit(String firstName, String lastName, String email, String phone) {
+        Repository.instance.editUser(firstName, lastName, email, phone, new EditUserCallback<Boolean>() {
+            @Override
+            public void onSuccees(Boolean data) {
+                makeToastShort("Your Details Were Updated");
+            }
+        });
     }
 }

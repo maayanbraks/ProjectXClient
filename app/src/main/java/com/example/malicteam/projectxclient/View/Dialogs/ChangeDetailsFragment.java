@@ -1,6 +1,7 @@
 package com.example.malicteam.projectxclient.View.Dialogs;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -13,10 +14,25 @@ import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Repository;
 
 public class ChangeDetailsFragment extends DialogFragment {
-    String _first = null;
-    String _last = null;
-    String _email = null;
-    String _phone = null;
+    public interface DetailsDialogInteraction {
+        void edit(String firstName, String lastName, String email, String phone);
+    }
+    private DetailsDialogInteraction mListener;
+    private String _first = null;
+    private String _last = null;
+    private String _email = null;
+    private String _phone = null;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof DetailsDialogInteraction) {
+            mListener = (DetailsDialogInteraction) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement DetailsDialogInteraction");
+        }
+    }
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -39,6 +55,7 @@ public class ChangeDetailsFragment extends DialogFragment {
         builder.setMessage(str)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        mListener.edit(_first, _last, _email, _phone);
 //                        Repository.instance.changeUserDetails(_first, _last, _email, _phone, new CloudManager.CloudCallback<String>() {
 //                            @Override
 //                            public void onComplete(String data) {

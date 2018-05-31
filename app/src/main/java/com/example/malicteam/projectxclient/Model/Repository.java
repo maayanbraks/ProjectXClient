@@ -894,7 +894,7 @@ public class Repository {
     }
 
 
-    public void   getEventsFromServer(final EventListCallback<List<Event>> callback) {
+    public void getEventsFromServer(final EventListCallback<List<Event>> callback) {
         //Init the get friends/contacts list of  User (by email).
         EventsListRequestData eventsListRequestData = new EventsListRequestData(userLiveData.getValue().getEmail());
         //send request
@@ -1004,7 +1004,8 @@ public class Repository {
             }
         });
     }
-    public void DeclineToInvite(int eventId,final DeclineToEventCallback<Boolean> callback) {
+
+    public void DeclineToInvite(int eventId, final DeclineToEventCallback<Boolean> callback) {
         //Init the get friends/contacts list of  User (by email).
         DeclineEventRequestData declineEventRequestData = new DeclineEventRequestData(userLiveData.getValue().getEmail(), eventId);
         //send request
@@ -1104,6 +1105,31 @@ public class Repository {
         });
     }
 
+
+    public void editUser(String firstName, String lastName, String email, String phone, EditUserCallback<Boolean> callback) {
+        EditUserRequestData editUserRequestData = new EditUserRequestData(email, firstName, lastName, phone, "Israel", userLiveData.getValue().getPictureUrl());
+        CloudManager.instance.sendToServer("Request", editUserRequestData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String data) {
+                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
+                switch (responseData.getType()) {
+                    case Error:
+                        return;
+                    case Boolean:
+                        BooleanResponseData booleanResponseData = ProductTypeConverters.getObjectFromString(data, BooleanResponseData.class);
+                        if (booleanResponseData.getFlag())
+                            callback.onSuccees(true);
+                    default:
+                        break;
+                }
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        });
+    }
 
     public void createUser(User user, String credential, CreateUserCallback<Boolean> callback) {
         CreateUserRequestData createUserRequestData = new CreateUserRequestData(user.getEmail(), credential, user.getFirstName(), user.getLastName(), user.getPhoneNumber(), null, null);
