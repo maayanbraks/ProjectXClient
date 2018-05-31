@@ -668,20 +668,6 @@ public class Repository {
         });
     }
 
-    public void sendDataSet(byte[] record, float length, final DataSetCallback callback) {
-        DataSetRequestData dataSetRequestData = new DataSetRequestData(userLiveData.getValue().getEmail(),record,length);
-        CloudManager.instance.sendToServer("Request", dataSetRequestData, new CloudManager.CloudCallback<String>() {
-            @Override
-            public void onComplete(String response) {
-
-            }
-
-            @Override
-            public void onCancel() {
-            }
-        });
-    }
-
     public void EditFriendList(LinkedList<String> friendList, EditFriendListCallback callback) {
         //ALSO DELETE FRIENDS!!!
         //init request
