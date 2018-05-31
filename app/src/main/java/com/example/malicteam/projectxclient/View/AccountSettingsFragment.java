@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.View.Dialogs.ChangeDetailsFragment;
+import com.example.malicteam.projectxclient.View.Dialogs.DataSetAlertDialogFragment;
 import com.example.malicteam.projectxclient.View.Dialogs.LogoutDialogFragment;
 import com.example.malicteam.projectxclient.View.Dialogs.PictureDialogFragment;
 import com.example.malicteam.projectxclient.View.Dialogs.RemoveAccountDialogFragment;
@@ -29,7 +30,7 @@ import com.example.malicteam.projectxclient.R;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
 public class AccountSettingsFragment extends Fragment {
-    public interface AccountSettingsInteraction {
+    public interface AccountSettingsInteraction extends DataSetAlertDialogFragment.DataSetAlertInteraction{
         void logout();
         void wantToEditAccount(String newFirstName, String newLastName, String newPhone);
     }
@@ -201,15 +202,10 @@ public class AccountSettingsFragment extends Fragment {
             }
         });
 
-        Button resetPassButton = (Button) view.findViewById(R.id.resetPassword_editAccount_button);
-        resetPassButton.setOnClickListener(new View.OnClickListener() {
+        Button myVoicebutton = (Button) view.findViewById(R.id.myVoice_btn_accountSettings);
+        myVoicebutton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                ResetPasswordDialogFragment resetPasswordDialog = new ResetPasswordDialogFragment();
-                resetPasswordDialog.show(getActivity().getSupportFragmentManager(), "ResetPasswordDialog");
-//                getActivity().getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.Layout_container, resetPasswordDialog,"resetPassworddialog")
-//                        .addToBackStack(null)
-//                        .commit();
+                mListener.goToDataSetActivity();
             }
         });
 

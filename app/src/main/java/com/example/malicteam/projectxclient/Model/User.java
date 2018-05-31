@@ -288,6 +288,7 @@ public class User implements Serializable {
                 ", pictureUrl='" + pictureUrl + '\'' +
                 ", admin=" + admin +
                 ", lastUpdated=" + lastUpdated +
+                ", dataSetTime="+dataSetTime +
                 '}';
     }
 }
