@@ -8,10 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -40,15 +37,12 @@ import com.example.malicteam.projectxclient.Common.Callbacks.DeclineToEventCallb
 import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.EditUserCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.EventDetailCallback;
-import com.example.malicteam.projectxclient.Common.Callbacks.MainActivityCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.ProtocolRequestCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
-import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.View.Dialogs.AddFriendFragment;
 import com.example.malicteam.projectxclient.View.Dialogs.ChangeDetailsFragment;
-import com.example.malicteam.projectxclient.View.Dialogs.LogoutDialogFragment;
 import com.example.malicteam.projectxclient.View.NewEventFragment;
 import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
 import com.example.malicteam.projectxclient.Common.Consts;
@@ -60,8 +54,6 @@ import com.example.malicteam.projectxclient.View.FriendDetailsFragment;
 import com.example.malicteam.projectxclient.View.FriendsListFragment;
 import com.example.malicteam.projectxclient.View.ResetPasswordFragment;
 
-import java.net.URISyntaxException;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.example.malicteam.projectxclient.Model.Event;
@@ -70,11 +62,7 @@ import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.ViewModel.EventsViewModel;
 import com.example.malicteam.projectxclient.ViewModel.FriendsViewModel;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-//import com.google.firebase.auth.FirebaseAuth;
 
-import Notifications.EventInvitationNotificationData;
 import ResponsesEntitys.ProtocolLine;
 import ResponsesEntitys.UserData;
 
