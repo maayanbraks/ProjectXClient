@@ -3,9 +3,13 @@ package com.example.malicteam.projectxclient.Activity;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.TextView;
@@ -14,6 +18,7 @@ import android.widget.ToggleButton;
 
 import com.example.malicteam.projectxclient.Common.Callbacks.CloseEventCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
+import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Model.IRecorder;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
@@ -117,15 +122,17 @@ public class DataSetActivity extends AppCompatActivity {
     }
 
     private void startRecord() {
-        if (!recorder.isRecording() && recorder != null) {
+        if (recorder != null && !recorder.isRecording()) {
             recorder.startRecording();
         }
     }
 
     private void uploadDataSet() {
         Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
+        //Upoload
+        Repository.instance.uploadDataSet(mFileName);
+        //ready for new record
         initFileName();
         recorder.setFileName(mFileName);
-        Repository.instance.uploadDataSet();
     }
 }

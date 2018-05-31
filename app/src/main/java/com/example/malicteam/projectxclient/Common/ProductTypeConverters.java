@@ -8,6 +8,7 @@ import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.User;
 import com.google.gson.Gson;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -56,39 +57,38 @@ public class ProductTypeConverters {
         }
         return list;
     }
-    public static String GenerateStringFromList(List<String> list) {
-        String newlist="";
-            for (String num : list) {
-                if (!(list.equals(""))){
-                        newlist = newlist + "," + num;
 
-            }
-                else newlist=""+num;
-           //newlist=newlist.substring(0,newlist.length()-1);
+    public static String GenerateStringFromList(List<String> list) {
+        String newlist = "";
+        for (String num : list) {
+            if (!(list.equals(""))) {
+                newlist = newlist + "," + num;
+
+            } else newlist = "" + num;
+            //newlist=newlist.substring(0,newlist.length()-1);
         }
 
 
         return newlist;
     }
-    public static List<UserData> GenerateListUserDataFromListUser(List<User> users)
-    {
-        List<UserData> usersData=new LinkedList<UserData>();
- for (int i=0;i<users.size();i++)
- {
-     usersData.add(new UserData(users.get(i).getFirstName(),users.get(i).getLastName(),users.get(i).getEmail(),users.get(i).getPictureUrl(),users.get(i).getPhoneNumber()));
- }
+
+    public static List<UserData> GenerateListUserDataFromListUser(List<User> users) {
+        List<UserData> usersData = new LinkedList<UserData>();
+        for (int i = 0; i < users.size(); i++) {
+            usersData.add(new UserData(users.get(i).getFirstName(), users.get(i).getLastName(), users.get(i).getEmail(), users.get(i).getPictureUrl(), users.get(i).getPhoneNumber()));
+        }
         return usersData;
     }
-    public static List<User> GenerateListUserFromListDataUser(List<UserData> usersData)
-    {
-        List<User> users=new LinkedList<>();
-        for (int i=0;i<usersData.size();i++)
-        {
-        //    Log.d("TAG","userdata="+usersData.get(i).getFirstName());
+
+    public static List<User> GenerateListUserFromListDataUser(List<UserData> usersData) {
+        List<User> users = new LinkedList<>();
+        for (int i = 0; i < usersData.size(); i++) {
+            //    Log.d("TAG","userdata="+usersData.get(i).getFirstName());
             users.add(new User(usersData.get(i)));
         }
         return users;
     }
+
     //GSON
     public static <T> T getObjectFromString(String data, Class<T> classOfT) {
         return gson.fromJson(data, classOfT);
@@ -101,13 +101,11 @@ public class ProductTypeConverters {
 
 
     public static String getAdminFirstNameByEmail(Event event) {
-        if (event!=null) {
+        if (event != null) {
 
-            for (int i=0;i<event.getParticipats().size();i++)
-            {
-                Log.d("TAG","(event.getAdminId()="+(event.getAdminId())+"event.getParticipats().get(i).getEmail()"+event.getParticipats().get(i).getEmail());
-                if (event.getAdminId().equals(event.getParticipats().get(i).getEmail()))
-                {
+            for (int i = 0; i < event.getParticipats().size(); i++) {
+                Log.d("TAG", "(event.getAdminId()=" + (event.getAdminId()) + "event.getParticipats().get(i).getEmail()" + event.getParticipats().get(i).getEmail());
+                if (event.getAdminId().equals(event.getParticipats().get(i).getEmail())) {
                     return event.getParticipats().get(i).getFirstName();
                 }
             }
@@ -115,13 +113,15 @@ public class ProductTypeConverters {
 
         return null;
     }
-    public static byte[] convertFileToByte(File file) throws IOException {
-        //init array with file length
-        byte[] bytesArray = new byte[(int) file.length()];
 
-        FileInputStream fis = new FileInputStream(file);
-        fis.read(bytesArray); //read file into bytes[]
-        fis.close();
+    public static byte[] convertFileToByte(String filePath) throws IOException {
+        File file = new File(filePath);
+        int fileSize = (int) file.length();
+        byte[] bytesArray = new byte[fileSize];
+
+        BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
+        buf.read(bytesArray, 0, bytesArray.length);
+        buf.close();
 
         return bytesArray;
     }

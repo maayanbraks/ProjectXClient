@@ -13,6 +13,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.AudioFormat;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -999,21 +1001,44 @@ public class Repository {
         });
     }
 
+    public void uploadDataSet(String filePath){
+        //get duration
+        Uri uri = Uri.parse(filePath);
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        mmr.setDataSource(MyApp.getContext(),uri);
+        String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        double duration = Double.parseDouble(durationStr) / 1000;
+        Log.d("TAG", "Data set time is " + duration);
+
+        //Convert File to byte[]
+        byte[] audioBytes = null;
+        try {
+            audioBytes = ProductTypeConverters.convertFileToByte(filePath);
+        }catch (Exception e){
+            Log.d("TAG", e.getStackTrace() + e.getMessage());
+        }
+        //Create request
+        DataSetRequestData dataSetRequestData = new DataSetRequestData(userLiveData.getValue().getEmail(), audioBytes, duration);
+        CloudManager.instance.sendToServer("Request", dataSetRequestData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String data) {
+
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        })
+    }
+
     public void closeEvent(String[] protocol, int eventId, String filePath, final CloseEventCallback callback) {
         //init File to byte[]
-        File file = new File(filePath);
-        int fileSize = (int) file.length();
-        byte[] audioBytes = new byte[fileSize];
+        byte[] audioBytes = null;
         try {
-            BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
-            buf.read(audioBytes, 0, audioBytes.length);
-            buf.close();
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            audioBytes = ProductTypeConverters.convertFileToByte(filePath);
+        }catch (Exception e){
+            Log.d("TAG", e.getStackTrace() + e.getMessage());
         }
 
         //Init the get friends/contacts list of  User (by email).

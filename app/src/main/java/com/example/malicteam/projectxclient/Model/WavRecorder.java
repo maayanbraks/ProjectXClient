@@ -119,6 +119,7 @@ public class WavRecorder implements IRecorder {
                 e.printStackTrace();
             }
         }
+
     }
 
     public void stopRecording() {
@@ -149,8 +150,9 @@ public class WavRecorder implements IRecorder {
         long totalAudioLen = 0;
         long totalDataLen = totalAudioLen + 36;
         long longSampleRate = RECORDER_SAMPLERATE;
-        int channels = ((RECORDER_CHANNELS == AudioFormat.CHANNEL_IN_MONO) ? 1
-                : 2);
+        int channels = 1;
+//                ((RECORDER_CHANNELS == AudioFormat.CHANNEL_IN_MONO) ? 1
+//                : 2);
         long byteRate = RECORDER_BPP * RECORDER_SAMPLERATE * channels / 8;
 
         byte[] data = new byte[bufferSize];
