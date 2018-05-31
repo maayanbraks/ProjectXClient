@@ -359,14 +359,16 @@ public class RecordingActivity extends AppCompatActivity {
     public void SetActivity() {
         recordingButton = (ImageButton) findViewById(R.id.buttonRecordStart);
         TextView eventTitle = findViewById(R.id.recording_title);
+        TextView DESC = findViewById(R.id.description_recording);
         TextView partici = findViewById(R.id.participants_recording);
         playingButton = findViewById(R.id.buttonPlayStart);
         eventTitle.setText(event.getTitle());
         String time[] = event.getDate().split(" "); //16/01/2018 12:08
         TextView startTime = findViewById(R.id.recording_date);
         TextView startDate = findViewById(R.id.recording_time);
-//        startTime.setText(time[1]);
-//        startDate.setText(time[0]);
+        startTime.setText(time[1]);
+        startDate.setText(time[0]);
+        DESC.setText(event.getDescription());
         partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
 //        mFileName += "/outalk" + event.getId() + ".acc";
 
