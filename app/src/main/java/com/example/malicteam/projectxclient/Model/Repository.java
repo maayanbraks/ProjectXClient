@@ -1001,14 +1001,19 @@ public class Repository {
         });
     }
 
-    public void uploadDataSet(String filePath){
-        //get duration
+    private float getDurationAsMinutesFromFile(String filePath){
         Uri uri = Uri.parse(filePath);
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
         mmr.setDataSource(MyApp.getContext(),uri);
         String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        double duration = Double.parseDouble(durationStr) / 1000;
-        Log.d("TAG", "Data set time is " + duration);
+        float duration = Float.parseFloat(durationStr) / 1000 / 60; //Milliseconds => Seconds => Minutes
+        Log.d("TAG", "Data set time is " + duration + " Minutes");
+        return duration;
+    }
+
+    public void uploadDataSet(String filePath){
+        //get duration
+        float minutes = getDurationAsMinutesFromFile(filePath);
 
         //Convert File to byte[]
         byte[] audioBytes = null;
@@ -1018,7 +1023,7 @@ public class Repository {
             Log.d("TAG", e.getStackTrace() + e.getMessage());
         }
         //Create request
-        DataSetRequestData dataSetRequestData = new DataSetRequestData(userLiveData.getValue().getEmail(), audioBytes, duration);
+        DataSetRequestData dataSetRequestData = new DataSetRequestData(userLiveData.getValue().getEmail(), audioBytes, minutes);
         CloudManager.instance.sendToServer("Request", dataSetRequestData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String data) {
@@ -1029,7 +1034,7 @@ public class Repository {
             public void onCancel() {
 
             }
-        })
+        });
     }
 
     public void closeEvent(String[] protocol, int eventId, String filePath, final CloseEventCallback callback) {
