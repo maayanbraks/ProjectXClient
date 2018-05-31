@@ -66,7 +66,7 @@ import static android.content.Context.MODE_PRIVATE;
 //Singleton
 public class Repository {
     private MutableLiveData<User> userLiveData;
-    //private MutableLiveData<List<Event>> eventsData;
+    private MutableLiveData<List<Event>> eventsLiveData;
     private MutableLiveData<List<User>> friendsLiveData;
 
     private List<User> friends = null;//holds local users
@@ -107,7 +107,7 @@ public class Repository {
         return userLiveData;
     }
 
-    public LiveData<List<User>> getFriendsLive() {
+    public LiveData<List<User>> getFriendsLiveData() {
         synchronized (this) {
             if (friendsLiveData == null) {
                 friendsLiveData = new MutableLiveData<List<User>>();
@@ -130,6 +130,31 @@ public class Repository {
             }
         }
         return friendsLiveData;
+    }
+
+    public LiveData<List<Event>> getEventsLiveData() {
+        synchronized (this) {
+            if (eventsLiveData == null) {
+                eventsLiveData = new MutableLiveData<List<Event>>();
+                getEventsFromServer(new EventListCallback<List<Event>>(){
+                    @Override
+                    public void onSuccees(List<Event> data) {
+                        if (data != null) eventsLiveData.postValue(data);
+                    }
+
+                    @Override
+                    public void UserIsNotExist() {
+
+                    }
+
+                    @Override
+                    public void userMustToLogin() {
+
+                    }
+                });
+            }
+        }
+        return eventsLiveData;
     }
 
     public void disconnectFromServer() {

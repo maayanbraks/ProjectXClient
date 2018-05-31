@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModel;
 
 import java.util.List;
 
-import com.example.malicteam.projectxclient.Common.Callbacks.FriendsListCallback;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
 
@@ -21,19 +20,8 @@ public class FriendsViewModel extends ViewModel {
 
     public FriendsViewModel() {
         super();
-        list = Repository.instance.getFriendsLive();
+        list = Repository.instance.getFriendsLiveData();
     }
-//
-//    public void initFriendsList(FriendsViewModelCallback<Boolean> callback) {
-////        this.list = Repository.instance.getFriendsMain();
-//        Repository.instance.getFriendsMain(new FriendsViewModelCallback<LiveData<List<User>>>() {
-//            @Override
-//            public void onComplete(LiveData<List<User>> data) {
-//                list = data;
-//                callback.onComplete(true);
-//            }
-//        });
-//    }
 
     public LiveData<List<User>> getFriendsList() {
         return list;
