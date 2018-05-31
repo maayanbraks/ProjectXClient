@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.malicteam.projectxclient.Common.Callbacks.CloseEventCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.LeaveEventCallBack;
 import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
@@ -310,6 +311,27 @@ public class RecordingActivity extends AppCompatActivity {
             return true;
         }
         return false;
+    }
+    public void leaveEvent() { // this func is leaving the event - NOT ADMIN!
+        Repository.instance.leaveEventRequest(event.getId(), new LeaveEventCallBack<Boolean>() {
+            @Override
+            public void TechnicalError() {
+                Toast.makeText(getApplication(), "Technical error.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void NoPendingEvents() {
+                Toast.makeText(getApplication(), "No pending events.", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccees(Boolean data) {
+                Toast.makeText(getApplication(), "leaving.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+
     }
 
     public void SetEventFromInvitation(Event eventtemp) {

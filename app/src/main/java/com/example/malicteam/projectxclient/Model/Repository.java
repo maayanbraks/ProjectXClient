@@ -28,14 +28,16 @@ import com.example.malicteam.projectxclient.Common.Callbacks.CloseEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.CreateUserCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.DeclineToEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallback;
-import com.example.malicteam.projectxclient.Common.Callbacks.EditUserCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.EventListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.FriendsListCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.LeaveEventCallBack;
 import com.example.malicteam.projectxclient.Common.Callbacks.LogInCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.MainActivityCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
+import com.example.malicteam.projectxclient.View.Dialogs.LogoutDialogFragment;
 import com.example.malicteam.projectxclient.ViewModel.FriendsViewModel;
 //import com.google.firebase.auth.FirebaseAuth;
 
@@ -45,6 +47,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -66,10 +71,6 @@ public class Repository {
     private LocalStorageManager localStorage = new LocalStorageManager();
 
     public Repository() {
-    }
-
-    public void disconnectFromServer() {
-        //TODO Disconnect from server
     }
 
 //    public LiveData<User> getUser(int id) {
@@ -969,7 +970,7 @@ public class Repository {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
-                // Log.d("TAG","oiasdjadjdjkaspdojaspdojasdojassdoj+gettype="+responseData.getType());
+               // Log.d("TAG","oiasdjadjdjkaspdojaspdojasdojassdoj+gettype="+responseData.getType());
                 switch (responseData.getType()) {
                     case Error:
                         ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
@@ -984,7 +985,7 @@ public class Repository {
                                 break;
                         }
                     case IsUserExistResponse:
-                        //   Log.d("TAG","IsUserExistResponeseoasjdsodjdsjdodjasd");
+                     //   Log.d("TAG","IsUserExistResponeseoasjdsodjdsjdodjasd");
                         IsUserExistResponseData response = ProductTypeConverters.getObjectFromString(data, IsUserExistResponseData.class);
                         callback.onSuccees(response.getUserData());
                         break;
@@ -1169,16 +1170,14 @@ public class Repository {
                         return;
                 }
             }
-
             @Override
             public void onCancel() {
             }
         });
     }
-
-    public void AgreeToInvite(int eventId, final AgreeToEventCallback<Boolean> callback) {
+    public void AgreeToInvite(int eventId,final AgreeToEventCallback<Boolean> callback) {
         //Init the get friends/contacts list of  User (by email).
-        ConfirmEventRequestData confirmEventRequestData = new ConfirmEventRequestData(userLiveData.getValue().getEmail(), eventId);
+        ConfirmEventRequestData confirmEventRequestData = new ConfirmEventRequestData(userLiveData.getValue().getEmail(),eventId);
         //send request
         CloudManager.instance.sendToServer("Request", confirmEventRequestData, new CloudManager.CloudCallback<String>() {
             @Override
@@ -1205,7 +1204,40 @@ public class Repository {
                         return;
                 }
             }
+            @Override
+            public void onCancel() {
+            }
+        });
+    }
+    public void leaveEventRequest(int eventId, final LeaveEventCallBack<Boolean> callback) {
+        //Init the get friends/contacts list of  User (by email).
+        LeaveEventRequestData leaveEventRequestData = new LeaveEventRequestData(userLiveData.getValue().getEmail(),eventId);
+        //send request
+        CloudManager.instance.sendToServer("Request", leaveEventRequestData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String data) {
+                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
+                switch (responseData.getType()) {
+                    case Error:
+                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
+                        switch (errorResponseData.getErrorType()) {
+                            case TechnicalError:
+                                callback.TechnicalError();
+                                break;
+                            case NoPendingEvents:
+                                callback.NoPendingEvents();
+                                break;
+                            default:
+                                break;
+                        }
+                    case Boolean:
+                        callback.onSuccees(true);
+                        break;
 
+                    default:
+                        return;
+                }
+            }
             @Override
             public void onCancel() {
             }
@@ -1244,7 +1276,6 @@ public class Repository {
                         return;
                 }
             }
-
             @Override
             public void onCancel() {
             }
@@ -1254,7 +1285,7 @@ public class Repository {
     public void InitCallbacksForCloudManeger(final RecordingActivityCallback callback) {
         CloudManager.instance.setRecordingCallback(callback);
 
-    }
+        }
 
     public void InitMainActivityCallback(final Observer<Event> callback) {
         CloudManager.instance.setMainActivityCallback(callback);
