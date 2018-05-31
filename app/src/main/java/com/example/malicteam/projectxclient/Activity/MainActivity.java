@@ -306,9 +306,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 bundle.putSerializable(Consts.USER, currentUser.getUser().getValue());
                 fragmentClass = NewEventFragment.class;
                 break;
+            case R.id.nav_dataSet:
+                loadMainFragment();//For supply home page after click 'Back' from Recording Activity
+                Intent intent = new Intent(MyApp.getContext(), DataSetActivity.class);
+                intent.putExtra(Consts.USER, currentUser.getUser().getValue());
+                startActivity(intent);
+                return true;
             case R.id.nav_logout:
                 logout();
-                break;
+                return true;
 
             default:
                 break;

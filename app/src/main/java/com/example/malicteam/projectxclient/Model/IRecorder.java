@@ -8,4 +8,5 @@ public interface IRecorder {
     void startRecording();
     void stopRecording();
     boolean isRecording();
+    void setFileName(String name);
 }

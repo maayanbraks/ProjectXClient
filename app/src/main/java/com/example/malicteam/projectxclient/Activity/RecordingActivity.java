@@ -31,21 +31,24 @@ import java.io.IOException;
 
 
 public class RecordingActivity extends AppCompatActivity {
+    //Record Objects
     private final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private final String[] permissions = {Manifest.permission.RECORD_AUDIO};
-    private boolean mStartToPlayMedia = true;//if true - next click should start playing
     private IRecorder recorder = null;
     private String mFileName = null;
-    private User myUser;
+    private boolean permissionToRecordAccepted = false;
+
+    //Playing Objects
     private MediaPlayer mPlayer = null;
+    private boolean mStartToPlayMedia = true;//if true - next click should start playing
 
     private ImageButton playingButton;
     private ImageButton recordingButton;
-
+    private User myUser;
     private Event event;
     private Event eventTemp;
     private Boolean fromInvitation;
-    private boolean permissionToRecordAccepted = false;
+
     private final String LOG_TAG = "AudioRecordTest";
 
     @Override
@@ -60,6 +63,7 @@ public class RecordingActivity extends AppCompatActivity {
         mFileName = getExternalCacheDir().getAbsolutePath() + "/" + String.valueOf(Math.abs(System.currentTimeMillis())).hashCode() + ".wav";
         //Init recorder
         recorder = new WavRecorder(mFileName);
+        //Init Event
         listenToParticipents();
         initEvent();
         initButtons();

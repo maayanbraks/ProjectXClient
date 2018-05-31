@@ -40,6 +40,11 @@ public class WavRecorder implements IRecorder {
         return (output);
     }
 
+    public void setFileName(String filename) {
+        if(!isRecording)
+            output = filename;
+    }
+
     public boolean isRecording(){
         return isRecording;
     }

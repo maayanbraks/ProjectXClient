@@ -30,9 +30,9 @@
                 android:icon="@android:drawable/ic_menu_info_details"
                 android:title="My Account" />
             <item
-                android:id="@+id/nav_signup"
-                android:icon="@android:drawable/ic_menu_edit"
-                android:title="Sign Up" />
+                android:id="@+id/nav_dataSet"
+                android:icon="@android:drawable/stat_sys_headset"
+                android:title="My Voice Recognizer" />
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@android:drawable/ic_notification_clear_all"
