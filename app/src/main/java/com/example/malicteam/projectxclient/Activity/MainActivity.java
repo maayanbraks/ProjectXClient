@@ -73,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private UserViewModel currentUser = null;
     private FriendsViewModel currentFriendsList = null;
 
+    private Observer<Integer> convertedObserver = null;
+
     private final Class _mainFragmentClass = EventsListFragment.class;
     private final int _mainNavId = R.id.nav_events_list;
     private TextView userNameHeader;
@@ -149,9 +151,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 new Observer<Integer>() {//Protocol is ready
                     @Override
                     public void onChanged(@Nullable Integer eventId) {
-//TODO send to eventListFragment -->change the event TO isCONVERTED=TRUE;
                         makeToastLong("Event id="+eventId+" protocol is ready");
-
+                        if(convertedObserver != null)
+                            convertedObserver.onChanged(eventId);
                     }
                 });
 
@@ -881,6 +883,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
+    @Override
+    public void initConvertedObserver(Observer<Integer> observer) {
+        this.convertedObserver = observer;
+    }
 
     @Override
     public void getProtocol(int eventId, final EventDetailCallback callback) {
