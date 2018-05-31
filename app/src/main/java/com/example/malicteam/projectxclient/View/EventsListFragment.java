@@ -1,5 +1,6 @@
 package com.example.malicteam.projectxclient.View;
 
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -26,6 +27,13 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class EventsListFragment extends Fragment {
+
+    public interface EventListListener {
+        void onEventSelected(Event event);
+
+        void initEventsList(Observer<List<Event>> observer);
+    }
+
     private EventListListener mListener;
     private List<Event> eventsList = new LinkedList<>();
     //    private UserViewModel currentUser = null;
@@ -58,18 +66,16 @@ public class EventsListFragment extends Fragment {
             eventListView.setAdapter(adapter);
 
             this._userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
-//            Repository.instance.getEvents(_userId, new CloudManager.CloudCallback<List<Event>>() {
-//                @Override
-//                public void onComplete(List<Event> data) {
-//                    eventsList = data;
-//                    if (adapter != null)
-//                        adapter.notifyDataSetChanged();
-//                }
 
-//                @Override
-//                public void onCancel() {
-//                }
-//            });
+            //get events list
+            mListener.initEventsList(new Observer<List<Event>>() {
+                @Override
+                public void onChanged(List<Event> data) {
+                    eventsList = data;
+                    refreshList();
+                }
+            });
+
             Repository.instance.getEventsFromServer(new EventListCallback<List<Event>>() {
                 @Override
                 public void onSuccees(List<Event> data) {
@@ -83,21 +89,11 @@ public class EventsListFragment extends Fragment {
                             }
                         }
                     });
-
-//                    try {
-//                        if (data != null) {
-//                            eventsList = data;
-//                            if (adapter != null)
-//                                adapter.notifyDataSetChanged();
-//                        }
-//                    }catch (Exception e){
-//                        Log.d("TAG", e.getMessage());
-//                    }
                 }
 
                 @Override
                 public void UserIsNotExist() {
-               //    Toast.makeText(MyApp.getContext(), "User not exist,try again.", Toast.LENGTH_SHORT).show();
+                    //    Toast.makeText(MyApp.getContext(), "User not exist,try again.", Toast.LENGTH_SHORT).show();
                     Log.d("TAG", "In getEventFromServer->EventListFragment --->UserIsNotExist");
                 }
 
@@ -108,19 +104,6 @@ public class EventsListFragment extends Fragment {
                     Log.d("TAG", "In getEventFromServer->EventListFragment --->userMustToLogin");
                 }
             });
-
-//            currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
-//            currentUser.init(_userId, true);
-//            currentUser.getUser().observe(this, new Observer<User>() {
-//                @Override
-//                public void onChanged(@Nullable User user) {
-//                    if (user != null) {
-//                        //update details
-//                        _userId = user.getId();
-//                        refreshList();
-//                    }
-//                }
-//            });
         }
         // Inflate the layout for this fragment
         return view;
@@ -152,22 +135,19 @@ public class EventsListFragment extends Fragment {
     }
 
     private void refreshList() {
-//        Repository.instance.getEvents(_userId, new CloudManager.CloudCallback<List<Event>>() {
-//            @Override
-//            public void onComplete(List<Event> data) {
-//                eventsList = data;
-//                if (adapter != null)
-//                    adapter.notifyDataSetChanged();
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//            }
-//        });
-    }
+        try {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (adapter != null) {
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+            });
 
-    public interface EventListListener {
-        void onEventSelected(Event event);
+        } catch (Exception e) {
+            Log.d("REFRESH_LIST_TAG", e.getMessage());
+        }
     }
 
 

@@ -67,6 +67,7 @@ import java.util.List;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.Model.Repository;
+import com.example.malicteam.projectxclient.ViewModel.EventsViewModel;
 import com.example.malicteam.projectxclient.ViewModel.FriendsViewModel;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -81,14 +82,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         FriendsListFragment.FriendsFragmentInteraction, NewEventFragment.NewEventInteraction, EventDetailsFragment.EventDetailsInteraction,
         ResetPasswordFragment.ResetPasswordListener, AddFriendFragment.AddFriendInteraction, ChangeDetailsFragment.DetailsDialogInteraction {
 
+    //LiveData
+    private UserViewModel currentUser = null;
+    private FriendsViewModel currentFriendsList = null;
+    private EventsViewModel currentEventsList = null;
+
     private final Class _mainFragmentClass = EventsListFragment.class;
     private final int _mainNavId = R.id.nav_events_list;
     private TextView userNameHeader;
     private TextView userEmailHeader;
     private NavigationView navigationView;
     private MenuItem currentItem = null;//holds the current item that checked (for un checked it a
-    private UserViewModel currentUser = null;
-    private FriendsViewModel currentFriendsList = null;
+
     private int userId;
     private View headerLayout;
     private DrawerLayout mDrawer;
@@ -470,23 +475,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        });
     }
 
-    public static void declineToInvite(Event event) {
+    public void declineToInvite(Event event) {
         //TODO
         //tell server we declined.
         Repository.instance.DeclineToInvite(event.getId(), new DeclineToEventCallback<Boolean>() {
             @Override
             public void onSuccees(Boolean data) {
-                Toast.makeText(MyApp.getContext(), "Refused.", Toast.LENGTH_SHORT).show();
+                makeToastLong("Refused");
             }
 
             @Override
             public void TechnicalError() {
-                Toast.makeText(MyApp.getContext(), "Error:TechnicalError", Toast.LENGTH_SHORT).show();
+                makeToastLong("Error:TechnicalError");
             }
 
             @Override
             public void NoPendingEvents() {
-                Toast.makeText(MyApp.getContext(), "Error:NoPendingEvents", Toast.LENGTH_SHORT).show();
+                makeToastLong("Error:NoPendingEvents");
             }
 
             @Override
@@ -494,19 +499,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(MyApp.getContext(), "Error:UserIsNotExist", Toast.LENGTH_SHORT).show();
             }
         });
-
-        //delete from invite DB
-//        Repository.instance.removeInvite(new CloudManager.CloudCallback<Boolean>() {
-//            @Override
-//            public void onComplete(Boolean data) {
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//
-//            }
-//        }, invite);
-
     }
 
     public void getInEvent(Event event) {
@@ -515,10 +507,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         intent = new Intent(getApplicationContext(), RecordingActivity.class);
         intent.putExtra(Consts.USER, currentUser.getUser().getValue());
         intent.putExtra("eventFromInvitation", event);
-        // Log.d("Tag","eventID="+eventId);
         startActivity(intent);
     }
-
 
     //FriendsList interface
     @Override
@@ -797,6 +787,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onChanged(@Nullable List<User> users) {
                 observer.onChanged(users);
+            }
+        });
+    }
+
+    @Override
+    public void initEventsList(Observer<List<Event>> observer) {
+        currentEventsList = ViewModelProviders.of(this).get(EventsViewModel.class);
+        currentEventsList.getEventsList().observe(this, new Observer<List<Event>>() {
+            @Override
+            public void onChanged(@Nullable List<Event> events) {
+                observer.onChanged(events);
             }
         });
     }

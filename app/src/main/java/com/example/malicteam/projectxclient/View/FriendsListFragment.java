@@ -29,22 +29,20 @@ import java.util.List;
 
 
 public class FriendsListFragment extends Fragment {
-    public interface FriendsFragmentInteraction extends BasicInteractionInterface{
+    public interface FriendsFragmentInteraction extends BasicInteractionInterface {
         void showFriendDetails(User user);
-//        void initFriendsList(FriendsViewModel.FriendsViewModelCallback<List<User>> callback);
-void initFriendsList(Observer<List<User>> observer);
+
+        void initFriendsList(Observer<List<User>> observer);
+
         void addFriend();
+
         void deleteFriend(User friend);
     }
 
     private FriendsFragmentInteraction mListener;
-//    private int userId;
     private List<User> friendsList = new LinkedList<>();
     private MyAdapter adapter = null;
     private ListView friendsListView = null;
-//    private FriendsViewModel friendsViewModel = null;
-//    private String emailString = "";
-    //private UserViewModel currentUser = null;
 
     public FriendsListFragment() {
         // Required empty public constructor
@@ -121,22 +119,22 @@ void initFriendsList(Observer<List<User>> observer);
 //                @Override
 //                public void onChanged(@Nullable List<User> list) {
 //                    friendsList = list;
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (adapter != null) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (adapter != null) {
 //                    try {
-                                adapter.notifyDataSetChanged();
+                        adapter.notifyDataSetChanged();
 //                    } catch (Exception e) {
 //                        Log.d("TAg", e.getMessage());
 //                    }
-                            }
-                        }
-                    });
+                    }
+                }
+            });
 //                }
 //            });
 
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d("REFRESH_LIST_TAG", e.getMessage());
         }
     }
