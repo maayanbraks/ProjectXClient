@@ -1,8 +1,9 @@
 package com.example.malicteam.projectxclient.Activity;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.media.AudioFormat;
 import android.media.MediaPlayer;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -18,7 +19,6 @@ import com.example.malicteam.projectxclient.Common.Callbacks.CloseEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.LeaveEventCallBack;
 import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
-import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.IRecorder;
@@ -29,29 +29,27 @@ import com.example.malicteam.projectxclient.R;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-
-import android.Manifest;
-
-import UpdateObjects.CloseEvent;
 
 
 public class RecordingActivity extends AppCompatActivity {
+    //Record Objects
     private final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private final String[] permissions = {Manifest.permission.RECORD_AUDIO};
-    private boolean mStartToPlayMedia = true;//if true - next click should start playing
     private IRecorder recorder = null;
     private String mFileName = null;
-    private User myUser;
+    private boolean permissionToRecordAccepted = false;
+
+    //Playing Objects
     private MediaPlayer mPlayer = null;
+    private boolean mStartToPlayMedia = true;//if true - next click should start playing
 
     private ImageButton playingButton;
     private ImageButton recordingButton;
-
+    private User myUser;
     private Event event;
     private Event eventTemp;
     private Boolean fromInvitation;
-    private boolean permissionToRecordAccepted = false;
+
     private final String LOG_TAG = "AudioRecordTest";
 
     @Override
@@ -66,6 +64,7 @@ public class RecordingActivity extends AppCompatActivity {
         mFileName = getExternalCacheDir().getAbsolutePath() + "/" + String.valueOf(Math.abs(System.currentTimeMillis())).hashCode() + ".wav";
         //Init recorder
         recorder = new WavRecorder(mFileName);
+        //Init Event
         listenToParticipents();
         initEvent();
         initButtons();
@@ -73,16 +72,15 @@ public class RecordingActivity extends AppCompatActivity {
         initView();
     }
 
-    private void initView(){
+    private void initView() {
         TextView onAir = findViewById(R.id.onAir_recording);
         //Recording Button + "On Air" image
-        if(recorder.isRecording()){//if recording now
+        if (recorder.isRecording()) {//if recording now
             recordingButton.setImageResource(android.R.drawable.ic_menu_save);
             onAir.setVisibility(View.VISIBLE);
             playingButton.setClickable(false);
             playingButton.setVisibility(View.INVISIBLE);
-        }
-        else{
+        } else {
             recordingButton.setImageResource(android.R.drawable.ic_btn_speak_now);
             onAir.setVisibility(View.INVISIBLE);
             playingButton.setImageResource(android.R.drawable.ic_media_play);
@@ -90,10 +88,9 @@ public class RecordingActivity extends AppCompatActivity {
             playingButton.setVisibility(View.VISIBLE);
         }
         //Playing Button
-        if(!mStartToPlayMedia){//if next click should be pause
+        if (!mStartToPlayMedia) {//if next click should be pause
             playingButton.setImageResource(android.R.drawable.ic_media_pause);
-        }
-        else{
+        } else {
             playingButton.setImageResource(android.R.drawable.ic_media_play);
         }
     }
@@ -132,17 +129,55 @@ public class RecordingActivity extends AppCompatActivity {
         }
     }
 
+    private void backClicked() {
+        String msg = "";
+        if(checkMeAdmin())
+            msg = "Are you sure you want to leave? \n" +
+                    "If you leave this event will be closed.";
+        else
+            msg = "Are you want to leave this event?";
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        // set title
+        alertDialogBuilder.setTitle(msg);
+        // set dialog message
+        alertDialogBuilder
+                .setCancelable(false)
+                .setNegativeButton("No, Stay!!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
+                .setPositiveButton("Yes :(", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        if (!mStartToPlayMedia)
+                            stopPlaying();
+                        if (recorder.isRecording())
+                            startRecordOrSaveIt();
+
+                        finish();
+                    }
+
+                });
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        // show it
+        alertDialog.show();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        backClicked();
+    }
+
     private void initButtons() {
         TextView backButton = (TextView) findViewById(R.id.back_btn_recording);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!mStartToPlayMedia)
-                    stopPlaying();
-                if (recorder.isRecording())
-                    startRecordOrSaveIt();
-
-                finish();
+                backClicked();
             }
         });
         recordingButton = (ImageButton) findViewById(R.id.buttonRecordStart);
@@ -150,7 +185,7 @@ public class RecordingActivity extends AppCompatActivity {
         recordingButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (CheckMeAdmin()) {
+                if (checkMeAdmin()) {
                     startRecordOrSaveIt();
                 }
             }
@@ -161,7 +196,7 @@ public class RecordingActivity extends AppCompatActivity {
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if (mStartToPlayMedia && CheckMeAdmin()) {
+                        if (mStartToPlayMedia && checkMeAdmin()) {
                             playOrPause();
                         }
                     }
@@ -204,7 +239,7 @@ public class RecordingActivity extends AppCompatActivity {
 
     public void StopRecordingByAdmin() {
         //notify user about that
-       // Toast.makeText(getApplication(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplication(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
         startRecordOrSaveIt();
         //stop recording...
     }
@@ -232,14 +267,16 @@ public class RecordingActivity extends AppCompatActivity {
 
     private void stopRecording() {
         recorder.stopRecording();
-        if (CheckMeAdmin()) {
+        if (checkMeAdmin()) {
             shareEvent();
+        } else {
+//            leaveEvent();
         }
         Log.d("TAG", "Stop recording func");
     }
 
-    private void shareEvent(){
-       // Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
+    private void shareEvent() {
+        Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
         Repository.instance.closeEvent(null, event.getId(), mFileName, new CloseEventCallback() {
             @Override
             public void onSuccees() {
@@ -269,7 +306,7 @@ public class RecordingActivity extends AppCompatActivity {
         });
     }
 
-    private boolean CheckMeAdmin() {
+    private boolean checkMeAdmin() {
         if ((myUser.getEmail()).equals(event.getAdminId())) {
             return true;
         }
@@ -333,7 +370,7 @@ public class RecordingActivity extends AppCompatActivity {
         partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
 //        mFileName += "/outalk" + event.getId() + ".acc";
 
-        if (!(CheckMeAdmin())) {
+        if (!(checkMeAdmin())) {
             recordingButton.setClickable(false);
             playingButton.setClickable(false);
         }
@@ -351,7 +388,7 @@ public class RecordingActivity extends AppCompatActivity {
         //{
         //  Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName()+" "+event.getParticipats().get(i).getLastName()+",just joined", Toast.LENGTH_LONG).show();
         //}
-        //Toast.makeText(getApplication(), user.getFirstName() + " " + user.getLastName() + ",just joined", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplication(), user.getFirstName() + " " + user.getLastName() + ",just joined", Toast.LENGTH_LONG).show();
 
         if (!(event.getParticipats().contains(user)))
             event.addToParticipats(user);
@@ -373,7 +410,7 @@ public class RecordingActivity extends AppCompatActivity {
 //        {
 //            if (event.getParticipats().get(i).getId()==userId)
 //            {
-        //Toast.makeText(getApplication(), user.getFirstName() + " " + user.getFirstName() + ",just left", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplication(), user.getFirstName() + " " + user.getFirstName() + ",just left", Toast.LENGTH_LONG).show();
         event.delFromParticipats(user);
         runOnUiThread(new Runnable() {
 

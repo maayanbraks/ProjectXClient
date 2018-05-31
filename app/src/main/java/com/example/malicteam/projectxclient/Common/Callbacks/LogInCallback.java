@@ -10,4 +10,5 @@ public interface LogInCallback<T> {
     void userIsNotExist();
     void login(T data);
     void UseIsAllReadyLoggedIn();
+    void IncorrectCredentials();
 }

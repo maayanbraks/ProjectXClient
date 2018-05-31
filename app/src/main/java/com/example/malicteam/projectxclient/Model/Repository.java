@@ -14,6 +14,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.AudioFormat;
+import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
@@ -605,6 +607,9 @@ public class Repository {
                             case ConnectionIsAlreadyEstablished:
                                 callback.UseIsAllReadyLoggedIn();
                                 return;
+                            case IncorrectCredentials:
+                                callback.IncorrectCredentials();
+                                return;
                             default:
                                 return;
                         }
@@ -697,6 +702,7 @@ public class Repository {
     }
 
     public void EditFriendList(LinkedList<String> friendList, EditFriendListCallback callback) {
+        //ALSO DELETE FRIENDS!!!
         //init request
         EditContactsListRequestData editContactsListRequestData = new EditContactsListRequestData(userLiveData.getValue().getEmail(), friendList);
         //send request
@@ -832,7 +838,7 @@ public class Repository {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
-                // Log.d("TAG","oiasdjadjdjkaspdojaspdojasdojassdoj+gettype="+responseData.getType());
+               // Log.d("TAG","oiasdjadjdjkaspdojaspdojasdojassdoj+gettype="+responseData.getType());
                 switch (responseData.getType()) {
                     case Error:
                         ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
@@ -847,7 +853,7 @@ public class Repository {
                                 break;
                         }
                     case IsUserExistResponse:
-                        //   Log.d("TAG","IsUserExistResponeseoasjdsodjdsjdodjasd");
+                     //   Log.d("TAG","IsUserExistResponeseoasjdsodjdsjdodjasd");
                         IsUserExistResponseData response = ProductTypeConverters.getObjectFromString(data, IsUserExistResponseData.class);
                         callback.onSuccees(response.getUserData());
                         break;
@@ -864,21 +870,49 @@ public class Repository {
         });
     }
 
+    private float getDurationAsMinutesFromFile(String filePath){
+        Uri uri = Uri.parse(filePath);
+        MediaMetadataRetriever mmr = new MediaMetadataRetriever();
+        mmr.setDataSource(MyApp.getContext(),uri);
+        String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        float duration = Float.parseFloat(durationStr) / 1000 / 60; //Milliseconds => Seconds => Minutes
+        Log.d("TAG", "Data set time is " + duration + " Minutes");
+        return duration;
+    }
+
+    public void uploadDataSet(String filePath){
+        //get duration
+        float minutes = getDurationAsMinutesFromFile(filePath);
+
+        //Convert File to byte[]
+        byte[] audioBytes = null;
+        try {
+            audioBytes = ProductTypeConverters.convertFileToByte(filePath);
+        }catch (Exception e){
+            Log.d("TAG", e.getStackTrace() + e.getMessage());
+        }
+        //Create request
+        DataSetRequestData dataSetRequestData = new DataSetRequestData(userLiveData.getValue().getEmail(), audioBytes, minutes);
+        CloudManager.instance.sendToServer("Request", dataSetRequestData, new CloudManager.CloudCallback<String>() {
+            @Override
+            public void onComplete(String data) {
+
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        });
+    }
+
     public void closeEvent(String[] protocol, int eventId, String filePath, final CloseEventCallback callback) {
         //init File to byte[]
-        File file = new File(filePath);
-        int fileSize = (int) file.length();
-        byte[] audioBytes = new byte[fileSize];
+        byte[] audioBytes = null;
         try {
-            BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
-            buf.read(audioBytes, 0, audioBytes.length);
-            buf.close();
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            audioBytes = ProductTypeConverters.convertFileToByte(filePath);
+        }catch (Exception e){
+            Log.d("TAG", e.getStackTrace() + e.getMessage());
         }
 
         //Init the get friends/contacts list of  User (by email).
@@ -921,7 +955,6 @@ public class Repository {
     public void deleteFromFriends(User friend) {
         friendsLiveData.getValue().remove(friend);
     }
-
 
     //CLASSES
     class MyTask extends AsyncTask<List<User>, String, List<User>> {
@@ -1201,11 +1234,19 @@ public class Repository {
                         return;
                     case Boolean:
                         BooleanResponseData booleanResponseData = ProductTypeConverters.getObjectFromString(data, BooleanResponseData.class);
-                        if (booleanResponseData.getFlag())
+                        if (booleanResponseData.getFlag()) {
+                            updateUserLocal(firstName, lastName, phone);
                             callback.onSuccees(true);
+                        }
                     default:
                         break;
                 }
+            }
+
+            private void updateUserLocal(String firstName, String lastName, String phone) {
+                userLiveData.getValue().setFirstName(firstName);
+                userLiveData.getValue().setLastName(lastName);
+                userLiveData.getValue().setPhoneNumber(phone);
             }
 
             @Override

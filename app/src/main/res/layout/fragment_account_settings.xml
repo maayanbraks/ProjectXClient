@@ -68,13 +68,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <EditText
-                        android:id="@+id/email_editAccount"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:ems="10"
-                        android:inputType="textEmailAddress"
-                        android:text="Email" />
+                    <!--<EditText-->
+                        <!--android:id="@+id/email_editAccount"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:ems="10"-->
+                        <!--android:inputType="textEmailAddress"-->
+                        <!--android:text="Email" />-->
 
                 </android.support.design.widget.TextInputLayout>
 
@@ -154,22 +154,16 @@
             </android.support.design.widget.AppBarLayout>
 
             <Button
-                android:id="@+id/deleteAccount_button"
-                style="?android:textAppearanceSmall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:text="Delete Account"
-                android:textStyle="bold" />
-
-            <Button
                 android:id="@+id/resetPassword_editAccount_button"
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="Reset Password"
-                android:textStyle="bold" />
+                android:textStyle="bold"
+
+                android:visibility="invisible"
+                android:clickable="false"/>
 
 
         </LinearLayout>
