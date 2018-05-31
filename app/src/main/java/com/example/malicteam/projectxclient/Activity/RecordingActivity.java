@@ -291,17 +291,20 @@ public class RecordingActivity extends AppCompatActivity {
 
             @Override
             public void UserIsNotExist() {
-                Toast.makeText(getApplication(), "Error:UserIsNotExist", Toast.LENGTH_SHORT).show();
+                MakeToastShort("Error:UserIsNotExist");
+                //Toast.makeText(getApplication(), "Error:UserIsNotExist", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void EventIsNotExist() {
-                Toast.makeText(getApplication(), "Error:EventIsNotExist", Toast.LENGTH_SHORT).show();
+                MakeToastShort("Error:EventIsNotExist");
+               // Toast.makeText(getApplication(), "Error:EventIsNotExist", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void TechnicalError() {
-                Toast.makeText(getApplication(), "Error:TechnicalError", Toast.LENGTH_SHORT).show();
+                MakeToastShort("Error:TechnicalError");
+               // Toast.makeText(getApplication(), "Error:TechnicalError", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -430,4 +433,17 @@ public class RecordingActivity extends AppCompatActivity {
     public void SetEventFromNewActivity() {
         SetActivity();
     }
-}
+
+    private void MakeToastShort(String toastInfo) {
+        runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                Toast.makeText(getApplication(), toastInfo, Toast.LENGTH_SHORT).show();
+
+
+            }
+        });
+    }
+    }
+
