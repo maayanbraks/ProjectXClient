@@ -28,6 +28,7 @@ import com.example.malicteam.projectxclient.Common.Callbacks.CloseEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.CreateUserCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.DeclineToEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.EditUserCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.EventListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.FriendsListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.LeaveEventCallBack;
