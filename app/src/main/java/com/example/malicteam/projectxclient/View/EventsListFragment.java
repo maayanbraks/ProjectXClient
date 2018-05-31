@@ -23,6 +23,7 @@ import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.R;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -67,14 +68,14 @@ public class EventsListFragment extends Fragment {
 
             this._userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
 
-            //get events list
-            mListener.initEventsList(new Observer<List<Event>>() {
-                @Override
-                public void onChanged(List<Event> data) {
-                    eventsList = data;
-                    refreshList();
-                }
-            });
+//            //get events list
+//            mListener.initEventsList(new Observer<List<Event>>() {
+//                @Override
+//                public void onChanged(List<Event> data) {
+//                    eventsList = data;
+//                    refreshList();
+//                }
+//            });
 
             Repository.instance.getEventsFromServer(new EventListCallback<List<Event>>() {
                 @Override
@@ -84,6 +85,7 @@ public class EventsListFragment extends Fragment {
                         public void run() {
                             if (data != null) {
                                 eventsList = data;
+                                Collections.reverse(eventsList);
                                 if (adapter != null)
                                     adapter.notifyDataSetChanged();
                             }
@@ -186,9 +188,19 @@ public class EventsListFragment extends Fragment {
                 TextView _nameEvent = view.findViewById(R.id._nameEvent);
                 TextView _date = view.findViewById(R.id._date);
                 TextView _participats = view.findViewById(R.id._participates);
+                TextView _status = view.findViewById(R.id.recordStatus_textView);
                 _nameEvent.setText(event.getTitle());
                 _participats.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
                 _date.setText(event.getDate());
+                if(event.isRecording()){
+                    _status.setText("Live");
+                }
+                else if(!event.isConverted()){
+                    _status.setText("Analyzing");
+                }
+                else{
+                    _status.setText("Done");
+                }
             }
 
             return view;

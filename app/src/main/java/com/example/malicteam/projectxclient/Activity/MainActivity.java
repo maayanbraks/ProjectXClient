@@ -59,7 +59,6 @@ import java.util.List;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.Model.Repository;
-import com.example.malicteam.projectxclient.ViewModel.EventsViewModel;
 import com.example.malicteam.projectxclient.ViewModel.FriendsViewModel;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
@@ -73,7 +72,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     //LiveData
     private UserViewModel currentUser = null;
     private FriendsViewModel currentFriendsList = null;
-    private EventsViewModel currentEventsList = null;
 
     private final Class _mainFragmentClass = EventsListFragment.class;
     private final int _mainNavId = R.id.nav_events_list;
@@ -781,13 +779,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void initEventsList(Observer<List<Event>> observer) {
-        currentEventsList = ViewModelProviders.of(this).get(EventsViewModel.class);
-        currentEventsList.getEventsList().observe(this, new Observer<List<Event>>() {
-            @Override
-            public void onChanged(@Nullable List<Event> events) {
-                observer.onChanged(events);
-            }
-        });
+//        currentEventsList = ViewModelProviders.of(this).get(EventsViewModel.class);
+//        currentEventsList.getEventsList().observe(this, new Observer<List<Event>>() {
+//            @Override
+//            public void onChanged(@Nullable List<Event> events) {
+//                observer.onChanged(events);
+//            }
+//        });
     }
 
     @Override
