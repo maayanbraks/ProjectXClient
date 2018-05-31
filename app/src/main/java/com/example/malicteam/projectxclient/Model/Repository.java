@@ -618,7 +618,7 @@ public class Repository {
                         callback.onBoolean(booleanResponseData.getFlag());
                     case Login:
                         LoginResponseData loginResponseData = ProductTypeConverters.getObjectFromString(response, LoginResponseData.class);
-                        User user = new User(loginResponseData.getFirstName(), loginResponseData.getLastName(), loginResponseData.getPhone(), loginRequestData.getUserEmail(), null, null, 1, loginResponseData.getId());
+                        User user = new User(loginResponseData.getFirstName(), loginResponseData.getLastName(), loginResponseData.getPhone(), loginRequestData.getUserEmail(), null, null, 1, loginResponseData.getId(),0);
                         callback.login(user);
                     default:
                         break;

@@ -35,13 +35,6 @@ public class User implements Serializable {
         return id;
     }
 
-    public float getDataSetTime() {
-        return dataSetTime;
-    }
-
-    public void setDataSetTime(float dataSetTime) {
-        this.dataSetTime = dataSetTime;
-    }
 
     private float dataSetTime;
     private String email;
@@ -51,8 +44,9 @@ public class User implements Serializable {
     private boolean admin = false;
     private long lastUpdated;
 
-    //    @Ignore
-    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds, long lastUpdated) {
+
+    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds) {
+        //SignUp CTOR
         this.firstName = firstName;
         this.lastName = lastName;
         this.id = generateId(email);
@@ -62,7 +56,8 @@ public class User implements Serializable {
         Date date = new Date();
         this.lastLogin = dateFormat.format(date);
         this.pictureUrl = null;
-        this.lastUpdated = lastUpdated;
+        this.lastUpdated = date.getTime();
+        this.dataSetTime = 0;
 
         if (friendsIds != null)
             this.friendsIds = ProductTypeConverters.toString(friendsIds);
@@ -74,7 +69,9 @@ public class User implements Serializable {
         else
             this.eventsIds = "{}";
     }
-    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds, long lastUpdated,int id) {
+
+    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds, long lastUpdated, int id, float dataSetTime) {
+        //Login Ctor
         this.firstName = firstName;
         this.lastName = lastName;
         this.id = id;
@@ -85,28 +82,7 @@ public class User implements Serializable {
         this.lastLogin = dateFormat.format(date);
         this.pictureUrl = null;
         this.lastUpdated = lastUpdated;
-
-        if (friendsIds != null)
-            this.friendsIds = ProductTypeConverters.toString(friendsIds);
-        else
-            this.friendsIds = "{}";
-
-        if (eventsIds != null)
-            this.eventsIds = ProductTypeConverters.toString(eventsIds);
-        else
-            this.eventsIds = "{}";
-    }
-    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds, String pictureUrl,long lastUpdated) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.id = generateId(email);
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date date = new Date();
-        this.lastLogin = dateFormat.format(date);
-        this.pictureUrl = pictureUrl;
-        //this.eventsIds = new LinkedList<Integer>();
+        this.dataSetTime = dataSetTime;
 
         if (friendsIds != null)
             this.friendsIds = ProductTypeConverters.toString(friendsIds);
@@ -121,26 +97,14 @@ public class User implements Serializable {
 
     public User(UserData userdata) {
         this.firstName = userdata.getFirstName();
-        this.lastName =  userdata.getLastName();
-        this.phoneNumber =  userdata.getPhoneNumber();
+        this.lastName = userdata.getLastName();
+        this.phoneNumber = userdata.getPhoneNumber();
         this.email = userdata.getEmail();
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         Date date = new Date();
         this.lastLogin = dateFormat.format(date);
         this.pictureUrl = userdata.getPictureURL();
-        this.id=132;
-
-        //this.eventsIds = new LinkedList<Integer>();
-
-//        if (friendsIds != null)
-//            this.friendsIds = ProductTypeConverters.toString(friendsIds);
-//        else
-//            this.friendsIds = "{}";
-//
-//        if (eventsIds != null)
-//            this.eventsIds = ProductTypeConverters.toString(eventsIds);
-//        else
-//            this.eventsIds = "{}";
+        this.id = 132;
     }
 
     public User() {
@@ -165,71 +129,33 @@ public class User implements Serializable {
         this.lastUpdated = 0;
         this.dataSetTime = 0;
     }
-    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds, String pictureUrl) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.id = generateId(email);
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date date = new Date();
-        this.lastLogin = dateFormat.format(date);
-        this.pictureUrl = pictureUrl;
-        //this.eventsIds = new LinkedList<Integer>();
-        this.lastUpdated = date.getTime();
 
-        if (friendsIds != null)
-            this.friendsIds = ProductTypeConverters.toString(friendsIds);
-        else
-            this.friendsIds = "{}";
-
-        if (eventsIds != null)
-            this.eventsIds = ProductTypeConverters.toString(eventsIds);
-        else
-            this.eventsIds = "{}";
-    }
-
-    public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.id = generateId(email);
-        this.phoneNumber = phoneNumber;
-        this.email = email;
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        Date date = new Date();
-        this.lastLogin = dateFormat.format(date);
-        this.pictureUrl = null;
-        this.lastUpdated = date.getTime();
-
-        if (friendsIds != null)
-            this.friendsIds = ProductTypeConverters.toString(friendsIds);
-        else
-            this.friendsIds = "{}";
-
-        if (eventsIds != null)
-            this.eventsIds = ProductTypeConverters.toString(eventsIds);
-        else
-            this.eventsIds = "{}";
-    }
-
-
-    public List<User> convertUserDataToUser(List<UserData> userDataList)
-    {
-        if (userDataList.size()<1)
+    public List<User> convertUserDataToUser(List<UserData> userDataList) {
+        if (userDataList.size() < 1)
             return null;
-        List<User> users= new LinkedList<>();
-        for(UserData item : userDataList){
-            int i=0;
-            User user=new User(userDataList.get(i));
+        List<User> users = new LinkedList<>();
+        for (UserData item : userDataList) {
+            int i = 0;
+            User user = new User(userDataList.get(i));
             users.add(user);
             i++;
         }
         return users;
     }
+
     public void addEventToList(int event) {
         List<Integer> list = ProductTypeConverters.toList(this.eventsIds);
         list.add(event);
         this.eventsIds = ProductTypeConverters.toString(list);
+    }
+
+
+    public float getDataSetTime() {
+        return dataSetTime;
+    }
+
+    public void setDataSetTime(float dataSetTime) {
+        this.dataSetTime = dataSetTime;
     }
 
     public void deleteEventFromList(int event) {
