@@ -1006,12 +1006,12 @@ public class Repository {
                         switch (errorResponseData.getErrorType()) {
                             case UserIsNotExist:
                                 callback.UserIsNotExist();
-                                break;
+                                return;
                             case UserMustToLogin:
                                 callback.userMustToLogin();
-                                break;
+                                return;
                             default:
-                                break;
+                                return;
                         }
                     case Events:
                         EventsListResponseData response = ProductTypeConverters.getObjectFromString(data, EventsListResponseData.class);
@@ -1023,7 +1023,7 @@ public class Repository {
                             }
                         }
                         callback.onSuccees(list);
-                        break;
+                        return;
 
                     default:
                         return;
