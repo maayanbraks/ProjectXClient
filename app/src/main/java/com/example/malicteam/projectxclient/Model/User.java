@@ -35,6 +35,15 @@ public class User implements Serializable {
         return id;
     }
 
+    public float getDataSetTime() {
+        return dataSetTime;
+    }
+
+    public void setDataSetTime(float dataSetTime) {
+        this.dataSetTime = dataSetTime;
+    }
+
+    private float dataSetTime;
     private String email;
     private String friendsIds;
     private String eventsIds;
@@ -87,7 +96,6 @@ public class User implements Serializable {
         else
             this.eventsIds = "{}";
     }
-
     public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds, String pictureUrl,long lastUpdated) {
         this.firstName = firstName;
         this.lastName = lastName;
@@ -110,7 +118,8 @@ public class User implements Serializable {
         else
             this.eventsIds = "{}";
     }
-    public User(UserData userdata) { //
+
+    public User(UserData userdata) {
         this.firstName = userdata.getFirstName();
         this.lastName =  userdata.getLastName();
         this.phoneNumber =  userdata.getPhoneNumber();
@@ -120,6 +129,7 @@ public class User implements Serializable {
         this.lastLogin = dateFormat.format(date);
         this.pictureUrl = userdata.getPictureURL();
         this.id=132;
+
         //this.eventsIds = new LinkedList<Integer>();
 
 //        if (friendsIds != null)
@@ -153,6 +163,7 @@ public class User implements Serializable {
             this.eventsIds = "{}";
 
         this.lastUpdated = 0;
+        this.dataSetTime = 0;
     }
     public User(String firstName, String lastName, String phoneNumber, String email, List<Integer> friendsIds, List<Integer> eventsIds, String pictureUrl) {
         this.firstName = firstName;

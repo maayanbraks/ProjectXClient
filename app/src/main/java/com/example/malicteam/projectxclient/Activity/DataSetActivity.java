@@ -17,6 +17,7 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.malicteam.projectxclient.Common.Callbacks.CloseEventCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.DataSetCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Model.IRecorder;
@@ -130,7 +131,17 @@ public class DataSetActivity extends AppCompatActivity {
     private void uploadDataSet() {
         Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
         //Upoload
-        Repository.instance.uploadDataSet(mFileName);
+        Repository.instance.uploadDataSet(mFileName, new DataSetCallback() {
+            @Override
+            public void TechnicalError() {
+                Log.d("TAG", "Error DataSEt Response Activity");
+            }
+
+            @Override
+            public void onSuccees(float length) {
+
+            }
+        });
         //ready for new record
         initFileName();
         recorder.setFileName(mFileName);
