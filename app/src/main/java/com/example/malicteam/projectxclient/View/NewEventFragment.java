@@ -120,7 +120,7 @@ public class NewEventFragment extends Fragment {
                 //DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm");
                 Date date = new Date();
                 String dateFormat = new SimpleDateFormat("dd/MM/yyyy HH:mm").format(Calendar.getInstance().getTime());
-                event = new Event(null, title,new LinkedList<User>(), description, myUser.getEmail(), dateFormat, 0);
+                event = new Event(null, title, new LinkedList<User>(), description, myUser.getEmail(), dateFormat, 0);
                 List<User> participats = new LinkedList<>();
                 //participats.add(myUser);
                 UsersInvites.add(myUser.getEmail());
@@ -129,15 +129,15 @@ public class NewEventFragment extends Fragment {
                 //Repository.instance.addEvent(event);
                 //UsersInvites.add(myUser.getEmail());
                 // event.addToParticipats(myUser);
-                Repository.instance.addEvent(UsersInvites, event, new AddEventCallback<Boolean>() {
+                Repository.instance.addEvent(UsersInvites, event, new AddEventCallback<Integer>() {
                     @Override
-                    public void onSuccees(Boolean data) {
-                        if (data) {
-                            mListener.startRecording(event);
-                        }
-                        //   try {
-                        //  currentUser.getUser().getValue().addEventToList(Integer.valueOf(event.getId()));
-                        //update the userDatabase
+                    public void onSuccees(Integer data) {
+                        event.setId(data);
+                        mListener.startRecording(event);
+                    }
+                    //   try {
+                    //  currentUser.getUser().getValue().addEventToList(Integer.valueOf(event.getId()));
+                    //update the userDatabase
 //                                Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudCallback() {
 //                                    @Override
 //                                    public void onComplete(Object data) {
@@ -147,11 +147,9 @@ public class NewEventFragment extends Fragment {
 //                                    @Override
 //                                    public void onCancel() {
 
-                        //}
-                        //});
-                        //}
-
-                    }
+                    //}
+                    //});
+                    //}
 
                     @Override
                     public void userIsNotExist() {
@@ -165,6 +163,7 @@ public class NewEventFragment extends Fragment {
                         Log.d("TAG", "In addevent-->neweventfragment ---> Technical error");
                     }
                 });
+
 
 //                    Intent intent = new Intent(MyApp.getContext(), RecordingActivity.class);
 //                    intent.putExtra("sendNewEvent", event);
