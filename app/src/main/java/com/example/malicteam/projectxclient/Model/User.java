@@ -104,7 +104,8 @@ public class User implements Serializable {
         Date date = new Date();
         this.lastLogin = dateFormat.format(date);
         this.pictureUrl = userdata.getPictureURL();
-        this.id = 132;
+        this.id = userdata.getUserId();
+        this.dataSetTime = userdata.getLengthOfRecord();
     }
 
     public User() {
