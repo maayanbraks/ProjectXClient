@@ -667,32 +667,13 @@ public class Repository {
             }
         });
     }
+
     public void sendDataSet(byte[] record, float length, final DataSetCallback callback) {
         DataSetRequestData dataSetRequestData = new DataSetRequestData(userLiveData.getValue().getEmail(),record,length);
         CloudManager.instance.sendToServer("Request", dataSetRequestData, new CloudManager.CloudCallback<String>() {
             @Override
             public void onComplete(String response) {
-                ResponseData responseData = ProductTypeConverters.getObjectFromString(response, ResponseData.class);
-                //Create To ResponseData
-                //Checke type
-                //BY the type -> create refrence ResponseData
-                switch (responseData.getType()) {
-                    case Error:
-                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(response, ErrorResponseData.class);
-                        switch (errorResponseData.getErrorType()) {
-                            case TechnicalError:
-                                callback.TechnicalError();
-                                return;
-                            default:
-                                return;
-                        }
-                    case DataSetResponseData:
-                        DataSetResponseData dataSetResponseData = ProductTypeConverters.getObjectFromString(response, DataSetResponseData.class);
-                        callback.onSuccees(dataSetResponseData.getUpdatedLength());
-                        return;
-                    default:
-                        break;
-                }
+
             }
 
             @Override
@@ -880,7 +861,7 @@ public class Repository {
         return duration;
     }
 
-    public void uploadDataSet(String filePath){
+    public void uploadDataSet(String filePath, final DataSetCallback callback){
         //get duration
         float minutes = getDurationAsMinutesFromFile(filePath);
 
@@ -895,8 +876,28 @@ public class Repository {
         DataSetRequestData dataSetRequestData = new DataSetRequestData(userLiveData.getValue().getEmail(), audioBytes, minutes);
         CloudManager.instance.sendToServer("Request", dataSetRequestData, new CloudManager.CloudCallback<String>() {
             @Override
-            public void onComplete(String data) {
-
+            public void onComplete(String response) {
+                ResponseData responseData = ProductTypeConverters.getObjectFromString(response, ResponseData.class);
+                //Create To ResponseData
+                //Checke type
+                //BY the type -> create refrence ResponseData
+                switch (responseData.getType()) {
+                    case Error:
+                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(response, ErrorResponseData.class);
+                        switch (errorResponseData.getErrorType()) {
+                            case TechnicalError:
+                                callback.TechnicalError();
+                                return;
+                            default:
+                                return;
+                        }
+                    case DataSetResponseData:
+                        DataSetResponseData dataSetResponseData = ProductTypeConverters.getObjectFromString(response, DataSetResponseData.class);
+                        callback.onSuccees(dataSetResponseData.getUpdatedLength());
+                        return;
+                    default:
+                        break;
+                }
             }
 
             @Override
