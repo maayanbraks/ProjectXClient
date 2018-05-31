@@ -1142,7 +1142,7 @@ public class Repository {
     }
 
 
-    public void addEvent(List<String> usersMails, Event event, final AddEventCallback<Boolean> callback) {
+    public void addEvent(List<String> usersMails, Event event, final AddEventCallback<Integer> callback) {
         CreateEventRequestData createEventRequestData = new CreateEventRequestData(userLiveData.getValue().getEmail(), usersMails, event.getTitle(), event.getDescription());
         CloudManager.instance.sendToServer("Request", createEventRequestData, new CloudManager.CloudCallback<String>() {
             @Override
@@ -1164,10 +1164,9 @@ public class Repository {
                             default:
                                 return;
                         }
-                    case Boolean:
-                        BooleanResponseData booleanResponseData = ProductTypeConverters.getObjectFromString(response, BooleanResponseData.class);
-                        if (booleanResponseData.getFlag())
-                            callback.onSuccees(true);
+                    case CreateEvent:
+                        CreateEventResponseData createEventResponseData=ProductTypeConverters.getObjectFromString(response, CreateEventResponseData.class);
+                            callback.onSuccees(createEventResponseData.getId());
                     default:
                         break;
                 }
