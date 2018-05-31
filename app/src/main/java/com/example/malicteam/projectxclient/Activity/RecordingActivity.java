@@ -1,6 +1,8 @@
 package com.example.malicteam.projectxclient.Activity;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.support.annotation.NonNull;
@@ -123,12 +125,40 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
     private void backClicked() {
-        if (!mStartToPlayMedia)
-            stopPlaying();
-        if (recorder.isRecording())
-            startRecordOrSaveIt();
+        String msg = "";
+        if(checkMeAdmin())
+            msg = "Are you sure you want to leave? \n" +
+                    "If you leave this event will be closed.";
+        else
+            msg = "Are you want to leave this event?";
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        // set title
+        alertDialogBuilder.setTitle(msg);
+        // set dialog message
+        alertDialogBuilder
+                .setCancelable(false)
+                .setNegativeButton("No, Stay!!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                })
+                .setPositiveButton("Yes :(", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        if (!mStartToPlayMedia)
+                            stopPlaying();
+                        if (recorder.isRecording())
+                            startRecordOrSaveIt();
 
-        finish();
+                        finish();
+                    }
+
+                });
+        // create alert dialog
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        // show it
+        alertDialog.show();
+
     }
 
     @Override
