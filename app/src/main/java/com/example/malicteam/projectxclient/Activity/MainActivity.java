@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -43,6 +44,7 @@ import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.View.Dialogs.AddFriendFragment;
 import com.example.malicteam.projectxclient.View.Dialogs.ChangeDetailsFragment;
+import com.example.malicteam.projectxclient.View.Dialogs.DataSetAlertDialogFragment;
 import com.example.malicteam.projectxclient.View.NewEventFragment;
 import com.example.malicteam.projectxclient.View.AccountSettingsFragment;
 import com.example.malicteam.projectxclient.Common.Consts;
@@ -59,7 +61,6 @@ import java.util.List;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.Model.Repository;
-import com.example.malicteam.projectxclient.ViewModel.EventsViewModel;
 import com.example.malicteam.projectxclient.ViewModel.FriendsViewModel;
 import com.example.malicteam.projectxclient.ViewModel.UserViewModel;
 
@@ -68,17 +69,19 @@ import ResponsesEntitys.UserData;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.AccountSettingsInteraction, EventsListFragment.EventListListener,
         FriendsListFragment.FriendsFragmentInteraction, NewEventFragment.NewEventInteraction, EventDetailsFragment.EventDetailsInteraction,
-        ResetPasswordFragment.ResetPasswordListener, AddFriendFragment.AddFriendInteraction, ChangeDetailsFragment.DetailsDialogInteraction {
+        ResetPasswordFragment.ResetPasswordListener, AddFriendFragment.AddFriendInteraction, ChangeDetailsFragment.DetailsDialogInteraction, DataSetAlertDialogFragment.DataSetAlertInteraction {
 
     //LiveData
     private UserViewModel currentUser = null;
     private FriendsViewModel currentFriendsList = null;
-    private EventsViewModel currentEventsList = null;
+
+    private Observer<Integer> convertedObserver = null;
 
     private final Class _mainFragmentClass = EventsListFragment.class;
     private final int _mainNavId = R.id.nav_events_list;
     private TextView userNameHeader;
     private TextView userEmailHeader;
+    private ProgressBar dataSetProgress;
     private NavigationView navigationView;
     private MenuItem currentItem = null;//holds the current item that checked (for un checked it a
 
@@ -106,24 +109,42 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         headerLayout = navigationView.getHeaderView(0);
         userNameHeader = (TextView) (headerLayout.findViewById(R.id.userName_head));
         userEmailHeader = (TextView) (headerLayout.findViewById(R.id.userMail_head));
+        dataSetProgress = (ProgressBar) (headerLayout.findViewById(R.id.progressBar_DataSetTimeHeader));
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        updateProfilePicture(mUser.getPictureUrl());
-//        userNameHeader.setText(mUser.getFirstName() + " " + mUser.getLastName());
-//        userEmailHeader.setText(mUser.getEmail());
         currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
         currentUser.initUser((User) getIntent().getSerializableExtra(Consts.USER));
         currentUser.getUser().observe(this, new Observer<User>() {
             @Override
             public void onChanged(@Nullable User user) {
                 if (user != null) {
+                    if(user.getEmail().equals("MaayanMail"))
+                        user.setDataSetTime(15);
+                    else if(user.getEmail().equals("EdenMail"))
+                        user.setDataSetTime(10);
                     //update details
                     updateProfilePicture(user.getPictureUrl());
                     userNameHeader.setText(user.getFirstName() + " " + user.getLastName());
                     userEmailHeader.setText(user.getEmail());
+                    dataSetProgress.setProgress((int) (user.getDataSetTime() * 100 / 15));
+                    if (dataSetProgress.getProgress() < 40) {
+                        dataSetProgress.setDrawingCacheBackgroundColor(13504528);//RED
+                        dataSetProgress.getProgressDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN);
+                    }
+                    else if (dataSetProgress.getProgress() < 90){
+                        dataSetProgress.setDrawingCacheBackgroundColor(16772886);//YELLOW
+                        dataSetProgress.getProgressDrawable().setColorFilter(Color.YELLOW, android.graphics.PorterDuff.Mode.SRC_IN);
+                    }
+                    else {
+                        dataSetProgress.getProgressDrawable().setColorFilter(Color.GREEN, android.graphics.PorterDuff.Mode.SRC_IN);
+                        dataSetProgress.setDrawingCacheBackgroundColor(4980523);//GREEN
+                    }
                     userId = user.getId();
+                    if (user.getDataSetTime() == 0) {
+                        openDataSetAlert();
+                    }
                 } else {
                     Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     startActivity(intent);
@@ -151,9 +172,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 new Observer<Integer>() {//Protocol is ready
                     @Override
                     public void onChanged(@Nullable Integer eventId) {
-//TODO send to eventListFragment -->change the event TO isCONVERTED=TRUE;
-                        makeToastLong("Event id="+eventId+" protocol is ready");
-
+                        makeToastLong("Event id=" + eventId + " protocol is ready");
+                        if (convertedObserver != null)
+                            convertedObserver.onChanged(eventId);
                     }
                 });
 
@@ -225,6 +246,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        {
 //            fragmentManager.beginTransaction().replace(R.id.flContent, mainFragment, _mainFragmentClass.getName()).commit();
 //        }
+    }
+
+    private void openDataSetAlert() {
+        DataSetAlertDialogFragment dialog = new DataSetAlertDialogFragment();
+        dialog.show(getSupportFragmentManager(), "DataSetAlertDialogFragment");
     }
 
     private Class getCurrentShownFragment() {
@@ -322,10 +348,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 fragmentClass = NewEventFragment.class;
                 break;
             case R.id.nav_dataSet:
-                loadMainFragment();//For supply home page after click 'Back' from Recording Activity
-                Intent intent = new Intent(MyApp.getContext(), DataSetActivity.class);
-                intent.putExtra(Consts.USER, currentUser.getUser().getValue());
-                startActivity(intent);
+                goToDataSetActivity();
                 return true;
             case R.id.nav_logout:
                 logout();
@@ -781,13 +804,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void initEventsList(Observer<List<Event>> observer) {
-        currentEventsList = ViewModelProviders.of(this).get(EventsViewModel.class);
-        currentEventsList.getEventsList().observe(this, new Observer<List<Event>>() {
-            @Override
-            public void onChanged(@Nullable List<Event> events) {
-                observer.onChanged(events);
-            }
-        });
+//        currentEventsList = ViewModelProviders.of(this).get(EventsViewModel.class);
+//        currentEventsList.getEventsList().observe(this, new Observer<List<Event>>() {
+//            @Override
+//            public void onChanged(@Nullable List<Event> events) {
+//                observer.onChanged(events);
+//            }
+//        });
     }
 
     @Override
@@ -869,11 +892,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void edit(String firstName, String lastName, String phone) {
-        if(firstName == null)
+        if (firstName == null)
             firstName = currentUser.getUser().getValue().getFirstName();
-        if(lastName == null)
+        if (lastName == null)
             lastName = currentUser.getUser().getValue().getLastName();
-        if(phone == null)
+        if (phone == null)
             phone = currentUser.getUser().getValue().getPhoneNumber();
         Repository.instance.editUser(firstName, lastName, currentUser.getUser().getValue().getEmail(), phone, new EditUserCallback<Boolean>() {
             @Override
@@ -883,6 +906,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
+    @Override
+    public void initConvertedObserver(Observer<Integer> observer) {
+        this.convertedObserver = observer;
+    }
 
     @Override
     public void getProtocol(int eventId, final EventDetailCallback callback) {
@@ -905,5 +932,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 callback.onSuccees(data);
             }
         });
+    }
+
+    @Override
+    public void goToDataSetActivity() {
+        loadMainFragment();//For supply home page after click 'Back' from Recording Activity
+        Intent intent = new Intent(MyApp.getContext(), DataSetActivity.class);
+        intent.putExtra(Consts.USER, currentUser.getUser().getValue());
+        startActivity(intent);
     }
 }

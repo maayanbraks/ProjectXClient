@@ -51,6 +51,9 @@ public class DataSetActivity extends AppCompatActivity {
         //Init recorder
         recorder = new WavRecorder(mFileName);
 
+        TextView timeTextView = findViewById(R.id.currentTime_dataSet);
+        timeTextView.setText(String.valueOf(myUser.getDataSetTime()) + " Minutes");
+
         initButtons();
     }
 
@@ -138,8 +141,8 @@ public class DataSetActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onSuccees(float length) {
-
+            public void onSuccees(float newLength) {
+                myUser.setDataSetTime(newLength);
             }
         });
         //ready for new record

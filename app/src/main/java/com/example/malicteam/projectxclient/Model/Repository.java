@@ -864,6 +864,7 @@ public class Repository {
                         }
                     case DataSetResponseData:
                         DataSetResponseData dataSetResponseData = ProductTypeConverters.getObjectFromString(response, DataSetResponseData.class);
+                        userLiveData.getValue().setDataSetTime(dataSetResponseData.getUpdatedLength());
                         callback.onSuccees(dataSetResponseData.getUpdatedLength());
                         return;
                     default:

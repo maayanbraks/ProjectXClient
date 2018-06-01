@@ -3,6 +3,7 @@ package com.example.malicteam.projectxclient.View;
 import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,6 +24,7 @@ import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.R;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,6 +32,8 @@ public class EventsListFragment extends Fragment {
 
     public interface EventListListener {
         void onEventSelected(Event event);
+
+        void initConvertedObserver(Observer<Integer> observer);
 
         void initEventsList(Observer<List<Event>> observer);
     }
@@ -67,14 +71,14 @@ public class EventsListFragment extends Fragment {
 
             this._userId = getArguments().getInt(Consts.USER_ID, Consts.DEFAULT_UID);
 
-            //get events list
-            mListener.initEventsList(new Observer<List<Event>>() {
-                @Override
-                public void onChanged(List<Event> data) {
-                    eventsList = data;
-                    refreshList();
-                }
-            });
+//            //get events list
+//            mListener.initEventsList(new Observer<List<Event>>() {
+//                @Override
+//                public void onChanged(List<Event> data) {
+//                    eventsList = data;
+//                    refreshList();
+//                }
+//            });
 
             Repository.instance.getEventsFromServer(new EventListCallback<List<Event>>() {
                 @Override
@@ -84,6 +88,7 @@ public class EventsListFragment extends Fragment {
                         public void run() {
                             if (data != null) {
                                 eventsList = data;
+                                Collections.reverse(eventsList);
                                 if (adapter != null)
                                     adapter.notifyDataSetChanged();
                             }
@@ -102,6 +107,16 @@ public class EventsListFragment extends Fragment {
 
 //                    Toast.makeText(MyApp.getContext(), "You must log in first", Toast.LENGTH_SHORT).show();
                     Log.d("TAG", "In getEventFromServer->EventListFragment --->userMustToLogin");
+                }
+            });
+
+            mListener.initConvertedObserver(new Observer<Integer>() {
+                @Override
+                public void onChanged(@Nullable Integer integer) {
+                    for (Event e : eventsList) {
+                        if(e.getId() == integer)
+                            e.setConverted(true);
+                    }
                 }
             });
         }
@@ -131,6 +146,35 @@ public class EventsListFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
+        Repository.instance.getEventsFromServer(new EventListCallback<List<Event>>() {
+            @Override
+            public void onSuccees(List<Event> data) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (data != null) {
+                            eventsList = data;
+                            Collections.reverse(eventsList);
+                            if (adapter != null)
+                                adapter.notifyDataSetChanged();
+                        }
+                    }
+                });
+            }
+
+            @Override
+            public void UserIsNotExist() {
+                //    Toast.makeText(MyApp.getContext(), "User not exist,try again.", Toast.LENGTH_SHORT).show();
+                Log.d("TAG", "In getEventFromServer->EventListFragment --->UserIsNotExist");
+            }
+
+            @Override
+            public void userMustToLogin() {
+
+//                    Toast.makeText(MyApp.getContext(), "You must log in first", Toast.LENGTH_SHORT).show();
+                Log.d("TAG", "In getEventFromServer->EventListFragment --->userMustToLogin");
+            }
+        });
         refreshList();
     }
 
@@ -186,9 +230,17 @@ public class EventsListFragment extends Fragment {
                 TextView _nameEvent = view.findViewById(R.id._nameEvent);
                 TextView _date = view.findViewById(R.id._date);
                 TextView _participats = view.findViewById(R.id._participates);
+                TextView _status = view.findViewById(R.id.recordStatus_textView);
                 _nameEvent.setText(event.getTitle());
                 _participats.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
                 _date.setText(event.getDate());
+                if (event.isConverted()) {
+                    _status.setText("Done");
+                } else if (!event.isRecording()) {
+                    _status.setText("Analyzing");
+                } else {
+                    _status.setText("Live");
+                }
             }
 
             return view;
