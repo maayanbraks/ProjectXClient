@@ -273,7 +273,6 @@
 //                Log.d("TAG", "File in Stop Recording -Making bytefile" + e);
 //                e.printStackTrace();
 //            }
-//            //TODO
 //            ////change the protocol in closeevent to Bytefile,
 //            Repository.instance.closeEvent(null, event.getId(), mFileName, new CloseEventCallback() {
 //
@@ -305,11 +304,9 @@
 //
 //
 //    private void StopRecording() {
-//        //TODO stop service of recording
 //    }
 //
 //    private void SaveConversation() {
-//        //TODO save pdf file
 //    }
 //
 //    private boolean CheckMeAdmin() {
@@ -363,7 +360,6 @@
 ////        try {
 ////             byte byteFile[]=ProductTypeConverters.convertFileToByte(convertFromAccToWav());
 ////            return byteFile;
-////             //todo
 ////            //Send the byteFile to Sahar
 ////        } catch (IOException e) {
 ////            e.printStackTrace();

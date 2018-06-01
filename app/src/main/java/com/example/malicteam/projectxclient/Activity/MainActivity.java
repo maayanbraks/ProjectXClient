@@ -402,50 +402,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        );
     }
 
-    /////////////////////////////////////////////////////////////////////////
-    public void Invitation(final Invite invite) {
-        final Context context = this;
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-
-        // set title
-        alertDialogBuilder.setTitle("You got new Invitation, from " + invite.getInviteFromId());
-
-        // set dialog message
-        alertDialogBuilder
-                .setCancelable(false)
-                .setNegativeButton("Decline", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        //  declineToInvite(invite);
-                        //Todo make delined to invite
-                        // dialog.cancel();
-                    }
-                })
-                .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Log.d("TAG", "You have agreed invite");
-                        //   agreeToInvite(invite);
-                        //Todo make Agree to evnet
-                        // GetInEvent(invite.getEventId());
-                        // MainActivity.this.finish();
-                    }
-
-                });
-
-        // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
-
-        // show it
-        if (!((Activity) context).isFinishing()) {
-            alertDialog.show();
-        }
-    }
-
     public void agreeToInvite(Event event) {
-        //TODO get in to event
         //tell server we agreed
-
         //get in to event.
-
         Repository.instance.AgreeToInvite(event.getId(), new AgreeToEventCallback<Boolean>() {
             @Override
             public void onSuccees(Boolean data) {
@@ -462,32 +421,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(MyApp.getContext(), "Error:UserIsNotExist", Toast.LENGTH_SHORT).show();
             }
         });
-
-
-//        Repository.instance.removeInvite(new FirebaseModel.Callback<Boolean>() {
-//            @Override
-//            public void onComplete(Boolean data) {
-//            }
-//        }, invite);
-        //Add event to myeventlist/
         Log.d("TAG", "invitegetevnetid=" + event.getId());
-//        currentUser.getUser().getValue().addEventToList(Integer.valueOf(eventInvitationNotificationData.getEventId()));
-        //update the userDatabase
-//        Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudCallback() {
-//            @Override
-//            public void onComplete(Object data) {
-//
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//
-//            }
-//        });
     }
 
     public void declineToInvite(Event event) {
-        //TODO
         //tell server we declined.
         Repository.instance.DeclineToInvite(event.getId(), new DeclineToEventCallback<Boolean>() {
             @Override
@@ -662,8 +599,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void GetInvation(Event event) {
-
-        //todo
         //open dialog with information
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
 
@@ -676,15 +611,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setNegativeButton("Decline", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         declineToInvite(event);
-                        //Todo make delined to invite
-                        // dialog.cancel();
                     }
                 })
                 .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d("TAG", "You have agreed invite");
                         agreeToInvite(event);
-                        //Todo make Agree to evnet
                         // GetInEvent(invite.getEventId());
                         // MainActivity.this.finish();
                     }

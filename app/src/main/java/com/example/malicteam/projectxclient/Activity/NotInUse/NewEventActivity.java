@@ -83,7 +83,7 @@
 ////        switch (view.getId()) {
 ////            case R.id.radio_pdf:
 ////                if (checked)
-////                    saveAsString = Consts.TXT;//TODO - now its txt default
+////                    saveAsString = Consts.TXT;
 ////                    break;
 ////            case R.id.radio_txt:
 ////                if (checked)

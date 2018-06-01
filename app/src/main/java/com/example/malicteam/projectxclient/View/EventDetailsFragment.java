@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.malicteam.projectxclient.Common.Callbacks.EventDetailCallback;
@@ -50,9 +51,13 @@ public class EventDetailsFragment extends Fragment {
         TextView _participates = view.findViewById(R.id.details_partici);
         TextView desc = view.findViewById(R.id.details_descp);
         TextView protocol = view.findViewById(R.id.protocolText);
+        ProgressBar progressBar = view.findViewById(R.id.progressBar_protocol);
+        progressBar.setVisibility(View.VISIBLE);
+
         mListener.getProtocol(event.getId(), new EventDetailCallback() {
             @Override
             public void onSuccees(List<ProtocolLine> list) {
+                progressBar.setVisibility(View.GONE);
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -66,10 +71,6 @@ public class EventDetailsFragment extends Fragment {
         title.setText(event.getTitle());
         _date.setText(event.getDate());
         String part = "Participats: " + event.getParticipats().toString();
-//        for (int num : event.getUsersIds()) {
-//            part.concat(Integer.toString(num));
-//        }
-        //TODO sadsaddsddsasada
         _participates.setText("Participats:" + event.getParticipatsNames());
         desc.setText("Description:" + event.getDescription());
         // Inflate the layout for this fragment
@@ -98,6 +99,5 @@ public class EventDetailsFragment extends Fragment {
 
     public interface EventDetailsInteraction {
         void getProtocol(int eventId, final EventDetailCallback callback);
-        // TODO: Update argument type and name
     }
 }

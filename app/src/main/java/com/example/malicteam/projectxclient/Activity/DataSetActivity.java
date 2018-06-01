@@ -92,7 +92,9 @@ public class DataSetActivity extends AppCompatActivity {
 
     private void backClicked() {
         final String title = "Are you sure you want to leave?";
-        final String msg = "If you leave this record will be stopped.";
+        String msg = "";
+        if(recorder.isRecording())
+            msg = "If you leave this record will be stopped.";
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         // set title
         alertDialogBuilder.setTitle(title);

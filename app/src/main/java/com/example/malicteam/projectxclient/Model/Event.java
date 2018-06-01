@@ -139,7 +139,6 @@ public class Event implements Serializable {
         Date d = new Date();
         this.date = eventData.getDateCreated();
         this.id = eventData.getId();
-        //TODO
         //set the starttime to eventdata starttime
         this.EventStartTime = " " ;
         this.isConverted=eventData.getIsConverted();

@@ -653,7 +653,6 @@
 //        FirebaseDatabase database = FirebaseDatabase.getInstance();
 //        DatabaseReference myRef = database.getReference("Events").child(Integer.toString(eventId)).child("Users");
 //
-//        //TODO add user to event
 //    }
 //
 //

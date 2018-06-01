@@ -186,7 +186,6 @@ public class NewEventFragment extends Fragment {
                                    @Override
                                    public void onClick(View v) {
                                        String parti = _part.getText().toString();
-                                       //TODO
                                        //check with server is userExist---->if do --->
                                        mListener.isUserExist(parti, new AddEventCallback<String>() {
                                            @Override
@@ -269,7 +268,6 @@ public class NewEventFragment extends Fragment {
 
 
     public interface NewEventInteraction extends BasicInteractionInterface {
-        // TODO: Update argument type and name
         void isUserExist(String parti, AddEventCallback<String> callback);
         void startRecording(Event event);
     }

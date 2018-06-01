@@ -175,12 +175,6 @@ public class AccountSettingsFragment extends Fragment {
                 //Open picture dialog
                 PictureDialogFragment pictureDialog = new PictureDialogFragment();
                 pictureDialog.show(getActivity().getSupportFragmentManager(), "ProfilePictureDialog");
-                //Todo move it to main activity (open picture dialog)
-//                getActivity().getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.Layout_container, pictureDialog,"ProfilePictureDialog")
-//                        .addToBackStack(null)
-//                        .commit();
-
             }
         });
 

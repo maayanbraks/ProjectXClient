@@ -1178,9 +1178,6 @@ public class Repository {
 
             }
 
-            //TODO add locally DB
-            //TODO create Content file and save locally
-            //TODO save firebase content
             String url = "";
 
             //FirebaseModel.addNewEvent(event);
@@ -1188,7 +1185,6 @@ public class Repository {
 
 //    public File getContentFile(){
 //
-//        //TODO get content image
 //
 //    }
         });

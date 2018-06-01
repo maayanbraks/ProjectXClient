@@ -90,7 +90,7 @@ public class CloudManager {
     public boolean connectToServer() throws URISyntaxException {
         IO.Options opts = new IO.Options();
         socket = IO.socket(SERVER_ADDRESS, opts);
-        initListeners();//todo MAYBE - move into the if - why listen if there is no connection?
+        initListeners();
         socket.connect();
         if (isConnected)
             return true;

@@ -180,7 +180,6 @@ public class LoginActivity extends Activity {
 //                        break;
 //                        default:
 //                        Log.d("TAG","Login succefull");
-//                        //TODO
 //                        // toast and then new intent
 //                          Toast.makeText(getApplicationContext(), "logging in", Toast.LENGTH_SHORT).show();
 //                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);

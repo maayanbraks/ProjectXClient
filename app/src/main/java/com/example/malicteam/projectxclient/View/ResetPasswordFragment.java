@@ -23,7 +23,6 @@ public class ResetPasswordFragment extends Fragment {
         // Required empty public constructor
     }
 
-    // TODO: Rename and change types and number of parameters
     public static ResetPasswordFragment newInstance() {
         ResetPasswordFragment fragment = new ResetPasswordFragment();
         Bundle args = new Bundle();
@@ -94,7 +93,6 @@ public class ResetPasswordFragment extends Fragment {
 
 
     public interface ResetPasswordListener {
-        // TODO: Update argument type and name
         void onBackButtonClick();
         void sendResetPassword(String email);
     }

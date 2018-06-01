@@ -97,7 +97,6 @@
 //            }
 //        }
 //
-//        //TODO Handle - upload picture
 //    }
 //
 //    private void initDetails(User user) {

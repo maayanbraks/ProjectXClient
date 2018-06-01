@@ -64,7 +64,6 @@ public class SignupActivity extends AppCompatActivity {
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Todo check if logged in already
                 Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
@@ -94,7 +93,6 @@ public class SignupActivity extends AppCompatActivity {
                     @Override
                     public void onSuccees(Boolean data) {
                         if (data) {
-                            //Todo Update Profile Picture
                             makeToastLong("Welcome...");
                             Intent intent = new Intent(SignupActivity.this, MainActivity.class);
                             intent.putExtra(Consts.USER, newUser);
@@ -276,7 +274,5 @@ public class SignupActivity extends AppCompatActivity {
                 profilePicture.setImageBitmap(bitmap);
             }
         }
-
-        //TODO add handle upload picture
     }
 }
