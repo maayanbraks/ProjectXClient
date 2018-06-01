@@ -27,7 +27,6 @@ public class EventDetailsFragment extends Fragment {
         // Required empty public constructor
     }
 
-    // TODO: Rename and change types and number of parameters
     public static EventDetailsFragment newInstance() {
         EventDetailsFragment fragment = new EventDetailsFragment();
         Bundle args = new Bundle();
@@ -55,30 +54,28 @@ public class EventDetailsFragment extends Fragment {
             @Override
             public void onSuccees(List<ProtocolLine> list) {
                 getActivity().runOnUiThread(new Runnable() {
-                                  @Override
-                                  public void run() {
-                                      protocol.setText(ProductTypeConverters.FromProtocolToString(list));
-                                  }
-                              });
+                    @Override
+                    public void run() {
+                        protocol.setText(ProductTypeConverters.FromProtocolToString(list));
+                    }
+                });
 
             }
         });
 
         title.setText(event.getTitle());
         _date.setText(event.getDate());
-        String part = "Participats: "+event.getParticipats().toString();
+        String part = "Participats: " + event.getParticipats().toString();
 //        for (int num : event.getUsersIds()) {
 //            part.concat(Integer.toString(num));
 //        }
         //TODO sadsaddsddsasada
-        _participates.setText("Participats:"+event.getParticipatsNames());
+        _participates.setText("Participats:" + event.getParticipatsNames());
         desc.setText("Description:" + event.getDescription());
         // Inflate the layout for this fragment
 
         return view;
     }
-
-
 
 
     @Override
