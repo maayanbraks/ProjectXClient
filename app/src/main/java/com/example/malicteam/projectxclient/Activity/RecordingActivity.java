@@ -156,6 +156,10 @@ public class RecordingActivity extends AppCompatActivity {
                             stopPlaying();
                         if (recorder.isRecording())
                             startRecordOrSaveIt();
+                            else {
+                            shareEvent();
+                            finish();
+                        }
                         if (!(checkMeAdmin())) {
                             leaveEvent();
                         }
