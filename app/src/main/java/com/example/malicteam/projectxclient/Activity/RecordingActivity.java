@@ -30,6 +30,8 @@ import com.example.malicteam.projectxclient.R;
 import java.io.File;
 import java.io.IOException;
 
+import UpdateObjects.CloseEvent;
+
 
 public class RecordingActivity extends AppCompatActivity {
     //Record Objects
@@ -154,8 +156,11 @@ public class RecordingActivity extends AppCompatActivity {
                             stopPlaying();
                         if (recorder.isRecording())
                             startRecordOrSaveIt();
+                        if (!(checkMeAdmin())) {
+                            leaveEvent();
+                        }
 
-                        finish();
+
                     }
 
                 });
@@ -239,7 +244,8 @@ public class RecordingActivity extends AppCompatActivity {
 
     public void StopRecordingByAdmin() {
         //notify user about that
-        Toast.makeText(getApplication(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getApplication(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
+        MakeToastShort("The admin has stop the record..");
         startRecordOrSaveIt();
         //stop recording...
     }
@@ -250,7 +256,8 @@ public class RecordingActivity extends AppCompatActivity {
             mPlayer.setDataSource(mFileName);
             mPlayer.prepare();
             mPlayer.start();
-            Toast.makeText(getApplication(), "Recording..", Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(getApplication(), "Recording..", Toast.LENGTH_SHORT).show();
+            MakeToastShort("Recording..");
         } catch (IOException e) {
             Log.e(LOG_TAG, "prepare() failed");
         }
@@ -269,14 +276,16 @@ public class RecordingActivity extends AppCompatActivity {
         recorder.stopRecording();
         if (checkMeAdmin()) {
             shareEvent();
+            finish();
         } else {
-//            leaveEvent();
+           leaveEvent();
         }
         Log.d("TAG", "Stop recording func");
     }
 
     private void shareEvent() {
-        Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
+   //     Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
+        MakeToastShort("Uploading...");
         Repository.instance.closeEvent(null, event.getId(), mFileName, new CloseEventCallback() {
             @Override
             public void onSuccees() {
@@ -319,17 +328,21 @@ public class RecordingActivity extends AppCompatActivity {
         Repository.instance.leaveEventRequest(event.getId(), new LeaveEventCallBack<Boolean>() {
             @Override
             public void TechnicalError() {
-                Toast.makeText(getApplication(), "Technical error.", Toast.LENGTH_SHORT).show();
+                MakeToastShort("Technical error.");
+              //  Toast.makeText(getApplication(), "Technical error.", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void NoPendingEvents() {
-                Toast.makeText(getApplication(), "No pending events.", Toast.LENGTH_SHORT).show();
+                MakeToastShort("No pending events.");
+               // Toast.makeText(getApplication(), "No pending events.", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onSuccees(Boolean data) {
-                Toast.makeText(getApplication(), "leaving.", Toast.LENGTH_SHORT).show();
+                MakeToastShort("leaving.");
+                finish();
+             //   Toast.makeText(getApplication(), "leaving.", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -346,13 +359,14 @@ public class RecordingActivity extends AppCompatActivity {
 //                {
         //getting event informatio
         event = eventtemp;
+
         // setting the layout from the event information
-        TextView _eventTitle = findViewById(R.id.recording_title);
+       // TextView _eventTitle = findViewById(R.id.recording_title);
         TextView Date = findViewById(R.id.recording_date);
         TextView partici = findViewById(R.id.participants_recording);
-        _eventTitle.setText(event.getTitle());
+       // _eventTitle.setText(event.getTitle());
         Date.setText(event.getDate());
-        partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
+       // partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
 //        mFileName += "/outalk" + event.getId() + ".acc";
         SetActivity();
 //        CheckRecordingStatus();
@@ -366,13 +380,9 @@ public class RecordingActivity extends AppCompatActivity {
         TextView partici = findViewById(R.id.participants_recording);
         playingButton = findViewById(R.id.buttonPlayStart);
         eventTitle.setText(event.getTitle());
-        String time[] = event.getDate().split(" "); //16/01/2018 12:08
-        TextView startTime = findViewById(R.id.recording_date);
-        TextView startDate = findViewById(R.id.recording_time);
-        startTime.setText(time[1]);
-        startDate.setText(time[0]);
+        partici.setText(event.getParticipatsFullNames());
+
         DESC.setText(event.getDescription());
-        partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
 //        mFileName += "/outalk" + event.getId() + ".acc";
 
         if (!(checkMeAdmin())) {
@@ -393,20 +403,23 @@ public class RecordingActivity extends AppCompatActivity {
         //{
         //  Toast.makeText(getApplication(), event.getParticipats().get(i).getFirstName()+" "+event.getParticipats().get(i).getLastName()+",just joined", Toast.LENGTH_LONG).show();
         //}
-        Toast.makeText(getApplication(), user.getFirstName() + " " + user.getLastName() + ",just joined", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplication(), user.getFirstName() + " " + user.getLastName() + ",just joined", Toast.LENGTH_LONG).show();
+        if (!(event.isUserConatin(user))) {
+            MakeToastShort(user.getFirstName() + " " + user.getLastName() + ",just joined");
 
-        if (!(event.getParticipats().contains(user)))
-            event.addToParticipats(user);
+            if (!(event.getParticipats().contains(user)))
+                event.addToParticipats(user);
 
-        runOnUiThread(new Runnable() {
+            runOnUiThread(new Runnable() {
 
-            @Override
-            public void run() {
+                @Override
+                public void run() {
 
-                partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
+                    partici.setText(event.getParticipatsFullNames());
 
-            }
-        });
+                }
+            });
+        }
     }
 
     public void userHasLeftTheEvent(User user) {
@@ -415,14 +428,15 @@ public class RecordingActivity extends AppCompatActivity {
 //        {
 //            if (event.getParticipats().get(i).getId()==userId)
 //            {
-        Toast.makeText(getApplication(), user.getFirstName() + " " + user.getFirstName() + ",just left", Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplication(), user.getFirstName() + " " + user.getFirstName() + ",just left", Toast.LENGTH_LONG).show();
+        MakeToastShort(user.getFirstName() + " " + user.getFirstName() + ",just left");
         event.delFromParticipats(user);
         runOnUiThread(new Runnable() {
 
             @Override
             public void run() {
 
-                partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
+                partici.setText(event.getParticipatsFullNames());
 
             }
         });
@@ -431,6 +445,14 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
     public void SetEventFromNewActivity() {
+        String time[] = event.getDate().split(" "); //16/01/2018 12:08
+        TextView partici = findViewById(R.id.participants_recording);
+        TextView startTime = findViewById(R.id.recording_date);
+        TextView startDate = findViewById(R.id.recording_time);
+        startTime.setText(time[1]);
+        startDate.setText(time[0]);
+        event.addToParticipats(myUser);
+        partici.setText(event.getParticipatsFullNames());
         SetActivity();
     }
 

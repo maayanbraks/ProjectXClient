@@ -232,7 +232,7 @@ public class EventsListFragment extends Fragment {
                 TextView _participats = view.findViewById(R.id._participates);
                 TextView _status = view.findViewById(R.id.recordStatus_textView);
                 _nameEvent.setText(event.getTitle());
-                _participats.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
+                _participats.setText(event.getParticipatsFullNames());
                 _date.setText(event.getDate());
                 if (event.isConverted()) {
                     _status.setText("Done");

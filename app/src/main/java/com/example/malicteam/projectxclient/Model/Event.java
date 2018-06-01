@@ -145,7 +145,7 @@ public class Event implements Serializable {
         this.isConverted=eventData.getIsConverted();
         this.isRecording=eventData.getIsRecording();
     }
-    public String getParticipatsNames(){
+    public String getParticipatsFirstNames(){
         String namesOfParticipats="";
             if (participats!=null)
             {
@@ -162,8 +162,34 @@ public class Event implements Serializable {
             }
             return null;
     }
+    public String getParticipatsFullNames(){
+        String namesOfParticipats="";
+        if (participats!=null)
+        {
+            for (int i=0;i<participats.size();i++)
+            {
+                if (i==0) {
+                    namesOfParticipats=participats.get(i).getFirstName()+" "+participats.get(i).getLastName();
+                }
+                else {
+                    namesOfParticipats=namesOfParticipats+","+participats.get(i).getFirstName()+" "+participats.get(i).getLastName();
+                }
+            }
+            return namesOfParticipats;
+        }
+        return null;
+    }
     public String getEventStartTime() {
         return EventStartTime;
+    }
+    public Boolean isUserConatin(User user)
+    {
+        for (int i=0;i<participats.size();i++)
+        {
+        if (user.getId()==participats.get(i).getId())
+            return true;
+        }
+        return false;
     }
 
     public void setEventStartTime(String eventStartTime) {
@@ -185,6 +211,11 @@ public class Event implements Serializable {
     public void delFromParticipats(User user)
     {
         this.participats.remove(user);
+        for (int i=0;i<participats.size();i++)
+        {
+            if (user.getId()==participats.get(i).getId())
+                participats.remove(i);
+        }
     }
     public String getTitle() {
         return title;

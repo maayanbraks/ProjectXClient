@@ -1,13 +1,11 @@
 package com.example.malicteam.projectxclient.View;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.malicteam.projectxclient.Common.Callbacks.EventDetailCallback;
@@ -70,7 +68,7 @@ public class EventDetailsFragment extends Fragment {
 //            part.concat(Integer.toString(num));
 //        }
         //TODO sadsaddsddsasada
-        _participates.setText("Participats:" + event.getParticipatsNames());
+        _participates.setText("Participats:" + event.getParticipatsFirstNames());
         desc.setText("Description:" + event.getDescription());
         // Inflate the layout for this fragment
 

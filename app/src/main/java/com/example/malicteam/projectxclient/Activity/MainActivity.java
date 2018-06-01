@@ -822,7 +822,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 String maketoast = "Adding" + user.getFirstName() + " " + user.getLastName();
                 makeToastShort(maketoast);
                 // Toast.makeText(MyApp.getContext(), maketoast, Toast.LENGTH_LONG);
-                callback.onSuccees(user.getFirstName());
+                callback.onSuccees(user.getFirstName()+" "+user.getLastName());
             }
 
             @Override
