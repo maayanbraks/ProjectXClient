@@ -282,7 +282,7 @@ public class CloudManager {
 //            e.printStackTrace();
 //        }
     }
-    public void SendAudioToServer(String path, int userOrEventId, int typeOfAudio, final SendAudioCallback callback) throws IOException {
+    public void SendAudioToServer(String path, int userOrEventId, int typeOfAudio,int lengthOfRecord, final SendAudioCallback callback) throws IOException {
         //1=EventId ,0=UserId (Eventid=audio of conversetion,UserId for dataset)
         java.net.Socket sock;
 
@@ -308,14 +308,26 @@ public class CloudManager {
             //wait for acknowlage
             BufferedReader inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
             responeFromServer= inFromServer.readLine();
-            Log.d("TAG","Respone on intID="+responeFromServer);
-            if (responeFromServer.equals("OK")) //send the AudioByt
+            if (!(responeFromServer.equals("OK"))) {
+                callback.UserOrEventIdNotExist("Error:IN sending eventorUserID=" + responeFromServer);
+                return;
+            }
+            if (typeOfAudio==0) { //need to send Length before the Record
+                outToServer.write(lengthOfRecord);
+                responeFromServer= inFromServer.readLine();
+                Log.d("TAG","Respone on legnth="+responeFromServer);
+                if (!(responeFromServer.equals("OK"))) //send the AudioByt
+                {
+                    callback.UserOrEventIdNotExist("Error:IN sending LengthofAudio=" + responeFromServer);
+                    return;
+                }
+            }
                 try {
                     outToServer.write(data);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-            else if (responeFromServer.equals("Error:RecivingTheAudioFile")) {
+             if (responeFromServer.equals("Error:RecivingTheAudioFile")) {
                 Log.d("TAG", "responefromServerError=" + responeFromServer);
                 callback.UserOrEventIdNotExist("Error:RecivingTheAudioFile");
             }

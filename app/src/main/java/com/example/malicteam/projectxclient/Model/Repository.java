@@ -1058,7 +1058,6 @@ public class Repository {
             }
         });
     }
-
     public void leaveEventRequest(int eventId, final LeaveEventCallBack<Boolean> callback) {
         //Init the get friends/contacts list of  User (by email).
         LeaveEventRequestData leaveEventRequestData = new LeaveEventRequestData(userLiveData.getValue().getEmail(), eventId);
