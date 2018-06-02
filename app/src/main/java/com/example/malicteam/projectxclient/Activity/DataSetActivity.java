@@ -37,7 +37,7 @@ public class DataSetActivity extends AppCompatActivity {
     private String mFileName = null;
     private boolean permissionToRecordAccepted = false;
 
-    private User myUser;
+    private User myUser;//No Live Data
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

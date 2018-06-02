@@ -14,13 +14,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.AudioFormat;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
-import android.webkit.URLUtil;
 
 import com.example.malicteam.projectxclient.Common.Callbacks.AddEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
@@ -35,25 +33,18 @@ import com.example.malicteam.projectxclient.Common.Callbacks.EventListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.FriendsListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.LeaveEventCallBack;
 import com.example.malicteam.projectxclient.Common.Callbacks.LogInCallback;
-import com.example.malicteam.projectxclient.Common.Callbacks.MainActivityCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.ProtocolRequestCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
-import com.example.malicteam.projectxclient.View.Dialogs.LogoutDialogFragment;
 import com.example.malicteam.projectxclient.ViewModel.FriendsViewModel;
 //import com.google.firebase.auth.FirebaseAuth;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -136,7 +127,7 @@ public class Repository {
         synchronized (this) {
             if (eventsLiveData == null) {
                 eventsLiveData = new MutableLiveData<List<Event>>();
-                getEventsFromServer(new EventListCallback<List<Event>>(){
+                getEventsFromServer(new EventListCallback<List<Event>>() {
                     @Override
                     public void onSuccees(List<Event> data) {
                         if (data != null) eventsLiveData.postValue(data);
@@ -790,7 +781,7 @@ public class Repository {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
-               // Log.d("TAG","oiasdjadjdjkaspdojaspdojasdojassdoj+gettype="+responseData.getType());
+                // Log.d("TAG","oiasdjadjdjkaspdojaspdojasdojassdoj+gettype="+responseData.getType());
                 switch (responseData.getType()) {
                     case Error:
                         ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
@@ -805,7 +796,7 @@ public class Repository {
                                 break;
                         }
                     case IsUserExistResponse:
-                     //   Log.d("TAG","IsUserExistResponeseoasjdsodjdsjdodjasd");
+                        //   Log.d("TAG","IsUserExistResponeseoasjdsodjdsjdodjasd");
                         IsUserExistResponseData response = ProductTypeConverters.getObjectFromString(data, IsUserExistResponseData.class);
                         callback.onSuccees(response.getUserData());
                         break;
@@ -822,61 +813,80 @@ public class Repository {
         });
     }
 
-    private float getDurationAsMinutesFromFile(String filePath){
+    private int getDurationAsSecondsFromFile(String filePath) {
         Uri uri = Uri.parse(filePath);
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        mmr.setDataSource(MyApp.getContext(),uri);
+        mmr.setDataSource(MyApp.getContext(), uri);
         String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        float duration = Float.parseFloat(durationStr) / 1000 / 60; //Milliseconds => Seconds => Minutes
-        Log.d("TAG", "Data set time is " + duration + " Minutes");
+        int duration = Integer.parseInt(durationStr) / 1000; //Milliseconds => Seconds
+        Log.d("TAG", "Data set time is " + duration + " Seconds");
         return duration;
     }
 
-    public void uploadDataSet(String filePath, final DataSetCallback callback){
+    public void uploadDataSet(String filePath, final DataSetCallback callback) {
         //get duration
-        float minutes = getDurationAsMinutesFromFile(filePath);
+        int seconds = getDurationAsSecondsFromFile(filePath);
 
         //Convert File to byte[]
         byte[] audioBytes = null;
         try {
             audioBytes = ProductTypeConverters.convertFileToByte(filePath);
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d("TAG", e.getStackTrace() + e.getMessage());
         }
-        //Create request
-        DataSetRequestData dataSetRequestData = new DataSetRequestData(userLiveData.getValue().getEmail(), audioBytes, minutes);
-        CloudManager.instance.sendToServer("Request", dataSetRequestData, new CloudManager.CloudCallback<String>() {
-            @Override
-            public void onComplete(String response) {
-                ResponseData responseData = ProductTypeConverters.getObjectFromString(response, ResponseData.class);
-                //Create To ResponseData
-                //Checke type
-                //BY the type -> create refrence ResponseData
-                switch (responseData.getType()) {
-                    case Error:
-                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(response, ErrorResponseData.class);
-                        switch (errorResponseData.getErrorType()) {
-                            case TechnicalError:
-                                callback.TechnicalError();
-                                return;
-                            default:
-                                return;
-                        }
-                    case DataSetResponseData:
-                        DataSetResponseData dataSetResponseData = ProductTypeConverters.getObjectFromString(response, DataSetResponseData.class);
-                        userLiveData.getValue().setDataSetTime(dataSetResponseData.getUpdatedLength());
-                        callback.onSuccees(dataSetResponseData.getUpdatedLength());
-                        return;
-                    default:
-                        break;
+
+        try {
+            CloudManager.instance.sendDataSet(userLiveData.getValue().getId(), String.valueOf(seconds) + "\n", audioBytes, new CloudManager.SendAudioCallback<Boolean>() {
+                @Override
+                public void onSuccees(Boolean data) {
+                    Log.d("TAG", "Repositoty -> SendDataSet -> On Succees = :)");
+                    float newTime = (((float)seconds) / 60) + userLiveData.getValue().getDataSetTime();
+                    userLiveData.getValue().setDataSetTime(newTime);
+                    callback.onSuccees(newTime);
                 }
-            }
 
-            @Override
-            public void onCancel() {
-
-            }
-        });
+                @Override
+                public void onError(Boolean error) {
+                    Log.d("TAG", "Repositoty -> SendDataSet -> On Error (Boolean 0)");
+                }
+            });
+        } catch (Exception e) {
+            Log.d("TAG", "Repositoty -> SendDataSet -> IO Exception " + e.getMessage());
+        }
+//        //Create request
+//        DataSetRequestData dataSetRequestData = new DataSetRequestData(userLiveData.getValue().getEmail(), audioBytes, minutes);
+//        CloudManager.instance.sendToServer("Request", dataSetRequestData, new CloudManager.CloudCallback<String>() {
+//            @Override
+//            public void onComplete(String response) {
+//                ResponseData responseData = ProductTypeConverters.getObjectFromString(response, ResponseData.class);
+//                //Create To ResponseData
+//                //Checke type
+//                //BY the type -> create refrence ResponseData
+//                switch (responseData.getType()) {
+//                    case Error:
+//                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(response, ErrorResponseData.class);
+//                        switch (errorResponseData.getErrorType()) {
+//                            case TechnicalError:
+//                                callback.TechnicalError();
+//                                return;
+//                            default:
+//                                return;
+//                        }
+//                    case DataSetResponseData:
+//                        DataSetResponseData dataSetResponseData = ProductTypeConverters.getObjectFromString(response, DataSetResponseData.class);
+//                        userLiveData.getValue().setDataSetTime(dataSetResponseData.getUpdatedLength());
+//                        callback.onSuccees(dataSetResponseData.getUpdatedLength());
+//                        return;
+//                    default:
+//                        break;
+//                }
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//
+//            }
+//        });
     }
 
     public void closeEvent(String[] protocol, int eventId, String filePath, final CloseEventCallback callback) {
@@ -884,46 +894,61 @@ public class Repository {
         byte[] audioBytes = null;
         try {
             audioBytes = ProductTypeConverters.convertFileToByte(filePath);
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d("TAG", e.getStackTrace() + e.getMessage());
         }
-        byte[] audio=new byte[20];
+        try {
+            CloudManager.instance.sendEvent(eventId, audioBytes, new CloudManager.SendAudioCallback<Boolean>() {
+                @Override
+                public void onSuccees(Boolean data) {
+                    Log.d("TAG", "Repositoty -> CloseEvent -> On Succees = :)");
+                    callback.onSuccees();
+                }
+
+                @Override
+                public void onError(Boolean error) {
+                    Log.d("TAG", "Repositoty -> CloseEvent -> On Error (Boolean 0)");
+                }
+            });
+        } catch (Exception e) {
+            Log.d("TAG", "Repositoty -> CloseEvent -> IO Exception " + e.getMessage());
+        }
         //audio=audioBytes.
         //Init the get friends/contacts list of  User (by email).
-        CloseEventRequestData closeEventRequestData = new CloseEventRequestData(userLiveData.getValue().getEmail(), eventId, audioBytes);
+//   OLD     CloseEventRequestData closeEventRequestData = new CloseEventRequestData(userLiveData.getValue().getEmail(), eventId, audioBytes);
 
         //send request
-        CloudManager.instance.sendToServer("Request", closeEventRequestData, new CloudManager.CloudCallback<String>() {
-            @Override
-            public void onComplete(String data) {
-                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
-                switch (responseData.getType()) {
-                    case Error:
-                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
-                        switch (errorResponseData.getErrorType()) {
-                            case UserIsNotExist:
-                                callback.UserIsNotExist();
-                                break;
-                            case FriendIsNotExist:
-                                callback.EventIsNotExist();
-                            case TechnicalError:
-                                callback.TechnicalError();
-                                break;
-                            default:
-                                break;
-                        }
-                    case Boolean: // this momment if boolean it mean ALWAS TRUE
-                        callback.onSuccees();
-                        break;
-                    default:
-                        return;
-                }
-            }
-
-            @Override
-            public void onCancel() {
-            }
-        });
+//        CloudManager.instance.sendToServer("Request", closeEventRequestData, new CloudManager.CloudCallback<String>() {
+//            @Override
+//            public void onComplete(String data) {
+//                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
+//                switch (responseData.getType()) {
+//                    case Error:
+//                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
+//                        switch (errorResponseData.getErrorType()) {
+//                            case UserIsNotExist:
+//                                callback.UserIsNotExist();
+//                                break;
+//                            case FriendIsNotExist:
+//                                callback.EventIsNotExist();
+//                            case TechnicalError:
+//                                callback.TechnicalError();
+//                                break;
+//                            default:
+//                                break;
+//                        }
+//                    case Boolean: // this momment if boolean it mean ALWAS TRUE
+//                        callback.onSuccees();
+//                        break;
+//                    default:
+//                        return;
+//                }
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//            }
+//        });
     }
 
     public void deleteFromFriends(User friend) {
@@ -938,12 +963,6 @@ public class Repository {
             if (lists.length > 0) {
                 List<User> data = lists[0];
                 long lastUpdateDate = 0;
-//                try {
-////                    lastUpdateDate = MyApp.getContext()
-////                            .getSharedPreferences("TAG", MODE_PRIVATE).getLong("lastUpdateDate", 0);
-//                }catch (Exception e){
-//
-//                }
                 if (data != null && data.size() > 0) {
                     //3. update the local DB
                     long reacentUpdate = lastUpdateDate;
@@ -1167,8 +1186,8 @@ public class Repository {
                                 return;
                         }
                     case CreateEvent:
-                        CreateEventResponseData createEventResponseData=ProductTypeConverters.getObjectFromString(response, CreateEventResponseData.class);
-                            callback.onSuccees(createEventResponseData.getId());
+                        CreateEventResponseData createEventResponseData = ProductTypeConverters.getObjectFromString(response, CreateEventResponseData.class);
+                        callback.onSuccees(createEventResponseData.getId());
                     default:
                         break;
                 }

@@ -20,6 +20,11 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 
 import static java.lang.Thread.sleep;
@@ -258,6 +263,94 @@ public class CloudManager {
         Log.d("TAG", "Register " + jsonString);
         socket.emit(EVENT_CONNECT, jsonString);
     }
+
+    ////////////////////////
+    //New Methods For Wav//
+    ///////////////////////
+    public interface SendAudioCallback<T> {
+        void onSuccees(T data);
+
+        void onError(T error);
+
+    }
+
+    private final String SERVER_ADDRESS_Audio = "http://193.106.55.95";
+    private final int SERVER_AUDIO_EVENT_PORT = 8082;
+    private final int SERVER_AUDIO_DATASET_PORT = 8081;
+
+    public void sendEvent(int eventId, byte[] data, final SendAudioCallback<Boolean> callback) throws IOException {
+        int responseFromServer;
+        java.net.Socket sock = new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_EVENT_PORT);
+        //send int to Server
+        DataOutputStream outToServer = new DataOutputStream(sock.getOutputStream());
+        outToServer.write(eventId);
+        //wait for acknowlage
+        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+        responseFromServer = inFromServer.read();
+        if (responseFromServer == 0) {
+            callback.onError(false);
+            return;
+        }
+        //SendData
+        try {
+            outToServer.write(data);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        if (responseFromServer == 0) {
+            Log.d("TAG", "responseFromServerError=" + responseFromServer);
+            callback.onError(false);
+        } else if (responseFromServer == 1) {
+            Log.d("TAG", "OK=" + responseFromServer);
+            callback.onSuccees(true);
+        }
+        sock.close();
+
+    }
+
+    public void sendDataSet(int userId, String lengthOfRecord, byte[] data, final SendAudioCallback<Boolean> callback) throws IOException {
+        int responseFromServer;
+        java.net.Socket sock = new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_DATASET_PORT);
+        //send int to Server
+        DataOutputStream outToServer = new DataOutputStream(sock.getOutputStream());
+        outToServer.write(userId);
+        //wait for acknowlage
+        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+        responseFromServer = inFromServer.read();
+        if (responseFromServer == 0) {
+            callback.onError(false);
+            return;
+        }
+        //need to send Length of DataSet before the Record
+        PrintWriter pw = new PrintWriter(sock.getOutputStream(), true);
+        pw.write(lengthOfRecord);
+        pw.flush();
+//        outToServer.write(lengthOfRecord);
+        responseFromServer = inFromServer.read();
+        Log.d("TAG", "Response on length=" + responseFromServer);
+        if (responseFromServer == 0) //send the AudioByt
+        {
+            callback.onError(false);
+            return;
+        }
+        //Send Data
+        try {
+            outToServer.write(data);
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
+        responseFromServer = inFromServer.read();
+        if (responseFromServer == 0) {
+            Log.d("TAG", "responseFromServerError=" + responseFromServer);
+            callback.onError(false);
+        } else if (responseFromServer == 1) {
+            Log.d("TAG", "OK=" + responseFromServer);
+            callback.onSuccees(true);
+        }
+        sock.close();
+
+    }
+
 
     public void disconnect() {
         socket.disconnect();

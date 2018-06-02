@@ -12,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -89,7 +91,7 @@ public class NewEventFragment extends Fragment {
         EditText _desc = view.findViewById(R.id.new_event_description);
         EditText _part = view.findViewById(R.id.new_event_participants);
         RadioGroup _saveAs = view.findViewById(R.id.save_as_group);
-        invitesUsers=new LinkedList<>();
+        invitesUsers = new LinkedList<>();
         _saveAs.check(R.id.radio_pdf);
         startRecord.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -184,25 +186,24 @@ public class NewEventFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
 
 
-                                   @Override
-                                   public void onClick(View v) {
-                                       String parti = _part.getText().toString();
-                                       //check with server is userExist---->if do --->
-                                       mListener.isUserExist(parti, new AddEventCallback<String>() {
-                                           @Override
-                                           public void onSuccees(String data) {
-                                               if (data.equals(myUser.getEmail()))
-                                               {
-                                                   Log.d("TAG","You cant add yourself to event");
-                                               } else{
-                                                   invitesUsers.add(data);
-                                                   UsersInvites.add(parti);
-                                                   InviteTextViewEdit(view);
+            @Override
+            public void onClick(View v) {
+                String parti = _part.getText().toString();
+                //check with server is userExist---->if do --->
+                mListener.isUserExist(parti, new AddEventCallback<String>() {
+                    @Override
+                    public void onSuccees(String data) {
+                        if (data.equals(myUser.getEmail())) {
+                            Log.d("TAG", "You cant add yourself to event");
+                        } else {
+                            invitesUsers.add(data);
+                            UsersInvites.add(parti);
+                            InviteTextViewEdit(view);
 
-                                               }
-                                              // Log.d("TAG", "In addevent-->neweventfragment----> OnSucess");
-                                              // Log.d("TAG", "Sucseed found user, added him");
-                                           }
+                        }
+                        // Log.d("TAG", "In addevent-->neweventfragment----> OnSucess");
+                        // Log.d("TAG", "Sucseed found user, added him");
+                    }
 
                     @Override
                     public void userIsNotExist() {
@@ -247,7 +248,20 @@ public class NewEventFragment extends Fragment {
 
         });
         // Inflate the layout for this fragment
+        ImageButton contactsList = (ImageButton) view.findViewById(R.id.openFriendsList_NewEvent_Button);
+        contactsList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showFriendsList(view);
+            }
+        });
         return view;
+    }
+
+    private void showFriendsList(View view){
+        List<User> friendsList = new LinkedList<>();
+        FriendsListFragment.MyAdapter adapter = null;
+        ListView friendsListView = (ListView) view.findViewById(R.id.friendsListView_newEvent);
     }
 
 
@@ -271,6 +285,7 @@ public class NewEventFragment extends Fragment {
 
     public interface NewEventInteraction extends BasicInteractionInterface {
         void isUserExist(String parti, AddEventCallback<String> callback);
+
         void startRecording(Event event);
     }
 
