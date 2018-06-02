@@ -887,7 +887,8 @@ public class Repository {
         }catch (Exception e){
             Log.d("TAG", e.getStackTrace() + e.getMessage());
         }
-
+        byte[] audio=new byte[20];
+        //audio=audioBytes.
         //Init the get friends/contacts list of  User (by email).
         CloseEventRequestData closeEventRequestData = new CloseEventRequestData(userLiveData.getValue().getEmail(), eventId, audioBytes);
 

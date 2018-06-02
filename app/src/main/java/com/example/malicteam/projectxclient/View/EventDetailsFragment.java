@@ -1,7 +1,6 @@
 package com.example.malicteam.projectxclient.View;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -53,20 +52,21 @@ public class EventDetailsFragment extends Fragment {
         TextView protocol = view.findViewById(R.id.protocolText);
         ProgressBar progressBar = view.findViewById(R.id.progressBar_protocol);
         progressBar.setVisibility(View.VISIBLE);
+        if (event.isConverted()) {
+            mListener.getProtocol(event.getId(), new EventDetailCallback() {
+                @Override
+                public void onSuccees(List<ProtocolLine> list) {
+                    progressBar.setVisibility(View.GONE);
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            protocol.setText(ProductTypeConverters.FromProtocolToString(list));
+                        }
+                    });
 
-        mListener.getProtocol(event.getId(), new EventDetailCallback() {
-            @Override
-            public void onSuccees(List<ProtocolLine> list) {
-                progressBar.setVisibility(View.GONE);
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        protocol.setText(ProductTypeConverters.FromProtocolToString(list));
-                    }
-                });
-
-            }
-        });
+                }
+            });
+        }
 
         title.setText(event.getTitle());
         _date.setText(event.getDate());

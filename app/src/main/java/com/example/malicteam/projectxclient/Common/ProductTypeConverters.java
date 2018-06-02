@@ -61,12 +61,13 @@ public class ProductTypeConverters {
 
     public static String GenerateStringFromList(List<String> list) {
         String newlist = "";
-        for (String num : list) {
-            if (!(list.equals(""))) {
-                newlist = newlist + "," + num;
+      for (int i=0;i<list.size();i++) {
 
-            } else newlist = "" + num;
-            //newlist=newlist.substring(0,newlist.length()-1);
+           if (i==0) {
+                newlist =list.get(i);
+
+            } else
+                newlist+=","+list.get(i);
         }
 
 

@@ -22,6 +22,7 @@ import com.example.malicteam.projectxclient.Common.Callbacks.AddEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
 import com.example.malicteam.projectxclient.Common.MyApp;
+import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
@@ -44,7 +45,7 @@ public class NewEventFragment extends Fragment {
     private ImageButton fab;
     private Event event;
     private User myUser;
-    private String invitedPpl;
+    private List<String> invitesUsers;
     private boolean thereIsParti = false;
 
     public NewEventFragment() {
@@ -68,7 +69,6 @@ public class NewEventFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_new_event, container, false);
         UsersInvites = new LinkedList<String>();
-        invitedPpl = new String(" ");
 
 //        currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
 //        currentUser.init(userId, true);
@@ -89,6 +89,7 @@ public class NewEventFragment extends Fragment {
         EditText _desc = view.findViewById(R.id.new_event_description);
         EditText _part = view.findViewById(R.id.new_event_participants);
         RadioGroup _saveAs = view.findViewById(R.id.save_as_group);
+        invitesUsers=new LinkedList<>();
         _saveAs.check(R.id.radio_pdf);
         startRecord.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -193,10 +194,11 @@ public class NewEventFragment extends Fragment {
                                                if (data.equals(myUser.getEmail()))
                                                {
                                                    Log.d("TAG","You cant add yourself to event");
-                                               } else if(invitedPpl.equals(" ")) {
-                                                   invitedPpl = data;
+                                               } else{
+                                                   invitesUsers.add(data);
                                                    UsersInvites.add(parti);
                                                    InviteTextViewEdit(view);
+
                                                }
                                               // Log.d("TAG", "In addevent-->neweventfragment----> OnSucess");
                                               // Log.d("TAG", "Sucseed found user, added him");
@@ -300,7 +302,7 @@ public class NewEventFragment extends Fragment {
                 thereIsParti = true;
                 TextView _invites = view.findViewById(R.id.newEvent_Invites);
 
-                _invites.setText("Participats:" + invitedPpl);
+                _invites.setText("Participats:" + ProductTypeConverters.GenerateStringFromList(invitesUsers));
 //                    } catch (Exception e) {
 //                        Log.d("TAg", e.getMessage());
 //                    }

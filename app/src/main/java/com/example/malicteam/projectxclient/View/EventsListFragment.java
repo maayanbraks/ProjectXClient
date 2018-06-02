@@ -79,36 +79,36 @@ public class EventsListFragment extends Fragment {
 //                    refreshList();
 //                }
 //            });
-
-            Repository.instance.getEventsFromServer(new EventListCallback<List<Event>>() {
-                @Override
-                public void onSuccees(List<Event> data) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (data != null) {
-                                eventsList = data;
-                                Collections.reverse(eventsList);
-                                if (adapter != null)
-                                    adapter.notifyDataSetChanged();
-                            }
-                        }
-                    });
-                }
-
-                @Override
-                public void UserIsNotExist() {
-                    //    Toast.makeText(MyApp.getContext(), "User not exist,try again.", Toast.LENGTH_SHORT).show();
-                    Log.d("TAG", "In getEventFromServer->EventListFragment --->UserIsNotExist");
-                }
-
-                @Override
-                public void userMustToLogin() {
-
-//                    Toast.makeText(MyApp.getContext(), "You must log in first", Toast.LENGTH_SHORT).show();
-                    Log.d("TAG", "In getEventFromServer->EventListFragment --->userMustToLogin");
-                }
-            });
+//
+//            Repository.instance.getEventsFromServer(new EventListCallback<List<Event>>() {
+//                @Override
+//                public void onSuccees(List<Event> data) {
+//                    getActivity().runOnUiThread(new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            if (data != null) {
+//                                eventsList = data;
+//                                Collections.reverse(eventsList);
+//                                if (adapter != null)
+//                                    adapter.notifyDataSetChanged();
+//                            }
+//                        }
+//                    });
+//                }
+//
+//                @Override
+//                public void UserIsNotExist() {
+//                    //    Toast.makeText(MyApp.getContext(), "User not exist,try again.", Toast.LENGTH_SHORT).show();
+//                    Log.d("TAG", "In getEventFromServer->EventListFragment --->UserIsNotExist");
+//                }
+//
+//                @Override
+//                public void userMustToLogin() {
+//
+////                    Toast.makeText(MyApp.getContext(), "You must log in first", Toast.LENGTH_SHORT).show();
+//                    Log.d("TAG", "In getEventFromServer->EventListFragment --->userMustToLogin");
+//                }
+//            });
 
             mListener.initConvertedObserver(new Observer<Integer>() {
                 @Override
@@ -232,7 +232,7 @@ public class EventsListFragment extends Fragment {
                 TextView _participats = view.findViewById(R.id._participates);
                 TextView _status = view.findViewById(R.id.recordStatus_textView);
                 _nameEvent.setText(event.getTitle());
-                _participats.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
+                _participats.setText(event.getParticipatsFullNames());
                 _date.setText(event.getDate());
                 if (event.isConverted()) {
                     _status.setText("Done");
