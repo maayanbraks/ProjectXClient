@@ -31,11 +31,8 @@ import java.util.List;
 public class FriendsListFragment extends Fragment {
     public interface FriendsFragmentInteraction extends BasicInteractionInterface {
         void showFriendDetails(User user);
-
         void initFriendsList(Observer<List<User>> observer);
-
         void addFriend();
-
         void deleteFriend(User friend);
     }
 
@@ -157,171 +154,12 @@ public class FriendsListFragment extends Fragment {
             public void onClick(View view) {
 
                 mListener.addFriend();
-//                openDialog();
-
-//                AlertDialog.Builder builder = new AlertDialog.Builder(MyApp.getContext());
-//                builder.setTitle("Add New Friend");
-//                builder.setMessage("Enter Email:");
-//                final EditText input = new EditText(MyApp.getContext());
-//                input.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
-//                builder.setView(input);
-//                builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        emailString = input.getText().toString();
-////                        Repository.instance.addFriend(emailString, new CloudManager.CloudCallback<Boolean>() {
-////                            @Override
-////                            public void onComplete(Boolean data) {
-////                                if (data) {
-////                                    Toast.makeText(MyApp.getContext(), "Added", Toast.LENGTH_SHORT).show();
-////                                    refreshList();
-////                                } else
-////                                    Toast.makeText(MyApp.getContext(), "Cannot add to your friends right now, please try later...", Toast.LENGTH_LONG).show();
-////                            }
-////
-////                            @Override
-////                            public void onCancel() {
-////                                dialog.cancel();
-////                            }
-////                        });
-//                        Repository.instance.addFriend(emailString, new AddFriendCallback<User>() {
-//                            @Override
-//                            public void onSuccees(User data) {
-//                                //contactsListResponseData.getContacts()
-//                                //Log.d("TAG","List= "+contactsListResponseData.getContacts());
-//                                // friendsList=friendsList.get(0).convertUserDataToUser(((ContactsListResponseData) data).getContacts());
-//                                friendsList.add(data);
-////                                for (User userr : friendsList) {
-////                                    Log.d("TAG", "a" + userr.getFirstName());
-////                                }
-////                                if (adapter != null) {
-////                                    adapter.notifyDataSetChanged();
-////                                }
-//                                Log.d("TAG", "Friend added Succeful");
-//                                refreshList();
-//                            }
-//
-//                            @Override
-//                            public void userIsNotExist() {
-////                                Log.d("TAG", "In getfriends1-->friendlistFragment ---> Technical error");
-//                                Toast.makeText(MyApp.getContext(), "EARROROR", Toast.LENGTH_SHORT).show();
-//                            }
-//
-//                            @Override
-//                            public void friendIsNotExist() {
-////                                Log.d("TAG", "n getfriends1-->friendlistFragment ---> userMustToLogin");
-//                                Toast.makeText(MyApp.getContext(), "Cant found email,please try again.", Toast.LENGTH_SHORT).show();
-//                            }
-//
-//                            @Override
-//                            public void bothUsersEquals() {
-////                                Log.d("TAG", "n getfriends1-->friendlistFragment ---> userMustToLogin");
-//                                Toast.makeText(MyApp.getContext(), "You cant add yourself as friend.", Toast.LENGTH_SHORT).show();
-//                            }
-//
-//                            @Override
-//                            public void alreadyFriends() {
-//                                Toast.makeText(MyApp.getContext(), "Stupid Boy.. You already friends.", Toast.LENGTH_SHORT).show();
-//                            }
-//
-////                            public void onComplete(String data) {
-////                                String respone = data.toString();
-////                                Log.d("TAG", "respone=" + respone);
-////                                switch (respone) {
-////                                    case "UserIsNotExist":
-////                                        //Log.d("TAG", "In getfriends1-->friendlistFragment ---> Technical error");
-////                                        Toast.makeText(MyApp.getContext(), "EARROROR", Toast.LENGTH_SHORT).show();
-////                                        break;
-////                                    case "FriendIsNotExist":
-////                                        //  Log.d("TAG", "n getfriends1-->friendlistFragment ---> userMustToLogin");
-////                                        Toast.makeText(MyApp.getContext(), "Cant found email,please try again.", Toast.LENGTH_SHORT).show();
-////                                        break;
-////                                    case "BothUsersEquals":
-////                                        //Log.d("TAG", "n getfriends1-->friendlistFragment ---> userMustToLogin");
-////                                        Toast.makeText(MyApp.getContext(), "You cant add yourself as friend.", Toast.LENGTH_SHORT).show();
-////                                        break;
-////                                    default:
-////                                        // AddFrie contactsListResponseData =CloudManager.getObjectFromString(data.toString(),ContactsListResponseData.class);
-////                                        AddFriendResponseData addFriendResponseData = CloudManager.getObjectFromString(data.toString(), AddFriendResponseData.class);
-////                                        //contactsListResponseData.getContacts()
-////                                        //Log.d("TAG","List= "+contactsListResponseData.getContacts());
-////                                        // friendsList=friendsList.get(0).convertUserDataToUser(((ContactsListResponseData) data).getContacts());
-////                                        friendsList.add(new User(addFriendResponseData.getUserData()));
-//////                                                            for (User userr:friendsList)
-//////                                                            {
-//////                                                                Log.d("TAG","a"+userr.getFirstName());
-//////                                                            }
-////                                        //     if (adapter != null) {
-//////                                                                adapter.notifyDataSetChanged();
-////                                        //}
-////                                        Log.d("TAG", "Friend added Succeful");
-////
-////
-////                                        break;
-////                                }
-////
-////                            }
-////
-////                            @Override
-////                            public void onCancel() {
-////
-////                            }
-//                        });
-//                    }
-//                });
-//                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.cancel();
-//                    }
-//                });
-//
-//                AlertDialog d = builder.create();
-//                d.show();
             }
 
         });
 
 //delete from the main delete button
         deleteButton.setVisibility(View.INVISIBLE);
-//        deleteButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if (waitForAction != null) {
-//                    AlertDialog.Builder builder = new AlertDialog.Builder(FriendsListActivity.this);
-//                    builder.setTitle("Delete Friend");
-//                    builder.setMessage("Are you sure you wand delete " + waitForAction.getFirstName() + " " + waitForAction.getLastName() + " from your friends?");
-//                    builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
-//                        @Override
-//                        public void onClick(DialogInterface dialog, int which) {
-//                            Repository.instance.deleteFromFriends(waitForAction.getId(), new FirebaseModel.CloudCallback<Boolean>() {
-//                                @Override
-//                                public void onComplete(Boolean data) {
-//                                    if (data != null) {
-//                                        Toast.makeText(getApplicationContext(), "Deleted", Toast.LENGTH_SHORT).show();
-//                                        refreshList();
-//                                    } else
-//                                        Toast.makeText(getApplicationContext(), "Cannot delete your friend right now, please try later...", Toast.LENGTH_LONG).show();
-//                                }
-//
-//                                @Override
-//                                public void onCancel() {
-//                                    dialog.cancel();
-//                                }
-//                            });
-//
-//                        }
-//                    })
-//                            .setNegativeButton("No, Cancel!", new DialogInterface.OnClickListener() {
-//                                @Override
-//                                public void onClick(DialogInterface dialog, int which) {
-//                                    dialog.cancel();
-//                                }
-//                            });
-//                    builder.show();
-//                }
-//            }
-//        });        return View;
 
     }
 
