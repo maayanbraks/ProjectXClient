@@ -38,6 +38,7 @@ public class CloudManager {
     public static final CloudManager instance = new CloudManager();
 
     //    private final String SERVER_ADDRESS = "http://192.168.27.1:8080";
+    private final String EVENT_CONNECT = "Connect";//Login + Register
     private final String SERVER_ADDRESS = "http://193.106.55.95:8080";
     private CloudCallback<String> localCallbackCloudManager;
     private RecordingActivityCallback recordingActivityCallback;
@@ -157,8 +158,7 @@ public class CloudManager {
                         e.printStackTrace();
                     }
 
-                }else
-                {
+                } else {
                     mainActivityInvitesCallback.onChanged(new Event(eventInvitationNotificationData.getEventData()));
                     return;
                 }
@@ -167,18 +167,16 @@ public class CloudManager {
                 UserJoinEventNotification userJoinEventNotification = ProductTypeConverters.getObjectFromString(data, UserJoinEventNotification.class);
                 if (recordingActivityCallback != null) {
                     //try {
-                        //sleep(1000);
-                        recordingActivityCallback.userJoinEvent(new User(userJoinEventNotification.getUserData()));
-                        return;
-                  //  } catch (InterruptedException e) {
-                      //  e.printStackTrace();
-                  //  }
-
-                }
-                else
-                   // recordingActivityCallback.userJoinEvent(new User(userJoinEventNotification.getUserData()));
+                    //sleep(1000);
+                    recordingActivityCallback.userJoinEvent(new User(userJoinEventNotification.getUserData()));
                     return;
+                    //  } catch (InterruptedException e) {
+                    //  e.printStackTrace();
+                    //  }
 
+                } else
+                    // recordingActivityCallback.userJoinEvent(new User(userJoinEventNotification.getUserData()));
+                    return;
 
 
             case UserLeaveEvent:
@@ -209,8 +207,7 @@ public class CloudManager {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                }else
-                {
+                } else {
                     recordingActivityCallback.eventClosed(new Event(eventCloseNotificationData.getEventData()));
                     return;
                 }
@@ -224,8 +221,7 @@ public class CloudManager {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                }else
-                {
+                } else {
                     mainActivityProtocolCallback.onChanged(protocolReadyNotificationData.getEventData().getId());
                     return;
                 }
@@ -253,14 +249,16 @@ public class CloudManager {
         localCallbackCloudManager = cloudManagerCallback;
         String jsonString = ProductTypeConverters.getStringFromObject(obj);
         Log.d("TAG", "sendLoginEvent " + jsonString);
-        socket.emit("Login", jsonString);
+        socket.emit(EVENT_CONNECT, jsonString);
     }
+
     public void registerRequest(Object obj, final CloudCallback<String> cloudManagerCallback) {
         localCallbackCloudManager = cloudManagerCallback;
         String jsonString = ProductTypeConverters.getStringFromObject(obj);
         Log.d("TAG", "Register " + jsonString);
-        socket.emit("Register", jsonString);
+        socket.emit(EVENT_CONNECT, jsonString);
     }
+
     public void disconnect() {
         socket.disconnect();
 //        IO.Options opts = new IO.Options();

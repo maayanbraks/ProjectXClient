@@ -86,14 +86,14 @@ public class DataSetActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+//        super.onBackPressed();
         backClicked();
     }
 
     private void backClicked() {
         final String title = "Are you sure you want to leave?";
         String msg = "";
-        if(recorder.isRecording())
+        if (recorder.isRecording())
             msg = "If you leave this record will be stopped.";
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         // set title
@@ -110,8 +110,10 @@ public class DataSetActivity extends AppCompatActivity {
                 })
                 .setPositiveButton("Yes :(", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        stopRecord();
-                        uploadDataSet();
+                        if (recorder.isRecording()) {
+                            stopRecord();
+                            uploadDataSet();
+                        }
                         finish();
                     }
                 });

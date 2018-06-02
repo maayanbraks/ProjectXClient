@@ -293,6 +293,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 })
                 .setPositiveButton("Yes :(", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        Repository.instance.disconnectFromServer();
                         finish();
                     }
 
