@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -290,12 +291,15 @@ public class RecordingActivity extends AppCompatActivity {
     private void shareEvent() {
    //     Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
         MakeToastShort("Uploading...");
+        ProgressBar pb = (ProgressBar)findViewById(R.id.progressBar_Recording);
+        pb.setVisibility(View.VISIBLE);
         Repository.instance.closeEvent(null, event.getId(), mFileName, new CloseEventCallback() {
             @Override
             public void onSuccees() {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        pb.setVisibility(View.GONE);
                         Toast.makeText(getApplication(), "File upload successful", Toast.LENGTH_SHORT).show();
                         new File(mFileName).delete();
                     }

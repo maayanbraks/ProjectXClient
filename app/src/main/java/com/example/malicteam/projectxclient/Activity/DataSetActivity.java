@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -136,7 +137,8 @@ public class DataSetActivity extends AppCompatActivity {
     }
 
     private void uploadDataSet() {
-        Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
+        ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar_dataSet);
+        Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_LONG).show();
         //Upoload
         Repository.instance.uploadDataSet(mFileName, new DataSetCallback() {
             @Override
@@ -146,6 +148,7 @@ public class DataSetActivity extends AppCompatActivity {
 
             @Override
             public void onSuccees(float newLength) {
+                pb.setVisibility(View.VISIBLE);
                 myUser.setDataSetTime(newLength);
             }
         });

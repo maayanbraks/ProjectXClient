@@ -114,7 +114,6 @@ public class FriendsListFragment extends Fragment {
 
     private void refreshList() {
         try {
-
 //            friendsViewModel.getFriendsList().observe(this, new Observer<List<User>>() {
 //                @Override
 //                public void onChanged(@Nullable List<User> list) {

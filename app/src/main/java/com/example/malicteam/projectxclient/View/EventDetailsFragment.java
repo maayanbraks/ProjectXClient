@@ -71,7 +71,7 @@ public class EventDetailsFragment extends Fragment {
         title.setText(event.getTitle());
         _date.setText(event.getDate());
         String part = "Participats: " + event.getParticipats().toString();
-        _participates.setText("Participats:" + event.getParticipatsNames());
+        _participates.setText("Participats:" + event.getParticipatsFirstNames());
         desc.setText("Description:" + event.getDescription());
         // Inflate the layout for this fragment
 
