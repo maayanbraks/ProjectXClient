@@ -1,6 +1,7 @@
 package com.example.malicteam.projectxclient.Model;
 
 import android.arch.lifecycle.Observer;
+import android.os.Build;
 import android.util.Log;
 
 //import com.github.nkzawa.emitter.Emitter;
@@ -8,6 +9,7 @@ import android.util.Log;
 //import com.github.nkzawa.socketio.client.Socket;
 
 import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
+import com.example.malicteam.projectxclient.Common.Callbacks.SendAudioCallback;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 
 import Notifications.EventCloseNotificationData;
@@ -20,7 +22,14 @@ import io.socket.client.IO;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static java.lang.Thread.sleep;
 
@@ -39,6 +48,9 @@ public class CloudManager {
 
     //    private final String SERVER_ADDRESS = "http://192.168.27.1:8080";
     private final String SERVER_ADDRESS = "http://193.106.55.95:8080";
+    private final String SERVER_ADDRESS_Audio = "http://193.106.55.95";
+    private final int SERVER_AUDIO_EVENT_PORT = 8082;
+    private final int SERVER_AUDIO_DATASET_PORT = 8081;
     private CloudCallback<String> localCallbackCloudManager;
     private RecordingActivityCallback recordingActivityCallback;
     private Observer<Event> mainActivityInvitesCallback;
@@ -269,5 +281,54 @@ public class CloudManager {
 //        } catch (URISyntaxException e) {
 //            e.printStackTrace();
 //        }
+    }
+    public void SendAudioToServer(String path, int userOrEventId, int typeOfAudio, final SendAudioCallback callback) throws IOException {
+        //1=EventId ,0=UserId (Eventid=audio of conversetion,UserId for dataset)
+        java.net.Socket sock;
+
+        String responeFromServer="";
+        Path fileLocation = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            fileLocation = Paths.get(path);
+        }
+        byte[] data = null;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                data = Files.readAllBytes(fileLocation);
+            }
+            if (typeOfAudio==1)
+                 sock=new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_EVENT_PORT);
+            else
+                sock=new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_DATASET_PORT);
+
+            //send int to Server
+            DataOutputStream outToServer= new DataOutputStream(sock.getOutputStream());
+            outToServer.write(userOrEventId);
+
+            //wait for acknowlage
+            BufferedReader inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+            responeFromServer= inFromServer.readLine();
+            Log.d("TAG","Respone on intID="+responeFromServer);
+            if (responeFromServer.equals("OK")) //send the AudioByt
+                try {
+                    outToServer.write(data);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            else if (responeFromServer.equals("Error:RecivingTheAudioFile")) {
+                Log.d("TAG", "responefromServerError=" + responeFromServer);
+                callback.UserOrEventIdNotExist("Error:RecivingTheAudioFile");
+            }
+            else if (responeFromServer.equals("OK")) {
+                Log.d("TAG", "OK=" + responeFromServer);
+                callback.onSuccees("");
+            }
+            sock.close();
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
     }
 }
