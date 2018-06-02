@@ -252,14 +252,14 @@ public class CloudManager {
     public void loginRequest(Object obj, final CloudCallback<String> cloudManagerCallback) {
         localCallbackCloudManager = cloudManagerCallback;
         String jsonString = ProductTypeConverters.getStringFromObject(obj);
-        Log.d("TAG", "sendLoginEvent " + jsonString);
-        socket.emit("Login", jsonString);
+        Log.d("TAG", "Connect " + jsonString);
+        socket.emit("Connect", jsonString);
     }
     public void registerRequest(Object obj, final CloudCallback<String> cloudManagerCallback) {
         localCallbackCloudManager = cloudManagerCallback;
         String jsonString = ProductTypeConverters.getStringFromObject(obj);
-        Log.d("TAG", "Register " + jsonString);
-        socket.emit("Register", jsonString);
+        Log.d("TAG", "Connect " + jsonString);
+        socket.emit("Connect", jsonString);
     }
     public void disconnect() {
         socket.disconnect();

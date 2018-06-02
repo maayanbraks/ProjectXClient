@@ -48,18 +48,20 @@ public class EventDetailsFragment extends Fragment {
         TextView _participates = view.findViewById(R.id.details_partici);
         TextView desc = view.findViewById(R.id.details_descp);
         TextView protocol = view.findViewById(R.id.protocolText);
-        mListener.getProtocol(event.getId(), new EventDetailCallback() {
-            @Override
-            public void onSuccees(List<ProtocolLine> list) {
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        protocol.setText(ProductTypeConverters.FromProtocolToString(list));
-                    }
-                });
+        if (event.isConverted()) {
+            mListener.getProtocol(event.getId(), new EventDetailCallback() {
+                @Override
+                public void onSuccees(List<ProtocolLine> list) {
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            protocol.setText(ProductTypeConverters.FromProtocolToString(list));
+                        }
+                    });
 
-            }
-        });
+                }
+            });
+        }
 
         title.setText(event.getTitle());
         _date.setText(event.getDate());
