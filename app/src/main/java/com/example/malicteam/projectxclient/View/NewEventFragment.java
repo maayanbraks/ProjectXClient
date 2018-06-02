@@ -4,7 +4,6 @@ import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.NestedScrollingChild;
 import android.support.v4.widget.NestedScrollView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,7 +16,6 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,12 +47,12 @@ public class NewEventFragment extends Fragment {
 
     private NewEventInteraction mListener;
     private UserViewModel currentUser = null;
-    private List<String> usersInvites;
+    private List<String> usersInvitesEmail;
+    private List<String> usersInvitesNames;
     private Button startRecord;
     private ImageButton fab;
     private Event event;
     private User myUser;
-    private List<String> invitesUsers;
     private boolean thereIsParti = false;
     private List<User> friendsList;
 
@@ -78,7 +76,8 @@ public class NewEventFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_new_event, container, false);
-        usersInvites = new LinkedList<String>();
+        usersInvitesEmail = new LinkedList<>();
+        usersInvitesNames = new LinkedList<>();
 
 //        currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
 //        currentUser.init(userId, true);
@@ -98,10 +97,8 @@ public class NewEventFragment extends Fragment {
         EditText _name = view.findViewById(R.id.new_event_title);
         EditText _desc = view.findViewById(R.id.new_event_description);
         EditText _part = view.findViewById(R.id.new_event_participants);
-        RadioGroup _saveAs = view.findViewById(R.id.save_as_group);
         nestedScrollView = (NestedScrollView) view.findViewById(R.id.contatsContainer_newEvents);
-        invitesUsers = new LinkedList<>();
-        _saveAs.check(R.id.radio_pdf);
+        _invites = view.findViewById(R.id.newEvent_Invites);
         startRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -109,7 +106,7 @@ public class NewEventFragment extends Fragment {
                 EditText _name = view.findViewById(R.id.new_event_title);
                 EditText _desc = view.findViewById(R.id.new_event_description);
                 EditText _part = view.findViewById(R.id.new_event_participants);
-                _invites = view.findViewById(R.id.newEvent_Invites);
+
                 String description = _desc.getText().toString();
                 String title = _name.getText().toString();
                 String parti = _part.getText().toString();
@@ -135,13 +132,13 @@ public class NewEventFragment extends Fragment {
                 event = new Event(null, title, new LinkedList<User>(), description, myUser.getEmail(), dateFormat, 0);
                 List<User> participats = new LinkedList<>();
                 //participats.add(myUser);
-                usersInvites.add(myUser.getEmail());
+                usersInvitesEmail.add(myUser.getEmail());
                 event.setParticipats(participats);
 //                    sendInvites("" + event.getId());
                 //Repository.instance.addEvent(event);
-                //usersInvites.add(myUser.getEmail());
+                //usersInvitesEmail.add(myUser.getEmail());
                 // event.addToParticipats(myUser);
-                Repository.instance.addEvent(usersInvites, event, new AddEventCallback<Integer>() {
+                Repository.instance.addEvent(usersInvitesEmail, event, new AddEventCallback<Integer>() {
                     @Override
                     public void onSuccees(Integer data) {
                         event.setId(data);
@@ -193,8 +190,6 @@ public class NewEventFragment extends Fragment {
 
         fab = (ImageButton) view.findViewById(R.id.addInviteButton);
         fab.setOnClickListener(new View.OnClickListener() {
-
-
             @Override
             public void onClick(View v) {
                 String parti = _part.getText().toString();
@@ -205,8 +200,8 @@ public class NewEventFragment extends Fragment {
                         if (data.equals(myUser.getEmail())) {
                             Log.d("TAG", "You cant add yourself to event");
                         } else {
-                            invitesUsers.add(data);
-                            usersInvites.add(parti);
+                            usersInvitesEmail.add(parti);
+                            usersInvitesNames.add(data);
                             InviteTextViewEdit(view);
                         }
                         // Log.d("TAG", "In addevent-->neweventfragment----> OnSucess");
@@ -268,8 +263,10 @@ public class NewEventFragment extends Fragment {
 
     private void showFriendsList(View view) {
         if (contactsOpen) {
+            contactsOpen = false;
             nestedScrollView.setVisibility(View.GONE);
         } else {
+            contactsOpen = true;
             nestedScrollView.setVisibility(View.VISIBLE);
             friendsList = new LinkedList<>();
             SimpleFriendsAdapter adapter = new SimpleFriendsAdapter();
@@ -312,7 +309,7 @@ public class NewEventFragment extends Fragment {
             }
             User friend = friendsList.get(i);
             CheckBox checkBox = (CheckBox) view.findViewById(R.id.checkBox_friendRow_newEvent);
-            if (usersInvites.contains(friend.getEmail())) {
+            if (usersInvitesEmail.contains(friend.getEmail())) {
                 checkBox.setChecked(true);
             } else {
                 checkBox.setChecked(false);
@@ -321,14 +318,17 @@ public class NewEventFragment extends Fragment {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    String fullName = friend.getFirstName() + " " + friend.getLastName();
                     if (checkBox.isChecked()) {
                         checkBox.setChecked(false);
-                        usersInvites.remove(friend);
-                        _invites.setText("Participats:" + ProductTypeConverters.GenerateStringFromList(invitesUsers));
+                        usersInvitesEmail.remove(friend);
+                        usersInvitesNames.remove(fullName);
+                        _invites.setText("Participats:" + ProductTypeConverters.GenerateStringFromList(usersInvitesNames));
                     } else {
                         checkBox.setChecked(true);
-                        usersInvites.add(friend.getEmail());
-                        _invites.setText("Participats:" + ProductTypeConverters.GenerateStringFromList(invitesUsers));
+                        usersInvitesEmail.add(friend.getEmail());
+                        usersInvitesNames.add(fullName);
+                        _invites.setText("Participats:" + ProductTypeConverters.GenerateStringFromList(usersInvitesNames));
                     }
                 }
             });
@@ -364,8 +364,8 @@ public class NewEventFragment extends Fragment {
 
 
 //    private void sendInvites(String eventId) {
-//        Log.d("TAG", "usrinvites=" + usersInvites);
-//        // String invites = usersInvites;
+//        Log.d("TAG", "usrinvites=" + usersInvitesEmail);
+//        // String invites = usersInvitesEmail;
 //        //String[] items = invites.split(",");
 ////        for (String item : items) {
 ////            Invite invite = new Invite(eventId, item, "" + userId);
@@ -392,7 +392,7 @@ public class NewEventFragment extends Fragment {
                 if (_invites == null)
                     _invites = view.findViewById(R.id.newEvent_Invites);
 
-                _invites.setText("Participats:" + ProductTypeConverters.GenerateStringFromList(invitesUsers));
+                _invites.setText("Participants: " + ProductTypeConverters.GenerateStringFromList(usersInvitesNames));
 //                    } catch (Exception e) {
 //                        Log.d("TAg", e.getMessage());
 //                    }
