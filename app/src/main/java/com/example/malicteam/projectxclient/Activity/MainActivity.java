@@ -340,14 +340,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void handleFloatingButton(boolean show){
-        if(show){
-            fab.setVisibility(View.VISIBLE);
-            fab.setClickable(true);
-        }
-        else{
-            fab.setVisibility(View.INVISIBLE);
-            fab.setClickable(false);
-        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(show){
+                    fab.setVisibility(View.VISIBLE);
+                    fab.setClickable(true);
+                }
+                else{
+                    fab.setVisibility(View.INVISIBLE);
+                    fab.setClickable(false);
+                }
+            }
+        });
+
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

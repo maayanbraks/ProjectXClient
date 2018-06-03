@@ -292,7 +292,7 @@ public class CloudManager {
 
     }
 
-    private final String SERVER_ADDRESS_Audio = "http://193.106.55.95";
+    private final String SERVER_ADDRESS_Audio = "193.106.55.95";
     private final int SERVER_AUDIO_EVENT_PORT = 8082;
     private final int SERVER_AUDIO_DATASET_PORT = 8081;
 
