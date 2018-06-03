@@ -121,7 +121,7 @@ public class RecordingActivity extends AppCompatActivity {
 
             @Override
             public void eventClosed(Event event) {
-                if(!checkMeAdmin())
+                if(!(checkMeAdmin()))
                     StopRecordingByAdmin();
             }
 
@@ -258,6 +258,7 @@ public class RecordingActivity extends AppCompatActivity {
         //Toast.makeText(getApplication(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
         MakeToastShort("The admin has stop the record..");
         startRecordOrSaveIt();
+        finish();
         //stop recording...
     }
 
@@ -374,14 +375,24 @@ public class RecordingActivity extends AppCompatActivity {
 //                if (EventList.size() != 0) //
 //                {
         //getting event informatio
+        TextView partici = findViewById(R.id.participants_recording);
         event = eventtemp;
+        event.addToParticipats(myUser);
+        runOnUiThread(new Runnable() {
 
+            @Override
+            public void run() {
+
+                partici.setText(event.getParticipatsFullNames());
+
+            }
+        });
         // setting the layout from the event information
         // TextView _eventTitle = findViewById(R.id.recording_title);
         TextView Date = findViewById(R.id.recording_date);
-        TextView partici = findViewById(R.id.participants_recording);
         // _eventTitle.setText(event.getTitle());
         Date.setText(event.getDate());
+
         // partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
 //        mFileName += "/outalk" + event.getId() + ".acc";
         SetActivity();
@@ -422,9 +433,9 @@ public class RecordingActivity extends AppCompatActivity {
         //Toast.makeText(getApplication(), user.getFirstName() + " " + user.getLastName() + ",just joined", Toast.LENGTH_LONG).show();
         if (!(event.isUserConatin(user))) {
             MakeToastShort(user.getFirstName() + " " + user.getLastName() + ",just joined");
+            event.addToParticipats(user);
+//            if (!(event.getParticipats().contains(user)))
 
-            if (!(event.getParticipats().contains(user)))
-                event.addToParticipats(user);
 
             runOnUiThread(new Runnable() {
 
@@ -484,4 +495,3 @@ public class RecordingActivity extends AppCompatActivity {
         });
     }
 }
-

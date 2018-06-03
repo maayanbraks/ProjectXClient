@@ -28,8 +28,8 @@ public class LoginActivity extends Activity {
     private ProgressBar progressBar;
     private Button btnSignup, btnLogin;//, btnReset;
 
-    private final String DEFAULT_USER = "SapirMail";
-    private final String DEFAULT_PASSWORD = "E";
+    private final String DEFAULT_USER = "EdenMail";
+    private final String DEFAULT_PASSWORD = "D";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

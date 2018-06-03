@@ -114,15 +114,26 @@ public class EventsListFragment extends Fragment {
                 @Override
                 public void onChanged(@Nullable Integer integer) {
                     for (Event e : eventsList) {
-                        if(e.getId() == integer)
+                        if (e.getId() == integer) {
                             e.setConverted(true);
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Collections.reverse(eventsList);
+                                    if (adapter != null)
+                                        adapter.notifyDataSetChanged();
+                                }
+
+                        });
+
                     }
                 }
-            });
-        }
-        // Inflate the layout for this fragment
-        return view;
+            }
+        });
     }
+    // Inflate the layout for this fragment
+        return view;
+}
 
     @Override
     public void onAttach(Context context) {
@@ -195,57 +206,57 @@ public class EventsListFragment extends Fragment {
     }
 
 
-    //Adapter class - uses eventList
-    public class EventAdapter extends BaseAdapter {
+//Adapter class - uses eventList
+public class EventAdapter extends BaseAdapter {
 
-        @Override
-        public int getCount() {
-            return eventsList.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-
-            if (view == null) {
-                view = getLayoutInflater().inflate(R.layout.records_list_row, viewGroup, false);
-            }
-            if (i < eventsList.size()) {
-                Event event = eventsList.get(i);
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        mListener.onEventSelected(event);
-                    }
-                });
-                TextView _nameEvent = view.findViewById(R.id._nameEvent);
-                TextView _date = view.findViewById(R.id._date);
-                TextView _participats = view.findViewById(R.id._participates);
-                TextView _status = view.findViewById(R.id.recordStatus_textView);
-                _nameEvent.setText(event.getTitle());
-                _participats.setText(event.getParticipatsFullNames());
-                _date.setText(event.getDate());
-                if (event.isConverted()) {
-                    _status.setText("Done");
-                } else if (!event.isRecording()) {
-                    _status.setText("Analyzing");
-                } else {
-                    _status.setText("Live");
-                }
-            }
-
-            return view;
-        }
-
+    @Override
+    public int getCount() {
+        return eventsList.size();
     }
+
+    @Override
+    public Object getItem(int position) {
+        return null;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int i, View view, ViewGroup viewGroup) {
+
+        if (view == null) {
+            view = getLayoutInflater().inflate(R.layout.records_list_row, viewGroup, false);
+        }
+        if (i < eventsList.size()) {
+            Event event = eventsList.get(i);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mListener.onEventSelected(event);
+                }
+            });
+            TextView _nameEvent = view.findViewById(R.id._nameEvent);
+            TextView _date = view.findViewById(R.id._date);
+            TextView _participats = view.findViewById(R.id._participates);
+            TextView _status = view.findViewById(R.id.recordStatus_textView);
+            _nameEvent.setText(event.getTitle());
+            _participats.setText(event.getParticipatsFullNames());
+            _date.setText(event.getDate());
+            if (event.isConverted()) {
+                _status.setText("Done");
+            } else if (!event.isRecording()) {
+                _status.setText("Analyzing");
+            } else {
+                _status.setText("Live");
+            }
+        }
+
+        return view;
+    }
+
+}
 
 }

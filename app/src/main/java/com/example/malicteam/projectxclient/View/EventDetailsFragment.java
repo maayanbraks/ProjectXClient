@@ -3,6 +3,7 @@ package com.example.malicteam.projectxclient.View;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,7 +61,8 @@ public class EventDetailsFragment extends Fragment {
                         @Override
                         public void run() {
                             progressBar.setVisibility(View.GONE);
-                            protocol.setText(ProductTypeConverters.FromProtocolToString(list));
+                            protocol.setText(Html.fromHtml(ProductTypeConverters.FromProtocolToString(list)));
+                          //  mytextview.setText(Html.fromHtml(sourceString));
                         }
                     });
 

@@ -104,7 +104,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Save As:" />
+                android:text="Language" />
 
             <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/save_as_group"
@@ -117,14 +117,14 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="onRadioButtonClicked"
-                    android:text="PDF" />
+                    android:text="Heb" />
 
                 <RadioButton
                     android:id="@+id/radio_txt"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:onClick="onRadioButtonClicked"
-                    android:text="TXT" />
+                    android:text="Eng" />
             </RadioGroup>
         </LinearLayout>
 

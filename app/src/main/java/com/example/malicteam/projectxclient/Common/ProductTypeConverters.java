@@ -134,7 +134,7 @@ public class ProductTypeConverters {
 
 
             for (int i = 0; i < list.size(); i++) {
-                protocol += list.get(i).getName() + ": " + list.get(i).getText() + "\n";
+                protocol += "<b>" +list.get(i).getName()+ "</b> </div>"+ ": " + list.get(i).getText() + "<br>"+"<br>";
             }
             return protocol;
         }
