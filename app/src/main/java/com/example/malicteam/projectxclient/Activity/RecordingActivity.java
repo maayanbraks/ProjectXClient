@@ -35,6 +35,10 @@ import UpdateObjects.CloseEvent;
 
 
 public class RecordingActivity extends AppCompatActivity {
+
+    private boolean isRecording = false;
+
+
     //Record Objects
     private final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
     private final String[] permissions = {Manifest.permission.RECORD_AUDIO};
@@ -76,26 +80,31 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        TextView onAir = findViewById(R.id.onAir_recording);
-        //Recording Button + "On Air" image
-        if (recorder.isRecording()) {//if recording now
-            recordingButton.setImageResource(android.R.drawable.ic_menu_save);
-            onAir.setVisibility(View.VISIBLE);
-            playingButton.setClickable(false);
-            playingButton.setVisibility(View.INVISIBLE);
-        } else {
-            recordingButton.setImageResource(android.R.drawable.ic_btn_speak_now);
-            onAir.setVisibility(View.INVISIBLE);
-            playingButton.setImageResource(android.R.drawable.ic_media_play);
-            playingButton.setClickable(true);
-            playingButton.setVisibility(View.VISIBLE);
-        }
-        //Playing Button
-        if (!mStartToPlayMedia) {//if next click should be pause
-            playingButton.setImageResource(android.R.drawable.ic_media_pause);
-        } else {
-            playingButton.setImageResource(android.R.drawable.ic_media_play);
-        }
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                TextView onAir = findViewById(R.id.onAir_recording);
+                //Recording Button + "On Air" image
+                if (recorder.isRecording()) {//if recording now
+                    recordingButton.setImageResource(android.R.drawable.ic_menu_save);
+                    onAir.setVisibility(View.VISIBLE);
+                    playingButton.setClickable(false);
+                    playingButton.setVisibility(View.INVISIBLE);
+                } else {
+                    recordingButton.setImageResource(android.R.drawable.ic_btn_speak_now);
+                    onAir.setVisibility(View.INVISIBLE);
+                    playingButton.setImageResource(android.R.drawable.ic_media_play);
+                    playingButton.setClickable(true);
+                    playingButton.setVisibility(View.VISIBLE);
+                }
+                //Playing Button
+                if (!mStartToPlayMedia) {//if next click should be pause
+                    playingButton.setImageResource(android.R.drawable.ic_media_pause);
+                } else {
+                    playingButton.setImageResource(android.R.drawable.ic_media_play);
+                }
+            }
+        });
     }
 
     private void listenToParticipents() {
@@ -112,7 +121,8 @@ public class RecordingActivity extends AppCompatActivity {
 
             @Override
             public void eventClosed(Event event) {
-                StopRecordingByAdmin();
+                if(!checkMeAdmin())
+                    StopRecordingByAdmin();
             }
 
         });
@@ -134,7 +144,7 @@ public class RecordingActivity extends AppCompatActivity {
 
     private void backClicked() {
         String msg = "";
-        if(checkMeAdmin())
+        if (checkMeAdmin())
             msg = "Are you sure you want to leave? \n" +
                     "If you leave this event will be closed.";
         else
@@ -155,17 +165,13 @@ public class RecordingActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int id) {
                         if (!mStartToPlayMedia)
                             stopPlaying();
-                        if (recorder.isRecording())
+                        if (isRecording) {
                             startRecordOrSaveIt();
-                            else {
-                            shareEvent();
-                            finish();
                         }
                         if (!(checkMeAdmin())) {
                             leaveEvent();
                         }
-
-
+                        finish();
                     }
 
                 });
@@ -178,7 +184,7 @@ public class RecordingActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+//        super.onBackPressed();
         backClicked();
     }
 
@@ -261,7 +267,7 @@ public class RecordingActivity extends AppCompatActivity {
             mPlayer.setDataSource(mFileName);
             mPlayer.prepare();
             mPlayer.start();
-          //  Toast.makeText(getApplication(), "Recording..", Toast.LENGTH_SHORT).show();
+            //  Toast.makeText(getApplication(), "Recording..", Toast.LENGTH_SHORT).show();
             MakeToastShort("Recording..");
         } catch (IOException e) {
             Log.e(LOG_TAG, "prepare() failed");
@@ -274,24 +280,26 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
     private void startRecording() {
+        isRecording = true;
         recorder.startRecording();
     }
 
     private void stopRecording() {
+        isRecording = false;
         recorder.stopRecording();
         if (checkMeAdmin()) {
             shareEvent();
 //            finish();
         } else {
-           leaveEvent();
+            leaveEvent();
         }
         Log.d("TAG", "Stop recording func");
     }
 
     private void shareEvent() {
-   //     Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
+        //     Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
         MakeToastShort("Uploading...");
-        ProgressBar pb = (ProgressBar)findViewById(R.id.progressBar_Recording);
+        ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar_Recording);
         pb.setVisibility(View.VISIBLE);
         Repository.instance.closeEvent(null, event.getId(), mFileName, new CloseEventCallback() {
             @Override
@@ -315,13 +323,13 @@ public class RecordingActivity extends AppCompatActivity {
             @Override
             public void EventIsNotExist() {
                 MakeToastShort("Error:EventIsNotExist");
-               // Toast.makeText(getApplication(), "Error:EventIsNotExist", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getApplication(), "Error:EventIsNotExist", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void TechnicalError() {
                 MakeToastShort("Error:TechnicalError");
-               // Toast.makeText(getApplication(), "Error:TechnicalError", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getApplication(), "Error:TechnicalError", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -332,28 +340,28 @@ public class RecordingActivity extends AppCompatActivity {
         }
         return false;
     }
+
     public void leaveEvent() { // this func is leaving the event - NOT ADMIN!
         Repository.instance.leaveEventRequest(event.getId(), new LeaveEventCallBack<Boolean>() {
             @Override
             public void TechnicalError() {
                 MakeToastShort("Technical error.");
-              //  Toast.makeText(getApplication(), "Technical error.", Toast.LENGTH_SHORT).show();
+                //  Toast.makeText(getApplication(), "Technical error.", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void NoPendingEvents() {
                 MakeToastShort("No pending events.");
-               // Toast.makeText(getApplication(), "No pending events.", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(getApplication(), "No pending events.", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onSuccees(Boolean data) {
                 MakeToastShort("leaving.");
                 finish();
-             //   Toast.makeText(getApplication(), "leaving.", Toast.LENGTH_SHORT).show();
+                //   Toast.makeText(getApplication(), "leaving.", Toast.LENGTH_SHORT).show();
             }
         });
-
 
 
     }
@@ -369,12 +377,12 @@ public class RecordingActivity extends AppCompatActivity {
         event = eventtemp;
 
         // setting the layout from the event information
-       // TextView _eventTitle = findViewById(R.id.recording_title);
+        // TextView _eventTitle = findViewById(R.id.recording_title);
         TextView Date = findViewById(R.id.recording_date);
         TextView partici = findViewById(R.id.participants_recording);
-       // _eventTitle.setText(event.getTitle());
+        // _eventTitle.setText(event.getTitle());
         Date.setText(event.getDate());
-       // partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
+        // partici.setText(ProductTypeConverters.GenerateStringFromList(ProductTypeConverters.GenerateListUserToListMails(event.getParticipats())));
 //        mFileName += "/outalk" + event.getId() + ".acc";
         SetActivity();
 //        CheckRecordingStatus();
@@ -475,5 +483,5 @@ public class RecordingActivity extends AppCompatActivity {
             }
         });
     }
-    }
+}
 

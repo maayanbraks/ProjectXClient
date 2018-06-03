@@ -32,15 +32,19 @@ public class FileSender extends AsyncTask<SenderObject, Void, Boolean> {
         try {
             sock = new java.net.Socket(SERVER_ADDRESS_Audio, port);
 
+            Log.d("TAG","Connectet to ip - " + SERVER_ADDRESS_Audio + " port - " + port);
+
             DataOutputStream outToServer = new DataOutputStream(sock.getOutputStream());
             BufferedReader inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
+            Log.d("TAG","BEFORE write id");
             outToServer.writeBytes(obj.getId() + "\n");
+            Log.d("TAG","AFTER write id");
 
             //wait for acknowlage
             responseFromServer = inFromServer.read();
-            Log.d("TAG","GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG  " + responseFromServer);
+            Log.d("TAG","AFTER get response for id" + responseFromServer);
 
 
             if (obj.getLengthOfRecord() != null) {
@@ -64,6 +68,7 @@ public class FileSender extends AsyncTask<SenderObject, Void, Boolean> {
                 return false;
             } else if (responseFromServer == 1) {
                 Log.d("TAG", "OK=" + responseFromServer);
+                obj.getCallback().onComplete(true);
                 return true;
             }
             inFromServer.close();
@@ -74,6 +79,7 @@ public class FileSender extends AsyncTask<SenderObject, Void, Boolean> {
             Log.d("TAG", "File Sender Failed because " + e.getMessage());
             return false;
         }
+        obj.getCallback().onComplete(true);
         return true;
     }
 }
