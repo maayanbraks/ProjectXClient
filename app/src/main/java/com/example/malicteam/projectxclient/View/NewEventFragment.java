@@ -1,27 +1,26 @@
 package com.example.malicteam.projectxclient.View;
 
+import android.arch.lifecycle.Observer;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.NestedScrollView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.malicteam.projectxclient.Activity.RecordingActivity;
 import com.example.malicteam.projectxclient.Common.Callbacks.AddEventCallback;
-import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.Consts;
-import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 import com.example.malicteam.projectxclient.Model.Event;
 import com.example.malicteam.projectxclient.Model.Repository;
@@ -35,18 +34,27 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-import ResponsesEntitys.UserData;
-
 public class NewEventFragment extends Fragment {
+    public interface NewEventInteraction extends BasicInteractionInterface, FriendsListFragment.FriendsFragmentInteraction {
+        void isUserExist(String parti, AddEventCallback<String> callback);
+
+        void startRecording(Event event);
+    }
+
+    private boolean contactsOpen = false;
+    private TextView _invites;
+    private NestedScrollView nestedScrollView;
+
     private NewEventInteraction mListener;
     private UserViewModel currentUser = null;
-    private List<String> UsersInvites;
+    private List<String> usersInvitesEmail;
+    private List<String> usersInvitesNames;
     private Button startRecord;
     private ImageButton fab;
     private Event event;
     private User myUser;
-    private List<String> invitesUsers;
     private boolean thereIsParti = false;
+    private List<User> friendsList;
 
     public NewEventFragment() {
         // Required empty public constructor
@@ -68,7 +76,8 @@ public class NewEventFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_new_event, container, false);
-        UsersInvites = new LinkedList<String>();
+        usersInvitesEmail = new LinkedList<>();
+        usersInvitesNames = new LinkedList<>();
 
 //        currentUser = ViewModelProviders.of(this).get(UserViewModel.class);
 //        currentUser.init(userId, true);
@@ -88,9 +97,8 @@ public class NewEventFragment extends Fragment {
         EditText _name = view.findViewById(R.id.new_event_title);
         EditText _desc = view.findViewById(R.id.new_event_description);
         EditText _part = view.findViewById(R.id.new_event_participants);
-        RadioGroup _saveAs = view.findViewById(R.id.save_as_group);
-        invitesUsers=new LinkedList<>();
-        _saveAs.check(R.id.radio_pdf);
+        nestedScrollView = (NestedScrollView) view.findViewById(R.id.contatsContainer_newEvents);
+        _invites = view.findViewById(R.id.newEvent_Invites);
         startRecord.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -98,7 +106,7 @@ public class NewEventFragment extends Fragment {
                 EditText _name = view.findViewById(R.id.new_event_title);
                 EditText _desc = view.findViewById(R.id.new_event_description);
                 EditText _part = view.findViewById(R.id.new_event_participants);
-                TextView _invites = view.findViewById(R.id.newEvent_Invites);
+
                 String description = _desc.getText().toString();
                 String title = _name.getText().toString();
                 String parti = _part.getText().toString();
@@ -124,13 +132,13 @@ public class NewEventFragment extends Fragment {
                 event = new Event(null, title, new LinkedList<User>(), description, myUser.getEmail(), dateFormat, 0);
                 List<User> participats = new LinkedList<>();
                 //participats.add(myUser);
-                UsersInvites.add(myUser.getEmail());
+//                usersInvitesEmail.add(myUser.getEmail());
                 event.setParticipats(participats);
 //                    sendInvites("" + event.getId());
                 //Repository.instance.addEvent(event);
-                //UsersInvites.add(myUser.getEmail());
+                //usersInvitesEmail.add(myUser.getEmail());
                 // event.addToParticipats(myUser);
-                Repository.instance.addEvent(UsersInvites, event, new AddEventCallback<Integer>() {
+                Repository.instance.addEvent(usersInvitesEmail, event, new AddEventCallback<Integer>() {
                     @Override
                     public void onSuccees(Integer data) {
                         event.setId(data);
@@ -139,7 +147,7 @@ public class NewEventFragment extends Fragment {
                     //   try {
                     //  currentUser.getUser().getValue().addEventToList(Integer.valueOf(event.getId()));
                     //update the userDatabase
-//                                Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudCallback() {
+//                                Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudManagerCallback() {
 //                                    @Override
 //                                    public void onComplete(Object data) {
 //                                        startActivity(intent);
@@ -182,28 +190,23 @@ public class NewEventFragment extends Fragment {
 
         fab = (ImageButton) view.findViewById(R.id.addInviteButton);
         fab.setOnClickListener(new View.OnClickListener() {
-
-
-                                   @Override
-                                   public void onClick(View v) {
-                                       String parti = _part.getText().toString();
-                                       //TODO
-                                       //check with server is userExist---->if do --->
-                                       mListener.isUserExist(parti, new AddEventCallback<String>() {
-                                           @Override
-                                           public void onSuccees(String data) {
-                                               if (data.equals(myUser.getEmail()))
-                                               {
-                                                   Log.d("TAG","You cant add yourself to event");
-                                               } else{
-                                                   invitesUsers.add(data);
-                                                   UsersInvites.add(parti);
-                                                   InviteTextViewEdit(view);
-
-                                               }
-                                              // Log.d("TAG", "In addevent-->neweventfragment----> OnSucess");
-                                              // Log.d("TAG", "Sucseed found user, added him");
-                                           }
+            @Override
+            public void onClick(View v) {
+                String parti = _part.getText().toString();
+                //check with server is userExist---->if do --->
+                mListener.isUserExist(parti, new AddEventCallback<String>() {
+                    @Override
+                    public void onSuccees(String data) {
+                        if (data.equals(myUser.getEmail())) {
+                            Log.d("TAG", "You cant add yourself to event");
+                        } else {
+                            usersInvitesEmail.add(parti);
+                            usersInvitesNames.add(data);
+                            InviteTextViewEdit(view);
+                        }
+                        // Log.d("TAG", "In addevent-->neweventfragment----> OnSucess");
+                        // Log.d("TAG", "Sucseed found user, added him");
+                    }
 
                     @Override
                     public void userIsNotExist() {
@@ -248,9 +251,110 @@ public class NewEventFragment extends Fragment {
 
         });
         // Inflate the layout for this fragment
+        ImageButton contactsList = (ImageButton) view.findViewById(R.id.openFriendsList_NewEvent_Button);
+        contactsList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showFriendsList(view);
+            }
+        });
         return view;
     }
 
+    private void showFriendsList(View view) {
+        if (contactsOpen) {
+            contactsOpen = false;
+            nestedScrollView.setVisibility(View.GONE);
+        } else {
+            contactsOpen = true;
+            nestedScrollView.setVisibility(View.VISIBLE);
+            friendsList = new LinkedList<>();
+            SimpleFriendsAdapter adapter = new SimpleFriendsAdapter();
+            ListView friendsListView = (ListView) view.findViewById(R.id.friendsListView_newEvent);
+            friendsListView.setAdapter(adapter);
+            mListener.initFriendsList(new Observer<List<User>>() {
+                @Override
+                public void onChanged(List<User> data) {
+                    friendsList = data;
+                    if (adapter != null) {
+                        adapter.notifyDataSetChanged();
+                    }
+                }
+            });
+        }
+    }
+
+    //Adapter
+    private class SimpleFriendsAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            return friendsList.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            final int CHECKED_COLOR = 16777215;//white
+            final int NOT_CHECKED_COLOR = 9300220;//kind of blue
+
+            if (view == null) {
+                view = getLayoutInflater().inflate(R.layout.friend_row_simple_new_event, viewGroup, false);
+            }
+
+            User friend = friendsList.get(i);
+            CheckBox checkBox = (CheckBox) view.findViewById(R.id.checkBox_friendRow_newEvent);
+            checkBox.setVisibility(View.INVISIBLE);
+            if (usersInvitesEmail.contains(friend.getEmail())) {
+                checkBox.setChecked(true);
+                view.setBackgroundResource(CHECKED_COLOR);
+            } else {
+                checkBox.setChecked(false);
+                view.setBackgroundResource(NOT_CHECKED_COLOR);
+            }
+
+
+            //Friend Details - onClick
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    String fullName = friend.getFirstName() + " " + friend.getLastName();
+                    if (checkBox.isChecked()) {//if check => do unchecked
+                        v.setBackgroundResource(NOT_CHECKED_COLOR);
+                        checkBox.setChecked(false);
+                        usersInvitesEmail.remove(friend);
+                        usersInvitesNames.remove(fullName);
+                        _invites.setText("Participats:" + ProductTypeConverters.GenerateStringFromList(usersInvitesNames));
+                    } else {
+                        v.setBackgroundResource(CHECKED_COLOR);
+                        checkBox.setChecked(true);
+                        usersInvitesEmail.add(friend.getEmail());
+                        usersInvitesNames.add(fullName);
+                        _invites.setText("Participats:" + ProductTypeConverters.GenerateStringFromList(usersInvitesNames));
+                    }
+                }
+            });
+
+            TextView firstName = (TextView) view.findViewById(R.id.firstName_friendsRow);
+            TextView lastName = (TextView) view.findViewById(R.id.lastName_friendsRow);
+            TextView email = (TextView) view.findViewById(R.id.email_friendsRow);
+            firstName.setText(friend.getFirstName());
+            lastName.setText(friend.getLastName());
+            email.setText(friend.getEmail());
+
+            return view;
+        }
+    }
+    //End Of Adapter
 
     @Override
     public void onAttach(Context context) {
@@ -270,19 +374,13 @@ public class NewEventFragment extends Fragment {
     }
 
 
-    public interface NewEventInteraction extends BasicInteractionInterface {
-        // TODO: Update argument type and name
-        void isUserExist(String parti, AddEventCallback<String> callback);
-        void startRecording(Event event);
-    }
-
 //    private void sendInvites(String eventId) {
-//        Log.d("TAG", "usrinvites=" + UsersInvites);
-//        // String invites = UsersInvites;
+//        Log.d("TAG", "usrinvites=" + usersInvitesEmail);
+//        // String invites = usersInvitesEmail;
 //        //String[] items = invites.split(",");
 ////        for (String item : items) {
 ////            Invite invite = new Invite(eventId, item, "" + userId);
-////            Repository.instance.addNewInvite(invite, new CloudManager.CloudCallback<Invite>() {
+////            Repository.instance.addNewInvite(invite, new CloudManager.CloudManagerCallback<Invite>() {
 ////                @Override
 ////                public void onComplete(Invite invite) {
 ////                    Log.d("TAG", "succeed adding new invite.");
@@ -302,9 +400,10 @@ public class NewEventFragment extends Fragment {
 
 //                    try {
                 thereIsParti = true;
-                TextView _invites = view.findViewById(R.id.newEvent_Invites);
+                if (_invites == null)
+                    _invites = view.findViewById(R.id.newEvent_Invites);
 
-                _invites.setText("Participats:" + ProductTypeConverters.GenerateStringFromList(invitesUsers));
+                _invites.setText("Participants: " + ProductTypeConverters.GenerateStringFromList(usersInvitesNames));
 //                    } catch (Exception e) {
 //                        Log.d("TAg", e.getMessage());
 //                    }

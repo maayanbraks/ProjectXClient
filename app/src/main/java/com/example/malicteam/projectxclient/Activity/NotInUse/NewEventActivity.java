@@ -83,7 +83,7 @@
 ////        switch (view.getId()) {
 ////            case R.id.radio_pdf:
 ////                if (checked)
-////                    saveAsString = Consts.TXT;//TODO - now its txt default
+////                    saveAsString = Consts.TXT;
 ////                    break;
 ////            case R.id.radio_txt:
 ////                if (checked)
@@ -211,7 +211,7 @@
 ////                    try {
 ////                        currentUser.getUser().getValue().addEventToList(Integer.valueOf(event.getId()));
 ////                        //update the userDatabase
-////                        Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudCallback() {
+////                        Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudManagerCallback() {
 ////                            @Override
 ////                            public void onComplete(Object data) {
 ////                                startActivity(intent);
@@ -239,12 +239,12 @@
 ////            public void onClick(View v) {
 ////                String parti = _part.getText().toString();
 ////
-////                FirebaseModel.isExistUser(User.generateId(parti), new CloudManager.CloudCallback<Integer>() {
+////                FirebaseModel.isExistUser(User.generateId(parti), new CloudManager.CloudManagerCallback<Integer>() {
 ////                    @Override
 ////                    public void onComplete(Integer id) {
 ////                        if (id > 0) {// if found user
 ////                            Log.d("TAG", "Found id,");
-////                            Repository.instance.getUserById(id, new CloudManager.CloudCallback<List<User>>() {
+////                            Repository.instance.getUserById(id, new CloudManager.CloudManagerCallback<List<User>>() {
 ////                                @Override
 ////                                public void onComplete(List<User> data) {
 ////                                    Log.d("TAG", "data size=," + data.size());
@@ -330,7 +330,7 @@
 ////            ///  Model.Invite invite= new Model.Invite(eventId,item,Mymail);
 ////            ///     Model.Invite
 ////            Invite invite = new Invite(eventId, item, "" + userId);
-////            Repository.instance.addNewInvite(invite, new CloudManager.CloudCallback<Invite>() {
+////            Repository.instance.addNewInvite(invite, new CloudManager.CloudManagerCallback<Invite>() {
 ////                @Override
 ////                public void onComplete(Invite invite) {
 ////                    Log.d("TAG", "succeed adding new invite.");

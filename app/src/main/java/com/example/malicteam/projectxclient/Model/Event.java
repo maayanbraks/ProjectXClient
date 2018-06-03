@@ -78,7 +78,7 @@ public class Event implements Serializable {
         this.description = "";
         this.EventStartTime = "";
         this.isRecording = true;
-        this.isConverted=false;
+        this.isConverted = false;
     }
 
     @Ignore
@@ -125,6 +125,7 @@ public class Event implements Serializable {
         this.date = dateFormat.format(d);
         this.id = Integer.valueOf(id);
         this.EventStartTime = time;
+        this.isConverted = false;
 
     }
 
@@ -139,55 +140,53 @@ public class Event implements Serializable {
         Date d = new Date();
         this.date = eventData.getDateCreated();
         this.id = eventData.getId();
-        //TODO
         //set the starttime to eventdata starttime
-        this.EventStartTime = " " ;
-        this.isConverted=eventData.getIsConverted();
-        this.isRecording=eventData.getIsRecording();
+        this.EventStartTime = " ";
+        if(eventData.getIsConverted() != null)
+            this.isConverted = eventData.getIsConverted();
+        else
+            this.isConverted = false;
+        this.isRecording = eventData.getIsRecording();
     }
-    public String getParticipatsFirstNames(){
-        String namesOfParticipats="";
-            if (participats!=null)
-            {
-                for (int i=0;i<participats.size();i++)
-                {
-                    if (i==0) {
-                        namesOfParticipats=participats.get(i).getFirstName();
-                                            }
-                    else {
-                        namesOfParticipats=namesOfParticipats+","+participats.get(i).getFirstName();
-                    }
-                }
-                return namesOfParticipats;
-            }
-            return null;
-    }
-    public String getParticipatsFullNames(){
-        String namesOfParticipats="";
-        if (participats!=null)
-        {
-            for (int i=0;i<participats.size();i++)
-            {
-                if (i==0) {
-                    namesOfParticipats=participats.get(i).getFirstName()+" "+participats.get(i).getLastName();
-                }
-                else {
-                    namesOfParticipats=namesOfParticipats+","+participats.get(i).getFirstName()+" "+participats.get(i).getLastName();
+
+    public String getParticipatsFirstNames() {
+        String namesOfParticipats = "";
+        if (participats != null) {
+            for (int i = 0; i < participats.size(); i++) {
+                if (i == 0) {
+                    namesOfParticipats = participats.get(i).getFirstName();
+                } else {
+                    namesOfParticipats = namesOfParticipats + "," + participats.get(i).getFirstName();
                 }
             }
             return namesOfParticipats;
         }
         return null;
     }
+
+    public String getParticipatsFullNames() {
+        String namesOfParticipats = "";
+        if (participats != null) {
+            for (int i = 0; i < participats.size(); i++) {
+                if (i == 0) {
+                    namesOfParticipats = participats.get(i).getFirstName() + " " + participats.get(i).getLastName();
+                } else {
+                    namesOfParticipats = namesOfParticipats + "," + participats.get(i).getFirstName() + " " + participats.get(i).getLastName();
+                }
+            }
+            return namesOfParticipats;
+        }
+        return null;
+    }
+
     public String getEventStartTime() {
         return EventStartTime;
     }
-    public Boolean isUserConatin(User user)
-    {
-        for (int i=0;i<participats.size();i++)
-        {
-        if (user.getId()==participats.get(i).getId())
-            return true;
+
+    public Boolean isUserConatin(User user) {
+        for (int i = 0; i < participats.size(); i++) {
+            if (user.getId() == participats.get(i).getId())
+                return true;
         }
         return false;
     }
@@ -208,15 +207,14 @@ public class Event implements Serializable {
         this.participats.add(user);
     }
 
-    public void delFromParticipats(User user)
-    {
+    public void delFromParticipats(User user) {
         this.participats.remove(user);
-        for (int i=0;i<participats.size();i++)
-        {
-            if (user.getId()==participats.get(i).getId())
+        for (int i = 0; i < participats.size(); i++) {
+            if (user.getId() == participats.get(i).getId())
                 participats.remove(i);
         }
     }
+
     public String getTitle() {
         return title;
     }

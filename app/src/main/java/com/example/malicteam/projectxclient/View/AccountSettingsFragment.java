@@ -123,7 +123,7 @@ public class AccountSettingsFragment extends Fragment {
 
     private void initProfilePicture() {
 //        Repository.instance.getProfilePicture(
-//                new CloudManager.CloudCallback<Bitmap>() {
+//                new CloudManager.CloudManagerCallback<Bitmap>() {
 //                    @Override
 //                    public void onComplete(Bitmap data) {
 //                        if (data != null) {
@@ -175,12 +175,6 @@ public class AccountSettingsFragment extends Fragment {
                 //Open picture dialog
                 PictureDialogFragment pictureDialog = new PictureDialogFragment();
                 pictureDialog.show(getActivity().getSupportFragmentManager(), "ProfilePictureDialog");
-                //Todo move it to main activity (open picture dialog)
-//                getActivity().getSupportFragmentManager().beginTransaction()
-//                        .replace(R.id.Layout_container, pictureDialog,"ProfilePictureDialog")
-//                        .addToBackStack(null)
-//                        .commit();
-
             }
         });
 
@@ -236,11 +230,11 @@ public class AccountSettingsFragment extends Fragment {
     }
 
     private void saveProfilePicture(View view) {
-//        Repository.instance.saveProfilePicture(bitmap, viewModel.getUser().getValue().getEmail(), new CloudManager.CloudCallback<String>() {
+//        Repository.instance.saveProfilePicture(bitmap, viewModel.getUser().getValue().getEmail(), new CloudManager.CloudManagerCallback<String>() {
 //            @Override
 //            public void onComplete(String url) {
 //                if (url != null)
-//                    Repository.instance.setPictureUrl(bitmap, new CloudManager.CloudCallback<Boolean>() {
+//                    Repository.instance.setPictureUrl(bitmap, new CloudManager.CloudManagerCallback<Boolean>() {
 //                        @Override
 //                        public void onComplete(Boolean data) {
 //                            if (data == true) {

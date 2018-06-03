@@ -86,7 +86,7 @@
 //                    @Override
 //                    public void onClick(DialogInterface dialog, int which) {
 //                        emailString = input.getText().toString();
-//                        Repository.instance.addFriend(emailString, new CloudManager.CloudCallback<Boolean>() {
+//                        Repository.instance.addFriend(emailString, new CloudManager.CloudManagerCallback<Boolean>() {
 //                            @Override
 //                            public void onComplete(Boolean data) {
 //                                if (data) {
@@ -126,7 +126,7 @@
 //////                    builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
 //////                        @Override
 //////                        public void onClick(DialogInterface dialog, int which) {
-//////                            Repository.instance.deleteFromFriends(waitForAction.getId(), new FirebaseModel.CloudCallback<Boolean>() {
+//////                            Repository.instance.deleteFromFriends(waitForAction.getId(), new FirebaseModel.CloudManagerCallback<Boolean>() {
 //////                                @Override
 //////                                public void onComplete(Boolean data) {
 //////                                    if (data != null) {

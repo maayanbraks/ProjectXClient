@@ -26,10 +26,10 @@ public class LoginActivity extends Activity {
 
     private EditText inputEmail, inputPassword;
     private ProgressBar progressBar;
-    private Button btnSignup, btnLogin, btnReset;
+    private Button btnSignup, btnLogin;//, btnReset;
 
-    private final String DEFAULT_USER = "GalMail";
-    private final String DEFAULT_PASSWORD = "B";
+    private final String DEFAULT_USER = "MaayanMail";
+    private final String DEFAULT_PASSWORD = "C";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +56,7 @@ public class LoginActivity extends Activity {
     private void initButtons() {
         btnSignup = (Button) findViewById(R.id.btn_signup);
         btnLogin = (Button) findViewById(R.id.btn_login);
-        btnReset = (Button) findViewById(R.id.btn_reset_password);
+//        btnReset = (Button) findViewById(R.id.btn_reset_password);
         btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,12 +64,12 @@ public class LoginActivity extends Activity {
                 finish();
             }
         });
-        btnReset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
-            }
-        });
+//        btnReset.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
+//            }
+//        });
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -180,7 +180,6 @@ public class LoginActivity extends Activity {
 //                        break;
 //                        default:
 //                        Log.d("TAG","Login succefull");
-//                        //TODO
 //                        // toast and then new intent
 //                          Toast.makeText(getApplicationContext(), "logging in", Toast.LENGTH_SHORT).show();
 //                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);

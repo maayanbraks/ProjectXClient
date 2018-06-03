@@ -1,7 +1,6 @@
 package com.example.malicteam.projectxclient.Model;
 
 import android.arch.lifecycle.Observer;
-import android.os.Build;
 import android.util.Log;
 
 //import com.github.nkzawa.emitter.Emitter;
@@ -9,7 +8,6 @@ import android.util.Log;
 //import com.github.nkzawa.socketio.client.Socket;
 
 import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
-import com.example.malicteam.projectxclient.Common.Callbacks.SendAudioCallback;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
 
 import Notifications.EventCloseNotificationData;
@@ -23,9 +21,11 @@ import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,7 +38,7 @@ import static java.lang.Thread.sleep;
  */
 
 public class CloudManager {
-    public interface CloudCallback<T> {
+    public interface CloudManagerCallback<T> {
         void onComplete(T data);
 
         void onCancel();
@@ -47,11 +47,9 @@ public class CloudManager {
     public static final CloudManager instance = new CloudManager();
 
     //    private final String SERVER_ADDRESS = "http://192.168.27.1:8080";
+    private final String EVENT_CONNECT = "Connect";//Login + Register
     private final String SERVER_ADDRESS = "http://193.106.55.95:8080";
-    private final String SERVER_ADDRESS_Audio = "http://193.106.55.95";
-    private final int SERVER_AUDIO_EVENT_PORT = 8082;
-    private final int SERVER_AUDIO_DATASET_PORT = 8081;
-    private CloudCallback<String> localCallbackCloudManager;
+    private CloudManagerCallback<String> localCallbackCloudManager;
     private RecordingActivityCallback recordingActivityCallback;
     private Observer<Event> mainActivityInvitesCallback;
     private Observer<Integer> mainActivityProtocolCallback;
@@ -102,7 +100,7 @@ public class CloudManager {
     public boolean connectToServer() throws URISyntaxException {
         IO.Options opts = new IO.Options();
         socket = IO.socket(SERVER_ADDRESS, opts);
-        initListeners();//todo MAYBE - move into the if - why listen if there is no connection?
+        initListeners();
         socket.connect();
         if (isConnected)
             return true;
@@ -169,8 +167,7 @@ public class CloudManager {
                         e.printStackTrace();
                     }
 
-                }else
-                {
+                } else {
                     mainActivityInvitesCallback.onChanged(new Event(eventInvitationNotificationData.getEventData()));
                     return;
                 }
@@ -179,18 +176,16 @@ public class CloudManager {
                 UserJoinEventNotification userJoinEventNotification = ProductTypeConverters.getObjectFromString(data, UserJoinEventNotification.class);
                 if (recordingActivityCallback != null) {
                     //try {
-                        //sleep(1000);
-                        recordingActivityCallback.userJoinEvent(new User(userJoinEventNotification.getUserData()));
-                        return;
-                  //  } catch (InterruptedException e) {
-                      //  e.printStackTrace();
-                  //  }
-
-                }
-                else
-                   // recordingActivityCallback.userJoinEvent(new User(userJoinEventNotification.getUserData()));
+                    //sleep(1000);
+                    recordingActivityCallback.userJoinEvent(new User(userJoinEventNotification.getUserData()));
                     return;
+                    //  } catch (InterruptedException e) {
+                    //  e.printStackTrace();
+                    //  }
 
+                } else
+                    // recordingActivityCallback.userJoinEvent(new User(userJoinEventNotification.getUserData()));
+                    return;
 
 
             case UserLeaveEvent:
@@ -221,8 +216,7 @@ public class CloudManager {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                }else
-                {
+                } else {
                     recordingActivityCallback.eventClosed(new Event(eventCloseNotificationData.getEventData()));
                     return;
                 }
@@ -236,8 +230,7 @@ public class CloudManager {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                }else
-                {
+                } else {
                     mainActivityProtocolCallback.onChanged(protocolReadyNotificationData.getEventData().getId());
                     return;
                 }
@@ -254,93 +247,147 @@ public class CloudManager {
 //    }
 //
 
-    public void sendToServer(String serverEvent, Object requestObject, final CloudCallback<String> cloudManagerCallback) {
+    public void sendToServer(String serverEvent, Object requestObject, final CloudManagerCallback<String> cloudManagerCallback) {
         localCallbackCloudManager = cloudManagerCallback;
         String jsonString = ProductTypeConverters.getStringFromObject(requestObject);
         Log.d("TAG", "sendEvent " + jsonString);
         socket.emit(serverEvent, jsonString);
     }
 
-    public void loginRequest(Object obj, final CloudCallback<String> cloudManagerCallback) {
+    public void loginRequest(Object obj, final CloudManagerCallback<String> cloudManagerCallback) {
+        if (!isConnected) {
+            try {
+                isConnected = connectToServer();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
         localCallbackCloudManager = cloudManagerCallback;
         String jsonString = ProductTypeConverters.getStringFromObject(obj);
-        Log.d("TAG", "Connect " + jsonString);
-        socket.emit("Connect", jsonString);
+        Log.d("TAG", "sendLoginEvent " + jsonString);
+        socket.emit(EVENT_CONNECT, jsonString);
     }
-    public void registerRequest(Object obj, final CloudCallback<String> cloudManagerCallback) {
+
+    public void registerRequest(Object obj, final CloudManagerCallback<String> cloudManagerCallback) {
+        if (!isConnected) {
+            try {
+                isConnected = connectToServer();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
         localCallbackCloudManager = cloudManagerCallback;
         String jsonString = ProductTypeConverters.getStringFromObject(obj);
-        Log.d("TAG", "Connect " + jsonString);
-        socket.emit("Connect", jsonString);
+        Log.d("TAG", "Register " + jsonString);
+        socket.emit(EVENT_CONNECT, jsonString);
     }
-    public void disconnect() {
+
+    ////////////////////////
+    //New Methods For Wav//
+    ///////////////////////
+    public interface SendAudioCallback<T> {
+        void onSuccees(T data);
+
+        void onError(T error);
+
+    }
+
+    private final String SERVER_ADDRESS_Audio = "193.106.55.95";
+    private final int SERVER_AUDIO_EVENT_PORT = 8082;
+    private final int SERVER_AUDIO_DATASET_PORT = 8081;
+
+    public void sendEvent(int eventId, byte[] data, final SendAudioCallback<Boolean> callback) throws IOException {
+        int responseFromServer = 0;
+        java.net.Socket sock = new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_EVENT_PORT);
+
+        DataOutputStream outToServer = new DataOutputStream(sock.getOutputStream());
+        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        outToServer.writeBytes(eventId + "\n");
+
+        //wait for acknowlage
+        responseFromServer = inFromServer.read();
+//        if (responseFromServer == 0) {
+//            callback.onError(false);
+//            return;
+//        }
+        //SendData
+        outToServer.writeBytes(data.length + "\n");
+        responseFromServer = inFromServer.read();
+        baos.write(data);
+        baos.writeTo(outToServer);
+//
+//        try {
+//            outToServer.write(data);
+//        } catch (IOException e1) {
+//            e1.printStackTrace();
+//        }
+        if (responseFromServer == 0) {
+            Log.d("TAG", "responseFromServerError=" + responseFromServer);
+            callback.onError(false);
+        } else if (responseFromServer == 1) {
+            Log.d("TAG", "OK=" + responseFromServer);
+            callback.onSuccees(true);
+        }
+        inFromServer.close();
+        outToServer.close();
+        baos.close();
+        sock.close();
+
+    }
+
+    public void sendDataSet(int userId, String lengthOfRecord, byte[] data, final SendAudioCallback<Boolean> callback) throws IOException {
+        int responseFromServer = 0;
+        java.net.Socket sock = new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_DATASET_PORT);
+
+        DataOutputStream outToServer = new DataOutputStream(sock.getOutputStream());
+        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        outToServer.writeBytes(userId + "\n");
+
+        //wait for acknowlage
+        responseFromServer = inFromServer.read();
+
+        //need to send Length of DataSet before the Record
+        outToServer.writeBytes(lengthOfRecord + "\n");
+        responseFromServer = inFromServer.read();
+        if (responseFromServer == 0) //send the AudioByt
+        {
+            callback.onError(false);
+            return;
+        }
+
+        //Send Data
+        outToServer.writeBytes(data.length + "\n");
+        responseFromServer = inFromServer.read();
+        baos.write(data);
+        baos.writeTo(outToServer);
+        responseFromServer = inFromServer.read();
+        if (responseFromServer == 0) {
+            Log.d("TAG", "responseFromServerError=" + responseFromServer);
+            callback.onError(false);
+        } else if (responseFromServer == 1) {
+            Log.d("TAG", "OK=" + responseFromServer);
+            callback.onSuccees(true);
+        }
+        inFromServer.close();
+        outToServer.close();
+        baos.close();
+        sock.close();
+    }
+
+
+    public void disconnect(CloudManagerCallback<Boolean> callback) {
         socket.disconnect();
+        isConnected = false;
+        callback.onComplete(true);
 //        IO.Options opts = new IO.Options();
 //        try {
 //            socket = IO.socket(SERVER_ADDRESS, opts);
 //        } catch (URISyntaxException e) {
 //            e.printStackTrace();
 //        }
-    }
-    public void SendAudioToServer(String path, int userOrEventId, int typeOfAudio,int lengthOfRecord, final SendAudioCallback callback) throws IOException {
-        //1=EventId ,0=UserId (Eventid=audio of conversetion,UserId for dataset)
-        java.net.Socket sock;
-
-        String responeFromServer="";
-        Path fileLocation = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            fileLocation = Paths.get(path);
-        }
-        byte[] data = null;
-        try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                data = Files.readAllBytes(fileLocation);
-            }
-            if (typeOfAudio==1)
-                 sock=new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_EVENT_PORT);
-            else
-                sock=new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_DATASET_PORT);
-
-            //send int to Server
-            DataOutputStream outToServer= new DataOutputStream(sock.getOutputStream());
-            outToServer.write(userOrEventId);
-
-            //wait for acknowlage
-            BufferedReader inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-            responeFromServer= inFromServer.readLine();
-            if (!(responeFromServer.equals("OK"))) {
-                callback.UserOrEventIdNotExist("Error:IN sending eventorUserID=" + responeFromServer);
-                return;
-            }
-            if (typeOfAudio==0) { //need to send Length before the Record
-                outToServer.write(lengthOfRecord);
-                responeFromServer= inFromServer.readLine();
-                Log.d("TAG","Respone on legnth="+responeFromServer);
-                if (!(responeFromServer.equals("OK"))) //send the AudioByt
-                {
-                    callback.UserOrEventIdNotExist("Error:IN sending LengthofAudio=" + responeFromServer);
-                    return;
-                }
-            }
-                try {
-                    outToServer.write(data);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-             if (responeFromServer.equals("Error:RecivingTheAudioFile")) {
-                Log.d("TAG", "responefromServerError=" + responeFromServer);
-                callback.UserOrEventIdNotExist("Error:RecivingTheAudioFile");
-            }
-            else if (responeFromServer.equals("OK")) {
-                Log.d("TAG", "OK=" + responeFromServer);
-                callback.onSuccees("");
-            }
-            sock.close();
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
     }
 }

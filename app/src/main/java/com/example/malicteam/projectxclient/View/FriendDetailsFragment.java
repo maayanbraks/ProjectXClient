@@ -75,7 +75,7 @@ public class FriendDetailsFragment extends Fragment {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             mListener.deleteFriend(user);
-//                            Repository.instance.deleteFromFriends(user.getId(), new CloudManager.CloudCallback<Boolean>() {
+//                            Repository.instance.deleteFromFriends(user.getId(), new CloudManager.CloudManagerCallback<Boolean>() {
 //                                @Override
 //                                public void onComplete(Boolean data) {
 //                                    if (data) {
@@ -135,7 +135,7 @@ public class FriendDetailsFragment extends Fragment {
 
         //Profile Picture
 //        Repository.instance.getProfilePicture(user.getPictureUrl(),
-//                new CloudManager.CloudCallback<Bitmap>() {
+//                new CloudManager.CloudManagerCallback<Bitmap>() {
 //                    @Override
 //                    public void onComplete(Bitmap data) {
 //                        if (data != null) {

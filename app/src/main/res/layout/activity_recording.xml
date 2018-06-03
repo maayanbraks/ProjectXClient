@@ -152,4 +152,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/participants_recording" />
 
+    <!--style="@style/?android:attr/progressBarStyle"-->
+    <ProgressBar
+        android:id="@+id/progressBar_Recording"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="56dp"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toStartOf="@+id/buttonPlayStart"
+        app:layout_constraintStart_toEndOf="@+id/buttonRecordStart"
+        app:layout_constraintTop_toBottomOf="@+id/recording_date" />
+
 </android.support.constraint.ConstraintLayout>

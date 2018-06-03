@@ -64,7 +64,6 @@ public class SignupActivity extends AppCompatActivity {
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Todo check if logged in already
                 Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
@@ -94,7 +93,6 @@ public class SignupActivity extends AppCompatActivity {
                     @Override
                     public void onSuccees(Boolean data) {
                         if (data) {
-                            //Todo Update Profile Picture
                             makeToastLong("Welcome...");
                             Intent intent = new Intent(SignupActivity.this, MainActivity.class);
                             intent.putExtra(Consts.USER, newUser);
@@ -127,7 +125,7 @@ public class SignupActivity extends AppCompatActivity {
 //                                    Toast.makeText(SignupActivity.this, "Thank you for registering", Toast.LENGTH_SHORT).show();
 //
 //                                    if (bitmap != null) {
-//                                        Repository.instance.saveProfilePicture(bitmap, email, new CloudManager.CloudCallback<String>() {
+//                                        Repository.instance.saveProfilePicture(bitmap, email, new CloudManager.CloudManagerCallback<String>() {
 //                                            @Override
 //                                            public void onComplete(String url) {
 //                                                User newUser;
@@ -138,7 +136,7 @@ public class SignupActivity extends AppCompatActivity {
 //                                                    newUser = new User(firstName.getText().toString(), lastName.getText().toString(), phone.getText().toString(), inputEmail.getText().toString(),
 //                                                            new LinkedList<Integer>(), new LinkedList<Integer>());
 //
-//                                                Repository.instance.addNewUserToDB(newUser, new CloudManager.CloudCallback<User>() {
+//                                                Repository.instance.addNewUserToDB(newUser, new CloudManager.CloudManagerCallback<User>() {
 //                                                    @Override
 //                                                    public void onComplete(User data) {
 //
@@ -168,7 +166,7 @@ public class SignupActivity extends AppCompatActivity {
 //                                        });
 //                                    } else {
 //                                        Repository.instance.addNewUserToDB(new User(firstName.getText().toString(), lastName.getText().toString(), phone.getText().toString(), inputEmail.getText().toString(),
-//                                                new LinkedList<Integer>(), new LinkedList<Integer>()), new CloudManager.CloudCallback<User>() {
+//                                                new LinkedList<Integer>(), new LinkedList<Integer>()), new CloudManager.CloudManagerCallback<User>() {
 //                                            @Override
 //                                            public void onComplete(User data) {
 //                                                if (data == null)
@@ -276,7 +274,5 @@ public class SignupActivity extends AppCompatActivity {
                 profilePicture.setImageBitmap(bitmap);
             }
         }
-
-        //TODO add handle upload picture
     }
 }

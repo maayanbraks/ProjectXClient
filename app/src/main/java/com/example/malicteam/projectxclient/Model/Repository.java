@@ -14,13 +14,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.AudioFormat;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
-import android.webkit.URLUtil;
 
 import com.example.malicteam.projectxclient.Common.Callbacks.AddEventCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.AddFriendCallback;
@@ -35,25 +33,18 @@ import com.example.malicteam.projectxclient.Common.Callbacks.EventListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.FriendsListCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.LeaveEventCallBack;
 import com.example.malicteam.projectxclient.Common.Callbacks.LogInCallback;
-import com.example.malicteam.projectxclient.Common.Callbacks.MainActivityCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.ProtocolRequestCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.RecordingActivityCallback;
 import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
-import com.example.malicteam.projectxclient.View.Dialogs.LogoutDialogFragment;
 import com.example.malicteam.projectxclient.ViewModel.FriendsViewModel;
 //import com.google.firebase.auth.FirebaseAuth;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -82,7 +73,7 @@ public class Repository {
 //            if (userLiveData == null) {
 //                userLiveData = new MutableLiveData<User>();
 //                FirebaseAuth auth = FirebaseAuth.getInstance();
-//                FirebaseModel.getUserAndObserve(Integer.toString(id), new CloudManager.CloudCallback<User>() {
+//                FirebaseModel.getUserAndObserve(Integer.toString(id), new CloudManager.CloudManagerCallback<User>() {
 //                    @Override
 //                    public void onComplete(User data) {
 //                        if (data != null)
@@ -136,7 +127,7 @@ public class Repository {
         synchronized (this) {
             if (eventsLiveData == null) {
                 eventsLiveData = new MutableLiveData<List<Event>>();
-                getEventsFromServer(new EventListCallback<List<Event>>(){
+                getEventsFromServer(new EventListCallback<List<Event>>() {
                     @Override
                     public void onSuccees(List<Event> data) {
                         if (data != null) eventsLiveData.postValue(data);
@@ -157,8 +148,8 @@ public class Repository {
         return eventsLiveData;
     }
 
-    public void disconnectFromServer() {
-        CloudManager.instance.disconnect();
+    public void disconnectFromServer(CloudManager.CloudManagerCallback<Boolean> callback) {
+        CloudManager.instance.disconnect(callback);
     }
 
     public void getFriendsMain(FriendsViewModel.FriendsViewModelCallback<LiveData<List<User>>> callback) {
@@ -203,7 +194,7 @@ public class Repository {
 //            someUser.add(new MutableLiveData<>());
 //
 //            FirebaseAuth auth = FirebaseAuth.getInstance();
-//            FirebaseModel.getSomeUserAndObserve(Integer.toString(id), new CloudManager.CloudCallback<User>() {
+//            FirebaseModel.getSomeUserAndObserve(Integer.toString(id), new CloudManager.CloudManagerCallback<User>() {
 //                @Override
 //                public void onComplete(User data) {
 //                    someUser.get(someUser.size() - 1).setValue(data);
@@ -218,24 +209,24 @@ public class Repository {
 //        return someUser.get(someUser.size() - 1);
 //    }
 
-//    public void getUserById(int id, final CloudManager.CloudCallback<List<User>> callback) {
+//    public void getUserById(int id, final CloudManager.CloudManagerCallback<List<User>> callback) {
 //        FirebaseModel.getUserById(id, callback);
 //    }
 //
-//    public void getEventById(int id, final CloudManager.CloudCallback<List<Event>> callback) {
+//    public void getEventById(int id, final CloudManager.CloudManagerCallback<List<Event>> callback) {
 //        FirebaseModel.getEventById(id, callback);
 //    }
 
-//    public void getEventRecordingStatus(int id, CloudManager.CloudCallback<List<Boolean>> callback) {
+//    public void getEventRecordingStatus(int id, CloudManager.CloudManagerCallback<List<Boolean>> callback) {
 //        FirebaseModel.getEventRecordingStatus(id, callback);
 //    }
 
-//    public void addFriend(String email, final CloudManager.CloudCallback<Boolean> cloudCallback) {
+//    public void addFriend(String email, final CloudManager.CloudManagerCallback<Boolean> cloudCallback) {
 //        FirebaseAuth auth = FirebaseAuth.getInstance();
 //        int userId = User.generateId(auth.getCurrentUser().getEmail());
 //        //List<User> _friendsList = new LinkedList<>();
 //
-//        FirebaseModel.initFriendsList(userId, new CloudManager.CloudCallback<List<User>>() {
+//        FirebaseModel.initFriendsList(userId, new CloudManager.CloudManagerCallback<List<User>>() {
 //            @Override
 //            public void onComplete(List<User> friendsList) {
 //                boolean found = false;
@@ -249,7 +240,7 @@ public class Repository {
 //                //if it not exist
 //                if (!found) {
 //                    //check if it Signed user
-//                    FirebaseModel.isExistUser(User.generateId(email), new CloudManager.CloudCallback<Integer>() {
+//                    FirebaseModel.isExistUser(User.generateId(email), new CloudManager.CloudManagerCallback<Integer>() {
 //                        @Override
 //                        public void onComplete(Integer friendId) {//ok - go on
 //                            if (friendId != null && friendId > 0) {
@@ -294,7 +285,7 @@ public class Repository {
 //                }
 //
 //                //2. get all students records that where updated since last update date
-//                FirebaseModel.initFriendsList(userId, new CloudManager.CloudCallback<List<User>>() {
+//                FirebaseModel.initFriendsList(userId, new CloudManager.CloudManagerCallback<List<User>>() {
 //                    @Override
 //                    public void onComplete(List<User> data) {
 //                        updateFriendsDataInLocalStorage(data);
@@ -309,9 +300,9 @@ public class Repository {
 //        return FriendsLiveData;
 //    }
 
-    //    public void initFriendsList(int userId, final CloudManager.CloudCallback<List<User>> callback) {
+    //    public void initFriendsList(int userId, final CloudManager.CloudManagerCallback<List<User>> callback) {
 //        FirebaseAuth auth = FirebaseAuth.getInstance();
-//        FirebaseModel.initFriendsList(userId, new CloudManager.CloudCallback<List<User>>() {
+//        FirebaseModel.initFriendsList(userId, new CloudManager.CloudManagerCallback<List<User>>() {
 //            @Override
 //            public void onComplete(List<User> data) {
 //                updateFriendsDataInLocalStorage(data);
@@ -326,9 +317,9 @@ public class Repository {
 //    }
 
 
-//    public void getEvents(int userId, CloudManager.CloudCallback<List<Event>> cloudCallback) {
+//    public void getEvents(int userId, CloudManager.CloudManagerCallback<List<Event>> cloudCallback) {
 //        FirebaseAuth auth = FirebaseAuth.getInstance();
-//        FirebaseModel.getEvents(userId, new CloudManager.CloudCallback<List<Event>>() {
+//        FirebaseModel.getEvents(userId, new CloudManager.CloudManagerCallback<List<Event>>() {
 //            @Override
 //            public void onComplete(List<Event> data) {
 //                cloudCallback.onComplete(data);
@@ -346,10 +337,10 @@ public class Repository {
         task.execute(data);
     }
 
-//    public void deleteFromFriends(int friendId, final CloudManager.CloudCallback<Boolean> cloudCallback) {
+//    public void deleteFromFriends(int friendId, final CloudManager.CloudManagerCallback<Boolean> cloudCallback) {
 //        FirebaseAuth auth = FirebaseAuth.getInstance();
 //        int userId = User.generateId(auth.getCurrentUser().getEmail());
-//        FirebaseModel.initFriendsList(userId, new CloudManager.CloudCallback<List<User>>() {
+//        FirebaseModel.initFriendsList(userId, new CloudManager.CloudManagerCallback<List<User>>() {
 //            @Override
 //            public void onComplete(List<User> data) {
 //                boolean found = false;
@@ -376,7 +367,7 @@ public class Repository {
 //        });
 //    }
 //
-//    public void changeUserDetails(String firstName, String lastName, String email, String phone, final CloudManager.CloudCallback<String> cloudCallback) {
+//    public void changeUserDetails(String firstName, String lastName, String email, String phone, final CloudManager.CloudManagerCallback<String> cloudCallback) {
 //        FirebaseAuth auth = FirebaseAuth.getInstance();
 //        int userId = User.generateId(auth.getCurrentUser().getEmail());
 //
@@ -403,48 +394,48 @@ public class Repository {
 //    }
 //
 //
-//    public void setPictureUrl(Bitmap bitmap, final CloudManager.CloudCallback<Boolean> cloudCallback) {
+//    public void setPictureUrl(Bitmap bitmap, final CloudManager.CloudManagerCallback<Boolean> cloudCallback) {
 //        FirebaseAuth auth = FirebaseAuth.getInstance();
 //        int id = User.generateId(auth.getCurrentUser().getEmail());
 //        FirebaseModel.setPictureUrl(id, bitmap, cloudCallback);
 //    }
 //
-//    public void saveRecord(String Path, String eventId, final Model.SaveAudioListener listener, CloudManager.CloudCallback callback) {
+//    public void saveRecord(String Path, String eventId, final Model.SaveAudioListener listener, CloudManager.CloudManagerCallback callback) {
 //        FirebaseModel.saveRecord(Path, eventId, listener, callback);
 //    }
 //
-//    public void saveRecord(String userId, String Path, String eventId, final Model.SaveAudioListener listener, CloudManager.CloudCallback callback) {
+//    public void saveRecord(String userId, String Path, String eventId, final Model.SaveAudioListener listener, CloudManager.CloudManagerCallback callback) {
 //        FirebaseModel.saveRecord(userId, Path, eventId, listener, callback);
 //    }
 //
-//    public void removeAccount(final CloudManager.CloudCallback<Boolean> cloudCallback) {
+//    public void removeAccount(final CloudManager.CloudManagerCallback<Boolean> cloudCallback) {
 //        FirebaseModel.removeAccount(cloudCallback);
 //    }
 //
-//    public void removeInvite(final CloudManager.CloudCallback<Boolean> callback, Invite invite) {
+//    public void removeInvite(final CloudManager.CloudManagerCallback<Boolean> callback, Invite invite) {
 //        FirebaseModel.removeInvite(callback, invite);
 //    }
 //
 //
-//    public void addNewUserToDB(User user, final CloudManager.CloudCallback cloudCallback) {
+//    public void addNewUserToDB(User user, final CloudManager.CloudManagerCallback cloudCallback) {
 //        FirebaseModel.addUser(user, cloudCallback);
 //    }
 //
-//    public void addNewInvite(Invite invite, final CloudManager.CloudCallback callback) {
+//    public void addNewInvite(Invite invite, final CloudManager.CloudManagerCallback callback) {
 //        FirebaseModel.addInvite(invite);
 //    }
 //
-//    public void getInvite(String id, final CloudManager.CloudCallback callback, FirebaseModel.GetInvitation invitation) {
+//    public void getInvite(String id, final CloudManager.CloudManagerCallback callback, FirebaseModel.GetInvitation invitation) {
 //        FirebaseModel.getInvite(id, invitation);
 //
 //    }
 //
-//    public void setEventList(User user, CloudManager.CloudCallback callback) {
+//    public void setEventList(User user, CloudManager.CloudManagerCallback callback) {
 //        FirebaseModel.setEventList(user, callback);
 //
 //    }
 //
-//    public void setRecodrdingStatus(String eventId, CloudManager.CloudCallback callback) {
+//    public void setRecodrdingStatus(String eventId, CloudManager.CloudManagerCallback callback) {
 //        FirebaseModel.setRecordingStatus(eventId, callback);
 //
 //    }
@@ -473,7 +464,7 @@ public class Repository {
 //        auth.signOut();
 //    }
 
-//    public void getProfilePicture(String url, final CloudManager.CloudCallback<Bitmap> cloudCallback) {
+//    public void getProfilePicture(String url, final CloudManager.CloudManagerCallback<Bitmap> cloudCallback) {
 //        if (url == null || url.equals("")) {
 //            cloudCallback.onCancel();
 //        } else {
@@ -484,7 +475,7 @@ public class Repository {
 //            if (image != null) {
 //                cloudCallback.onComplete(image);
 //            } else {
-//                FirebaseModel.getImage(url, new CloudManager.CloudCallback<Bitmap>() {
+//                FirebaseModel.getImage(url, new CloudManager.CloudManagerCallback<Bitmap>() {
 //                    @Override
 //                    public void onComplete(Bitmap data) {
 //                        cloudCallback.onComplete(data);
@@ -500,7 +491,7 @@ public class Repository {
 //    }
 
 //    //Default user (connected user)
-//    public void getProfilePicture(final CloudManager.CloudCallback<Bitmap> cloudCallback) {
+//    public void getProfilePicture(final CloudManager.CloudManagerCallback<Bitmap> cloudCallback) {
 //        String url = userLiveData.getValue().getPictureUrl();
 //        if (url == null || url.equals("")) {
 //            cloudCallback.onCancel();
@@ -512,7 +503,7 @@ public class Repository {
 //            if (image != null) {
 //                cloudCallback.onComplete(image);
 //            } else {
-//                FirebaseModel.getImage(url, new CloudManager.CloudCallback<Bitmap>() {
+//                FirebaseModel.getImage(url, new CloudManager.CloudManagerCallback<Bitmap>() {
 //                    @Override
 //                    public void onComplete(Bitmap data) {
 //                        cloudCallback.onComplete(data);
@@ -527,7 +518,7 @@ public class Repository {
 //        }
 //    }
 //
-//    public void saveProfilePicture(Bitmap bitmap, String email, final CloudManager.CloudCallback cloudCallback) {
+//    public void saveProfilePicture(Bitmap bitmap, String email, final CloudManager.CloudManagerCallback cloudCallback) {
 //
 //        FirebaseModel.saveImage(bitmap, User.generateId(email), new Model.SaveImageListener() {
 //            @Override
@@ -573,7 +564,7 @@ public class Repository {
     //New Server Methods
     public void logIn(String username, String password, final LogInCallback<User> callback) {
         LoginRequestData loginRequestData = new LoginRequestData(username, password);
-        CloudManager.instance.loginRequest(loginRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.loginRequest(loginRequestData, new CloudManager.CloudManagerCallback<String>() {
             @Override
             public void onComplete(String response) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(response, ResponseData.class);
@@ -618,7 +609,7 @@ public class Repository {
 
     public void getProtocol(int eventId, final ProtocolRequestCallback<List<ProtocolLine>> callback) {
         EventProtocolRequestData protocolRequestData = new EventProtocolRequestData(userLiveData.getValue().getEmail(), eventId);
-        CloudManager.instance.sendToServer("Request", protocolRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", protocolRequestData, new CloudManager.CloudManagerCallback<String>() {
             @Override
             public void onComplete(String response) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(response, ResponseData.class);
@@ -658,7 +649,7 @@ public class Repository {
         //init request
         EditContactsListRequestData editContactsListRequestData = new EditContactsListRequestData(userLiveData.getValue().getEmail(), friendList);
         //send request
-        CloudManager.instance.sendToServer("Request", editContactsListRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", editContactsListRequestData, new CloudManager.CloudManagerCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
@@ -698,7 +689,7 @@ public class Repository {
         //init request
         AddFriendRequestData addFriendRequestData = new AddFriendRequestData(userLiveData.getValue().getEmail(), email);
         //send request
-        CloudManager.instance.sendToServer("Request", addFriendRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", addFriendRequestData, new CloudManager.CloudManagerCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
@@ -744,7 +735,7 @@ public class Repository {
         //Init the get friends/contacts list of  User (by email).
         ContactsListRequestData contactsListRequestData = new ContactsListRequestData(userLiveData.getValue().getEmail());
         //send request
-        CloudManager.instance.sendToServer("Request", contactsListRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", contactsListRequestData, new CloudManager.CloudManagerCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
@@ -786,11 +777,11 @@ public class Repository {
         //Init the get friends/contacts list of  User (by email).
         IsUserExistRequestData IsUserExistResponseData = new IsUserExistRequestData(userLiveData.getValue().getEmail(), email);
         //send request
-        CloudManager.instance.sendToServer("Request", IsUserExistResponseData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", IsUserExistResponseData, new CloudManager.CloudManagerCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
-               // Log.d("TAG","oiasdjadjdjkaspdojaspdojasdojassdoj+gettype="+responseData.getType());
+                // Log.d("TAG","oiasdjadjdjkaspdojaspdojasdojassdoj+gettype="+responseData.getType());
                 switch (responseData.getType()) {
                     case Error:
                         ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
@@ -805,7 +796,7 @@ public class Repository {
                                 break;
                         }
                     case IsUserExistResponse:
-                     //   Log.d("TAG","IsUserExistResponeseoasjdsodjdsjdodjasd");
+                        //   Log.d("TAG","IsUserExistResponeseoasjdsodjdsjdodjasd");
                         IsUserExistResponseData response = ProductTypeConverters.getObjectFromString(data, IsUserExistResponseData.class);
                         callback.onSuccees(response.getUserData());
                         break;
@@ -822,61 +813,80 @@ public class Repository {
         });
     }
 
-    private float getDurationAsMinutesFromFile(String filePath){
+    private int getDurationAsSecondsFromFile(String filePath) {
         Uri uri = Uri.parse(filePath);
         MediaMetadataRetriever mmr = new MediaMetadataRetriever();
-        mmr.setDataSource(MyApp.getContext(),uri);
+        mmr.setDataSource(MyApp.getContext(), uri);
         String durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        float duration = Float.parseFloat(durationStr) / 1000 / 60; //Milliseconds => Seconds => Minutes
-        Log.d("TAG", "Data set time is " + duration + " Minutes");
+        int duration = Integer.parseInt(durationStr) / 1000; //Milliseconds => Seconds
+        Log.d("TAG", "Data set time is " + duration + " Seconds");
         return duration;
     }
 
-    public void uploadDataSet(String filePath, final DataSetCallback callback){
+    public void uploadDataSet(String filePath, final DataSetCallback callback) {
         //get duration
-        float minutes = getDurationAsMinutesFromFile(filePath);
+        int seconds = getDurationAsSecondsFromFile(filePath);
 
         //Convert File to byte[]
         byte[] audioBytes = null;
         try {
             audioBytes = ProductTypeConverters.convertFileToByte(filePath);
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d("TAG", e.getStackTrace() + e.getMessage());
         }
-        //Create request
-        DataSetRequestData dataSetRequestData = new DataSetRequestData(userLiveData.getValue().getEmail(), audioBytes, minutes);
-        CloudManager.instance.sendToServer("Request", dataSetRequestData, new CloudManager.CloudCallback<String>() {
-            @Override
-            public void onComplete(String response) {
-                ResponseData responseData = ProductTypeConverters.getObjectFromString(response, ResponseData.class);
-                //Create To ResponseData
-                //Checke type
-                //BY the type -> create refrence ResponseData
-                switch (responseData.getType()) {
-                    case Error:
-                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(response, ErrorResponseData.class);
-                        switch (errorResponseData.getErrorType()) {
-                            case TechnicalError:
-                                callback.TechnicalError();
-                                return;
-                            default:
-                                return;
-                        }
-                    case DataSetResponseData:
-                        DataSetResponseData dataSetResponseData = ProductTypeConverters.getObjectFromString(response, DataSetResponseData.class);
-                        userLiveData.getValue().setDataSetTime(dataSetResponseData.getUpdatedLength());
-                        callback.onSuccees(dataSetResponseData.getUpdatedLength());
-                        return;
-                    default:
-                        break;
+
+        try {
+            CloudManager.instance.sendDataSet(userLiveData.getValue().getId(), String.valueOf(seconds) + "\n", audioBytes, new CloudManager.SendAudioCallback<Boolean>() {
+                @Override
+                public void onSuccees(Boolean data) {
+                    Log.d("TAG", "Repositoty -> SendDataSet -> On Succees = :)");
+                    float newTime = (((float)seconds) / 60) + userLiveData.getValue().getDataSetTime();
+                    userLiveData.getValue().setDataSetTime(newTime);
+                    callback.onSuccees(newTime);
                 }
-            }
 
-            @Override
-            public void onCancel() {
-
-            }
-        });
+                @Override
+                public void onError(Boolean error) {
+                    Log.d("TAG", "Repositoty -> SendDataSet -> On Error (Boolean 0)");
+                }
+            });
+        } catch (Exception e) {
+            Log.d("TAG", "Repositoty -> SendDataSet -> IO Exception " + e.getMessage());
+        }
+//        //Create request
+//        DataSetRequestData dataSetRequestData = new DataSetRequestData(userLiveData.getValue().getEmail(), audioBytes, minutes);
+//        CloudManager.instance.sendToServer("Request", dataSetRequestData, new CloudManager.CloudManagerCallback<String>() {
+//            @Override
+//            public void onComplete(String response) {
+//                ResponseData responseData = ProductTypeConverters.getObjectFromString(response, ResponseData.class);
+//                //Create To ResponseData
+//                //Checke type
+//                //BY the type -> create refrence ResponseData
+//                switch (responseData.getType()) {
+//                    case Error:
+//                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(response, ErrorResponseData.class);
+//                        switch (errorResponseData.getErrorType()) {
+//                            case TechnicalError:
+//                                callback.TechnicalError();
+//                                return;
+//                            default:
+//                                return;
+//                        }
+//                    case DataSetResponseData:
+//                        DataSetResponseData dataSetResponseData = ProductTypeConverters.getObjectFromString(response, DataSetResponseData.class);
+//                        userLiveData.getValue().setDataSetTime(dataSetResponseData.getUpdatedLength());
+//                        callback.onSuccees(dataSetResponseData.getUpdatedLength());
+//                        return;
+//                    default:
+//                        break;
+//                }
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//
+//            }
+//        });
     }
 
     public void closeEvent(String[] protocol, int eventId, String filePath, final CloseEventCallback callback) {
@@ -884,46 +894,61 @@ public class Repository {
         byte[] audioBytes = null;
         try {
             audioBytes = ProductTypeConverters.convertFileToByte(filePath);
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.d("TAG", e.getStackTrace() + e.getMessage());
         }
-        byte[] audio=new byte[20];
+        try {
+            CloudManager.instance.sendEvent(eventId, audioBytes, new CloudManager.SendAudioCallback<Boolean>() {
+                @Override
+                public void onSuccees(Boolean data) {
+                    Log.d("TAG", "Repositoty -> CloseEvent -> On Succees = :)");
+                    callback.onSuccees();
+                }
+
+                @Override
+                public void onError(Boolean error) {
+                    Log.d("TAG", "Repositoty -> CloseEvent -> On Error (Boolean 0)");
+                }
+            });
+        } catch (Exception e) {
+            Log.d("TAG", "Repositoty -> CloseEvent -> IO Exception " + e.getMessage());
+        }
         //audio=audioBytes.
         //Init the get friends/contacts list of  User (by email).
-        CloseEventRequestData closeEventRequestData = new CloseEventRequestData(userLiveData.getValue().getEmail(), eventId, audioBytes);
+//   OLD     CloseEventRequestData closeEventRequestData = new CloseEventRequestData(userLiveData.getValue().getEmail(), eventId, audioBytes);
 
         //send request
-        CloudManager.instance.sendToServer("Request", closeEventRequestData, new CloudManager.CloudCallback<String>() {
-            @Override
-            public void onComplete(String data) {
-                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
-                switch (responseData.getType()) {
-                    case Error:
-                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
-                        switch (errorResponseData.getErrorType()) {
-                            case UserIsNotExist:
-                                callback.UserIsNotExist();
-                                break;
-                            case FriendIsNotExist:
-                                callback.EventIsNotExist();
-                            case TechnicalError:
-                                callback.TechnicalError();
-                                break;
-                            default:
-                                break;
-                        }
-                    case Boolean: // this momment if boolean it mean ALWAS TRUE
-                        callback.onSuccees();
-                        break;
-                    default:
-                        return;
-                }
-            }
-
-            @Override
-            public void onCancel() {
-            }
-        });
+//        CloudManager.instance.sendToServer("Request", closeEventRequestData, new CloudManager.CloudManagerCallback<String>() {
+//            @Override
+//            public void onComplete(String data) {
+//                ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
+//                switch (responseData.getType()) {
+//                    case Error:
+//                        ErrorResponseData errorResponseData = ProductTypeConverters.getObjectFromString(data, ErrorResponseData.class);
+//                        switch (errorResponseData.getErrorType()) {
+//                            case UserIsNotExist:
+//                                callback.UserIsNotExist();
+//                                break;
+//                            case FriendIsNotExist:
+//                                callback.EventIsNotExist();
+//                            case TechnicalError:
+//                                callback.TechnicalError();
+//                                break;
+//                            default:
+//                                break;
+//                        }
+//                    case Boolean: // this momment if boolean it mean ALWAS TRUE
+//                        callback.onSuccees();
+//                        break;
+//                    default:
+//                        return;
+//                }
+//            }
+//
+//            @Override
+//            public void onCancel() {
+//            }
+//        });
     }
 
     public void deleteFromFriends(User friend) {
@@ -938,12 +963,6 @@ public class Repository {
             if (lists.length > 0) {
                 List<User> data = lists[0];
                 long lastUpdateDate = 0;
-//                try {
-////                    lastUpdateDate = MyApp.getContext()
-////                            .getSharedPreferences("TAG", MODE_PRIVATE).getLong("lastUpdateDate", 0);
-//                }catch (Exception e){
-//
-//                }
                 if (data != null && data.size() > 0) {
                     //3. update the local DB
                     long reacentUpdate = lastUpdateDate;
@@ -983,7 +1002,7 @@ public class Repository {
         //Init the get friends/contacts list of  User (by email).
         EventsListRequestData eventsListRequestData = new EventsListRequestData(userLiveData.getValue().getEmail());
         //send request
-        CloudManager.instance.sendToServer("Request", eventsListRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", eventsListRequestData, new CloudManager.CloudManagerCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
@@ -1027,7 +1046,7 @@ public class Repository {
         //Init the get friends/contacts list of  User (by email).
         ConfirmEventRequestData confirmEventRequestData = new ConfirmEventRequestData(userLiveData.getValue().getEmail(), eventId);
         //send request
-        CloudManager.instance.sendToServer("Request", confirmEventRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", confirmEventRequestData, new CloudManager.CloudManagerCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
@@ -1062,7 +1081,7 @@ public class Repository {
         //Init the get friends/contacts list of  User (by email).
         LeaveEventRequestData leaveEventRequestData = new LeaveEventRequestData(userLiveData.getValue().getEmail(), eventId);
         //send request
-        CloudManager.instance.sendToServer("Request", leaveEventRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", leaveEventRequestData, new CloudManager.CloudManagerCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
@@ -1098,7 +1117,7 @@ public class Repository {
         //Init the get friends/contacts list of  User (by email).
         DeclineEventRequestData declineEventRequestData = new DeclineEventRequestData(userLiveData.getValue().getEmail(), eventId);
         //send request
-        CloudManager.instance.sendToServer("Request", declineEventRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", declineEventRequestData, new CloudManager.CloudManagerCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
@@ -1145,7 +1164,7 @@ public class Repository {
 
     public void addEvent(List<String> usersMails, Event event, final AddEventCallback<Integer> callback) {
         CreateEventRequestData createEventRequestData = new CreateEventRequestData(userLiveData.getValue().getEmail(), usersMails, event.getTitle(), event.getDescription());
-        CloudManager.instance.sendToServer("Request", createEventRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", createEventRequestData, new CloudManager.CloudManagerCallback<String>() {
             @Override
             public void onComplete(String response) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(response, ResponseData.class);
@@ -1166,8 +1185,8 @@ public class Repository {
                                 return;
                         }
                     case CreateEvent:
-                        CreateEventResponseData createEventResponseData=ProductTypeConverters.getObjectFromString(response, CreateEventResponseData.class);
-                            callback.onSuccees(createEventResponseData.getId());
+                        CreateEventResponseData createEventResponseData = ProductTypeConverters.getObjectFromString(response, CreateEventResponseData.class);
+                        callback.onSuccees(createEventResponseData.getId());
                     default:
                         break;
                 }
@@ -1178,9 +1197,6 @@ public class Repository {
 
             }
 
-            //TODO add locally DB
-            //TODO create Content file and save locally
-            //TODO save firebase content
             String url = "";
 
             //FirebaseModel.addNewEvent(event);
@@ -1188,7 +1204,6 @@ public class Repository {
 
 //    public File getContentFile(){
 //
-//        //TODO get content image
 //
 //    }
         });
@@ -1197,7 +1212,7 @@ public class Repository {
 
     public void editUser(String firstName, String lastName, String email, String phone, EditUserCallback<Boolean> callback) {
         EditUserRequestData editUserRequestData = new EditUserRequestData(email, firstName, lastName, phone, "Israel", userLiveData.getValue().getPictureUrl());
-        CloudManager.instance.sendToServer("Request", editUserRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.sendToServer("Request", editUserRequestData, new CloudManager.CloudManagerCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);
@@ -1230,7 +1245,7 @@ public class Repository {
 
     public void createUser(User user, String credential, CreateUserCallback<Boolean> callback) {
         CreateUserRequestData createUserRequestData = new CreateUserRequestData(user.getEmail(), credential, user.getFirstName(), user.getLastName(), user.getPhoneNumber(), null, null);
-        CloudManager.instance.registerRequest(createUserRequestData, new CloudManager.CloudCallback<String>() {
+        CloudManager.instance.registerRequest(createUserRequestData, new CloudManager.CloudManagerCallback<String>() {
             @Override
             public void onComplete(String data) {
                 ResponseData responseData = ProductTypeConverters.getObjectFromString(data, ResponseData.class);

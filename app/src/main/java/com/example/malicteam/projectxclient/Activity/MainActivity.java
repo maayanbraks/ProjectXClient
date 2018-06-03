@@ -42,6 +42,7 @@ import com.example.malicteam.projectxclient.Common.Callbacks.ProtocolRequestCall
 import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
+import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.View.Dialogs.AddFriendFragment;
 import com.example.malicteam.projectxclient.View.Dialogs.ChangeDetailsFragment;
 import com.example.malicteam.projectxclient.View.Dialogs.DataSetAlertDialogFragment;
@@ -70,6 +71,9 @@ import ResponsesEntitys.UserData;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.AccountSettingsInteraction, EventsListFragment.EventListListener,
         FriendsListFragment.FriendsFragmentInteraction, NewEventFragment.NewEventInteraction, EventDetailsFragment.EventDetailsInteraction,
         ResetPasswordFragment.ResetPasswordListener, AddFriendFragment.AddFriendInteraction, ChangeDetailsFragment.DetailsDialogInteraction, DataSetAlertDialogFragment.DataSetAlertInteraction {
+
+    //Floating Button
+    private FloatingActionButton fab;
 
     //LiveData
     private UserViewModel currentUser = null;
@@ -180,10 +184,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //End of
         //Floating add button
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.record_fab);
+        fab = (FloatingActionButton) findViewById(R.id.record_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                handleFloatingButton(false);
                 Fragment fragment = null;
                 Bundle bundle = new Bundle();
                 bundle.putSerializable(Consts.USER, currentUser.getUser().getValue());
@@ -214,6 +219,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void loadMainFragment() {
+        handleFloatingButton(true);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -293,7 +299,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 })
                 .setPositiveButton("Yes :(", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        finish();
+                        Repository.instance.disconnectFromServer(new CloudManager.CloudManagerCallback<Boolean>() {
+                            @Override
+                            public void onComplete(Boolean data) {
+                                finish();
+                            }
+
+                            @Override
+                            public void onCancel() {
+                                finish();
+                            }
+                        });
                     }
 
                 });
@@ -323,6 +339,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
+    private void handleFloatingButton(boolean show){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(show){
+                    fab.setVisibility(View.VISIBLE);
+                    fab.setClickable(true);
+                }
+                else{
+                    fab.setVisibility(View.INVISIBLE);
+                    fab.setClickable(false);
+                }
+            }
+        });
+
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -332,18 +365,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = menuItem.getItemId();
         switch (id) {
             case R.id.nav_settings_account:
+                handleFloatingButton(true);
                 bundle.putSerializable(Consts.USER, currentUser.getUser().getValue());
                 fragmentClass = AccountSettingsFragment.class;
                 break;
             case R.id.nav_events_list:
+                handleFloatingButton(true);
                 bundle.putInt(Consts.USER_ID, userId);
                 fragmentClass = EventsListFragment.class;
                 break;
             case R.id.nav_friends_list:
+                handleFloatingButton(true);
                 bundle.putInt(Consts.USER_ID, userId);
                 fragmentClass = FriendsListFragment.class;
                 break;
             case R.id.nav_events_new:
+                handleFloatingButton(false);
                 bundle.putSerializable(Consts.USER, currentUser.getUser().getValue());
                 fragmentClass = NewEventFragment.class;
                 break;
@@ -383,7 +420,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void updateProfilePicture(String url) {
         ImageView profilePic = (ImageView) headerLayout.findViewById(R.id.userPic_head);
 //        Repository.instance.getProfilePicture(
-//                new CloudManager.CloudCallback<Bitmap>() {
+//                new CloudManager.CloudManagerCallback<Bitmap>() {
 //                    @Override
 //                    public void onComplete(Bitmap data) {
 //                        try {
@@ -402,50 +439,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //        );
     }
 
-    /////////////////////////////////////////////////////////////////////////
-    public void Invitation(final Invite invite) {
-        final Context context = this;
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-
-        // set title
-        alertDialogBuilder.setTitle("You got new Invitation, from " + invite.getInviteFromId());
-
-        // set dialog message
-        alertDialogBuilder
-                .setCancelable(false)
-                .setNegativeButton("Decline", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        //  declineToInvite(invite);
-                        //Todo make delined to invite
-                        // dialog.cancel();
-                    }
-                })
-                .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        Log.d("TAG", "You have agreed invite");
-                        //   agreeToInvite(invite);
-                        //Todo make Agree to evnet
-                        // GetInEvent(invite.getEventId());
-                        // MainActivity.this.finish();
-                    }
-
-                });
-
-        // create alert dialog
-        AlertDialog alertDialog = alertDialogBuilder.create();
-
-        // show it
-        if (!((Activity) context).isFinishing()) {
-            alertDialog.show();
-        }
-    }
-
     public void agreeToInvite(Event event) {
-        //TODO get in to event
         //tell server we agreed
-
         //get in to event.
-
         Repository.instance.AgreeToInvite(event.getId(), new AgreeToEventCallback<Boolean>() {
             @Override
             public void onSuccees(Boolean data) {
@@ -462,32 +458,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Toast.makeText(MyApp.getContext(), "Error:UserIsNotExist", Toast.LENGTH_SHORT).show();
             }
         });
-
-
-//        Repository.instance.removeInvite(new FirebaseModel.Callback<Boolean>() {
-//            @Override
-//            public void onComplete(Boolean data) {
-//            }
-//        }, invite);
-        //Add event to myeventlist/
         Log.d("TAG", "invitegetevnetid=" + event.getId());
-//        currentUser.getUser().getValue().addEventToList(Integer.valueOf(eventInvitationNotificationData.getEventId()));
-        //update the userDatabase
-//        Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudCallback() {
-//            @Override
-//            public void onComplete(Object data) {
-//
-//            }
-//
-//            @Override
-//            public void onCancel() {
-//
-//            }
-//        });
     }
 
     public void declineToInvite(Event event) {
-        //TODO
         //tell server we declined.
         Repository.instance.DeclineToInvite(event.getId(), new DeclineToEventCallback<Boolean>() {
             @Override
@@ -614,7 +588,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 ////                    }
 ////                });
 ////            }
-//////                                Repository.instance.deleteFromFriends(friend.getId(), new CloudManager.CloudCallback<Boolean>() {
+//////                                Repository.instance.deleteFromFriends(friend.getId(), new CloudManager.CloudManagerCallback<Boolean>() {
 //////                                    @Override
 //////                                    public void onComplete(Boolean data) {
 //////                                        if (data) {
@@ -662,8 +636,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void GetInvation(Event event) {
-
-        //todo
         //open dialog with information
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(MainActivity.this);
 
@@ -676,15 +648,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .setNegativeButton("Decline", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         declineToInvite(event);
-                        //Todo make delined to invite
-                        // dialog.cancel();
                     }
                 })
                 .setPositiveButton("Agree", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         Log.d("TAG", "You have agreed invite");
                         agreeToInvite(event);
-                        //Todo make Agree to evnet
                         // GetInEvent(invite.getEventId());
                         // MainActivity.this.finish();
                     }
@@ -873,7 +842,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void logout() {
-        Repository.instance.disconnectFromServer();
+        Repository.instance.disconnectFromServer(new CloudManager.CloudManagerCallback<Boolean>() {
+            @Override
+            public void onComplete(Boolean data) {
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        });
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(intent);
         finish();

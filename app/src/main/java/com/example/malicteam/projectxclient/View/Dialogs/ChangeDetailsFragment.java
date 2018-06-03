@@ -53,7 +53,7 @@ public class ChangeDetailsFragment extends DialogFragment {
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         mListener.edit(_first, _last, _phone);
-//                        Repository.instance.changeUserDetails(_first, _last, _phone, new CloudManager.CloudCallback<String>() {
+//                        Repository.instance.changeUserDetails(_first, _last, _phone, new CloudManager.CloudManagerCallback<String>() {
 //                            @Override
 //                            public void onComplete(String data) {
 //                                if (data != null && data != "")

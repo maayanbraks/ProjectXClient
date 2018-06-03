@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -36,7 +37,7 @@ public class DataSetActivity extends AppCompatActivity {
     private String mFileName = null;
     private boolean permissionToRecordAccepted = false;
 
-    private User myUser;
+    private User myUser;//No Live Data
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,13 +87,15 @@ public class DataSetActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+//        super.onBackPressed();
         backClicked();
     }
 
     private void backClicked() {
         final String title = "Are you sure you want to leave?";
-        final String msg = "If you leave this record will be stopped.";
+        String msg = "";
+        if (recorder.isRecording())
+            msg = "If you leave this record will be stopped.";
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
         // set title
         alertDialogBuilder.setTitle(title);
@@ -108,8 +111,10 @@ public class DataSetActivity extends AppCompatActivity {
                 })
                 .setPositiveButton("Yes :(", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        stopRecord();
-                        uploadDataSet();
+                        if (recorder.isRecording()) {
+                            stopRecord();
+                            uploadDataSet();
+                        }
                         finish();
                     }
                 });
@@ -132,7 +137,8 @@ public class DataSetActivity extends AppCompatActivity {
     }
 
     private void uploadDataSet() {
-        Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_SHORT).show();
+        ProgressBar pb = (ProgressBar) findViewById(R.id.progressBar_dataSet);
+        Toast.makeText(getApplication(), "Uploading...", Toast.LENGTH_LONG).show();
         //Upoload
         Repository.instance.uploadDataSet(mFileName, new DataSetCallback() {
             @Override
@@ -142,6 +148,7 @@ public class DataSetActivity extends AppCompatActivity {
 
             @Override
             public void onSuccees(float newLength) {
+                pb.setVisibility(View.VISIBLE);
                 myUser.setDataSetTime(newLength);
             }
         });
