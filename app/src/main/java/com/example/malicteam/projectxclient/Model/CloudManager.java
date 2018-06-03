@@ -21,11 +21,15 @@ import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static java.lang.Thread.sleep;
 
@@ -293,24 +297,32 @@ public class CloudManager {
     private final int SERVER_AUDIO_DATASET_PORT = 8081;
 
     public void sendEvent(int eventId, byte[] data, final SendAudioCallback<Boolean> callback) throws IOException {
-        int responseFromServer;
+        int responseFromServer = 0;
         java.net.Socket sock = new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_EVENT_PORT);
-        //send int to Server
+
         DataOutputStream outToServer = new DataOutputStream(sock.getOutputStream());
-        outToServer.write(eventId);
-        //wait for acknowlage
         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        outToServer.writeBytes(eventId + "\n");
+
+        //wait for acknowlage
         responseFromServer = inFromServer.read();
-        if (responseFromServer == 0) {
-            callback.onError(false);
-            return;
-        }
+//        if (responseFromServer == 0) {
+//            callback.onError(false);
+//            return;
+//        }
         //SendData
-        try {
-            outToServer.write(data);
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
+        outToServer.writeBytes(data.length + "\n");
+        responseFromServer = inFromServer.read();
+        baos.write(data);
+        baos.writeTo(outToServer);
+//
+//        try {
+//            outToServer.write(data);
+//        } catch (IOException e1) {
+//            e1.printStackTrace();
+//        }
         if (responseFromServer == 0) {
             Log.d("TAG", "responseFromServerError=" + responseFromServer);
             callback.onError(false);
@@ -318,41 +330,40 @@ public class CloudManager {
             Log.d("TAG", "OK=" + responseFromServer);
             callback.onSuccees(true);
         }
+        inFromServer.close();
+        outToServer.close();
+        baos.close();
         sock.close();
 
     }
 
     public void sendDataSet(int userId, String lengthOfRecord, byte[] data, final SendAudioCallback<Boolean> callback) throws IOException {
-        int responseFromServer;
+        int responseFromServer = 0;
         java.net.Socket sock = new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_DATASET_PORT);
-        //send int to Server
+
         DataOutputStream outToServer = new DataOutputStream(sock.getOutputStream());
-        outToServer.write(userId);
-        //wait for acknowlage
         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        outToServer.writeBytes(userId + "\n");
+
+        //wait for acknowlage
         responseFromServer = inFromServer.read();
-        if (responseFromServer == 0) {
-            callback.onError(false);
-            return;
-        }
+
         //need to send Length of DataSet before the Record
-        PrintWriter pw = new PrintWriter(sock.getOutputStream(), true);
-        pw.write(lengthOfRecord);
-        pw.flush();
-//        outToServer.write(lengthOfRecord);
+        outToServer.writeBytes(lengthOfRecord + "\n");
         responseFromServer = inFromServer.read();
-        Log.d("TAG", "Response on length=" + responseFromServer);
         if (responseFromServer == 0) //send the AudioByt
         {
             callback.onError(false);
             return;
         }
+
         //Send Data
-        try {
-            outToServer.write(data);
-        } catch (IOException e1) {
-            e1.printStackTrace();
-        }
+        outToServer.writeBytes(data.length + "\n");
+        responseFromServer = inFromServer.read();
+        baos.write(data);
+        baos.writeTo(outToServer);
         responseFromServer = inFromServer.read();
         if (responseFromServer == 0) {
             Log.d("TAG", "responseFromServerError=" + responseFromServer);
@@ -361,8 +372,10 @@ public class CloudManager {
             Log.d("TAG", "OK=" + responseFromServer);
             callback.onSuccees(true);
         }
+        inFromServer.close();
+        outToServer.close();
+        baos.close();
         sock.close();
-
     }
 
 
