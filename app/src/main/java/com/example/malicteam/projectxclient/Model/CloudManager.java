@@ -299,12 +299,13 @@ public class CloudManager {
 
     public void sendEvent(int eventId, byte[] data, final SendAudioCallback<Boolean> callback) throws IOException {
         SenderObject obj = new SenderObject(eventId, null, data);
-        FileSender f = new FileSender();
-        boolean res = f.doInBackground(obj);
-        if(res == true)
-            callback.onSuccees(res);
-        else
-            callback.onError(res);
+        new FileSender().execute(obj);
+//        boolean res = f.doInBackground(obj);
+//        if(res == true)
+//            callback.onSuccees(res);
+//        else
+//            callback.onError(res);
+        Log.d("TAG","ASDF");
 //        int responseFromServer = 0;
 //        java.net.Socket sock = new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_EVENT_PORT);
 

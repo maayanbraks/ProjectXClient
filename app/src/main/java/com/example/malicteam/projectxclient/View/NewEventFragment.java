@@ -344,7 +344,7 @@ public class NewEventFragment extends Fragment {
                         checkBox.setChecked(false);
                         usersInvitesEmail.remove(friend);
                         usersInvitesNames.remove(fullName);
-                        _invites.setText("Participats:" + ProductTypeConverters.GenerateStringFromList(usersInvitesNames));
+                        _invites.setText("Participats: " + ProductTypeConverters.GenerateStringFromList(usersInvitesNames));
                     } else {
                         v.setBackgroundColor(CHECKED_COLOR);
                         checkBox.setChecked(true);

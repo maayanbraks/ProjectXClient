@@ -40,6 +40,8 @@ public class FileSender extends AsyncTask<SenderObject, Void, Boolean> {
 
             //wait for acknowlage
             responseFromServer = inFromServer.read();
+            Log.d("TAG","GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG  " + responseFromServer);
+
 
             if (obj.getLengthOfRecord() != null) {
                 //need to send Length of DataSet before the Record
