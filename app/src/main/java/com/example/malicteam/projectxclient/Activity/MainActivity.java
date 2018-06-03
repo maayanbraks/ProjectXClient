@@ -42,6 +42,7 @@ import com.example.malicteam.projectxclient.Common.Callbacks.ProtocolRequestCall
 import com.example.malicteam.projectxclient.Common.Callbacks.isUserExistResponeCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
+import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.View.Dialogs.AddFriendFragment;
 import com.example.malicteam.projectxclient.View.Dialogs.ChangeDetailsFragment;
 import com.example.malicteam.projectxclient.View.Dialogs.DataSetAlertDialogFragment;
@@ -70,6 +71,9 @@ import ResponsesEntitys.UserData;
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AccountSettingsFragment.AccountSettingsInteraction, EventsListFragment.EventListListener,
         FriendsListFragment.FriendsFragmentInteraction, NewEventFragment.NewEventInteraction, EventDetailsFragment.EventDetailsInteraction,
         ResetPasswordFragment.ResetPasswordListener, AddFriendFragment.AddFriendInteraction, ChangeDetailsFragment.DetailsDialogInteraction, DataSetAlertDialogFragment.DataSetAlertInteraction {
+
+    //Floating Button
+    private FloatingActionButton fab;
 
     //LiveData
     private UserViewModel currentUser = null;
@@ -180,10 +184,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         //End of
         //Floating add button
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.record_fab);
+        fab = (FloatingActionButton) findViewById(R.id.record_fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                handleFloatingButton(false);
                 Fragment fragment = null;
                 Bundle bundle = new Bundle();
                 bundle.putSerializable(Consts.USER, currentUser.getUser().getValue());
@@ -214,6 +219,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void loadMainFragment() {
+        handleFloatingButton(true);
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -293,8 +299,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 })
                 .setPositiveButton("Yes :(", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        Repository.instance.disconnectFromServer();
-                        finish();
+                        Repository.instance.disconnectFromServer(new CloudManager.CloudManagerCallback<Boolean>() {
+                            @Override
+                            public void onComplete(Boolean data) {
+                                finish();
+                            }
+
+                            @Override
+                            public void onCancel() {
+                                finish();
+                            }
+                        });
                     }
 
                 });
@@ -324,6 +339,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
+    private void handleFloatingButton(boolean show){
+        if(show){
+            fab.setVisibility(View.VISIBLE);
+            fab.setClickable(true);
+        }
+        else{
+            fab.setVisibility(View.INVISIBLE);
+            fab.setClickable(false);
+        }
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -333,18 +359,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = menuItem.getItemId();
         switch (id) {
             case R.id.nav_settings_account:
+                handleFloatingButton(true);
                 bundle.putSerializable(Consts.USER, currentUser.getUser().getValue());
                 fragmentClass = AccountSettingsFragment.class;
                 break;
             case R.id.nav_events_list:
+                handleFloatingButton(true);
                 bundle.putInt(Consts.USER_ID, userId);
                 fragmentClass = EventsListFragment.class;
                 break;
             case R.id.nav_friends_list:
+                handleFloatingButton(true);
                 bundle.putInt(Consts.USER_ID, userId);
                 fragmentClass = FriendsListFragment.class;
                 break;
             case R.id.nav_events_new:
+                handleFloatingButton(false);
                 bundle.putSerializable(Consts.USER, currentUser.getUser().getValue());
                 fragmentClass = NewEventFragment.class;
                 break;
@@ -384,7 +414,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void updateProfilePicture(String url) {
         ImageView profilePic = (ImageView) headerLayout.findViewById(R.id.userPic_head);
 //        Repository.instance.getProfilePicture(
-//                new CloudManager.CloudCallback<Bitmap>() {
+//                new CloudManager.CloudManagerCallback<Bitmap>() {
 //                    @Override
 //                    public void onComplete(Bitmap data) {
 //                        try {
@@ -552,7 +582,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 ////                    }
 ////                });
 ////            }
-//////                                Repository.instance.deleteFromFriends(friend.getId(), new CloudManager.CloudCallback<Boolean>() {
+//////                                Repository.instance.deleteFromFriends(friend.getId(), new CloudManager.CloudManagerCallback<Boolean>() {
 //////                                    @Override
 //////                                    public void onComplete(Boolean data) {
 //////                                        if (data) {
@@ -806,7 +836,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void logout() {
-        Repository.instance.disconnectFromServer();
+        Repository.instance.disconnectFromServer(new CloudManager.CloudManagerCallback<Boolean>() {
+            @Override
+            public void onComplete(Boolean data) {
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onCancel() {
+
+            }
+        });
         Intent intent = new Intent(MainActivity.this, LoginActivity.class);
         startActivity(intent);
         finish();

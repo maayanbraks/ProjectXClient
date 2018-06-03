@@ -87,6 +87,8 @@
             android:text="Invites:" />
 
         <android.support.v4.widget.NestedScrollView
+
+            android:layout_marginTop="8dp"
             android:id="@+id/contatsContainer_newEvents"
             android:layout_width="match_parent"
             android:layout_height="200dp"

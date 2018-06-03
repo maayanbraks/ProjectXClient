@@ -42,7 +42,7 @@
 //
 //    //Firebase Methods
 //    //Users
-////    public static void getUserAndObserve(String id, final CloudManager.CloudCallback<User> cloudCallback) {
+////    public static void getUserAndObserve(String id, final CloudManager.CloudManagerCallback<User> cloudCallback) {
 ////        FirebaseDatabase database = FirebaseDatabase.getInstance();
 ////        DatabaseReference myRef = database.getReference("Users").child(id);
 ////
@@ -74,7 +74,7 @@
 ////        });
 ////    }
 //
-////    public static void getSomeUserAndObserve(String id, final CloudManager.CloudCallback<User> cloudCallback) {
+////    public static void getSomeUserAndObserve(String id, final CloudManager.CloudManagerCallback<User> cloudCallback) {
 ////        FirebaseDatabase database = FirebaseDatabase.getInstance();
 ////        DatabaseReference myRef = database.getReference("Users").child(id);
 ////
@@ -108,7 +108,7 @@
 ////        });
 ////    }
 //
-////    public static void addUser(User user, CloudManager.CloudCallback<User> cloudCallback) {
+////    public static void addUser(User user, CloudManager.CloudManagerCallback<User> cloudCallback) {
 ////        try {
 ////            FirebaseDatabase database = FirebaseDatabase.getInstance();
 ////            DatabaseReference myRef = database.getReference("Users").child(Integer.toString(user.getId()));
@@ -133,7 +133,7 @@
 ////        }
 ////    }
 //
-////    public static void setRecordingStatus(String eventId, CloudManager.CloudCallback<Boolean> cloudCallback) {
+////    public static void setRecordingStatus(String eventId, CloudManager.CloudManagerCallback<Boolean> cloudCallback) {
 ////        try {
 ////            Log.d("TAG", "In setrecordingstatus func");
 ////            FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -149,7 +149,7 @@
 //    /*
 //    remove current user - from DB & Google Auth
 //     */
-////    public static void removeAccount(final CloudManager.CloudCallback<Boolean> cloudCallback) {
+////    public static void removeAccount(final CloudManager.CloudManagerCallback<Boolean> cloudCallback) {
 ////        FirebaseDatabase database = FirebaseDatabase.getInstance();
 ////        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 ////        boolean success = false;
@@ -176,7 +176,7 @@
 ////        }
 ////    }
 //
-////    public static void removeInvite(final CloudManager.CloudCallback<Boolean> callback, Invite invite) {
+////    public static void removeInvite(final CloudManager.CloudManagerCallback<Boolean> callback, Invite invite) {
 ////        FirebaseDatabase database = FirebaseDatabase.getInstance();
 ////        boolean success = false;
 ////        //Delete from DB
@@ -215,7 +215,7 @@
 //    /*
 //    get Picture and change the profile picture of user <id>
 //     */
-//    public static void setPictureUrl(int id, Bitmap bitmap, final CloudManager.CloudCallback<Boolean> cloudCallback) {
+//    public static void setPictureUrl(int id, Bitmap bitmap, final CloudManager.CloudManagerCallback<Boolean> cloudCallback) {
 //        saveImage(bitmap, id, new Model.SaveImageListener() {
 //            @Override
 //            public void complete(String url) {
@@ -234,7 +234,7 @@
 //
 //    }
 //
-//    public static void setFriends(int userId, List<User> friends, final CloudManager.CloudCallback callback) {
+//    public static void setFriends(int userId, List<User> friends, final CloudManager.CloudManagerCallback callback) {
 //        try {
 //            FirebaseDatabase database = FirebaseDatabase.getInstance();
 //            DatabaseReference myRef = database.getReference("Users").child(Integer.toString(userId)).child("FriendsList");
@@ -249,7 +249,7 @@
 //        }
 //    }
 //
-//    public static void setFriends(int userId, String friends, final CloudManager.CloudCallback<Boolean> callback) {
+//    public static void setFriends(int userId, String friends, final CloudManager.CloudManagerCallback<Boolean> callback) {
 //        try {
 //            FirebaseDatabase database = FirebaseDatabase.getInstance();
 //            DatabaseReference myRef = database.getReference("Users").child(Integer.toString(userId)).child("FriendsList");
@@ -287,7 +287,7 @@
 //        });
 //    }
 //
-//    public static void getEvents(int userId, final CloudManager.CloudCallback<List<Event>> cloudCallback) {
+//    public static void getEvents(int userId, final CloudManager.CloudManagerCallback<List<Event>> cloudCallback) {
 ////        FirebaseDatabase database = FirebaseDatabase.getInstance();
 ////        DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId)).child("EventsList");
 ////        final List<Integer>[] ids = new List[]{new LinkedList<Integer>()};
@@ -344,7 +344,7 @@
 //    }
 //
 //
-//    public static void getFriends(int userId, final CloudManager.CloudCallback<List<User>> cloudCallback) {
+//    public static void getFriends(int userId, final CloudManager.CloudManagerCallback<List<User>> cloudCallback) {
 //        FirebaseDatabase database = FirebaseDatabase.getInstance();
 //        DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId)).child("FriendsList");
 //        final List<Integer>[] ids = new List[]{new LinkedList<Integer>()};
@@ -402,7 +402,7 @@
 //
 //    }
 //
-//    public static void getUserById(int userId, final CloudManager.CloudCallback<List<User>> callback) {
+//    public static void getUserById(int userId, final CloudManager.CloudManagerCallback<List<User>> callback) {
 //        FirebaseDatabase database = FirebaseDatabase.getInstance();
 //        DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId));
 //        List<User> userList = new LinkedList<>();
@@ -426,7 +426,7 @@
 //        });
 //    }
 //
-//    public static void getEventById(int eventId, final CloudManager.CloudCallback<List<Event>> callback) {
+//    public static void getEventById(int eventId, final CloudManager.CloudManagerCallback<List<Event>> callback) {
 ////        FirebaseDatabase database = FirebaseDatabase.getInstance();
 ////        DatabaseReference idsListRef = database.getReference("Events").child(Integer.toString(eventId));
 ////        List<Event> userList = new LinkedList<>();
@@ -453,7 +453,7 @@
 ////        });
 //    }
 //
-////    public static void getEventRecordingStatus(int eventId, final CloudManager.CloudCallback<List<Boolean>> callback) {
+////    public static void getEventRecordingStatus(int eventId, final CloudManager.CloudManagerCallback<List<Boolean>> callback) {
 ////        FirebaseDatabase database = FirebaseDatabase.getInstance();
 ////        DatabaseReference idsListRef = database.getReference("Events").child(Integer.toString(eventId));
 ////        List<Boolean> checkStatus = new LinkedList<>();
@@ -476,7 +476,7 @@
 ////        });
 ////    }
 //
-//    public static void isExistUser(int id, final CloudManager.CloudCallback cloudCallback) {
+//    public static void isExistUser(int id, final CloudManager.CloudManagerCallback cloudCallback) {
 //        FirebaseDatabase database = FirebaseDatabase.getInstance();
 //        DatabaseReference myRef = database.getReference("Users").child(Integer.toString(id));
 //
@@ -501,7 +501,7 @@
 //    /*
 //    Get url & cloudCallback return Image from Firebase.
 //     */
-//    public static void getImage(String url, final CloudManager.CloudCallback<Bitmap> cloudCallback) {
+//    public static void getImage(String url, final CloudManager.CloudManagerCallback<Bitmap> cloudCallback) {
 //        if (url != null) {
 //            FirebaseStorage storage = FirebaseStorage.getInstance();
 //            StorageReference httpsReference = storage.getReferenceFromUrl(url);
@@ -598,7 +598,7 @@
 //    }
 //
 //
-//    public static void getEventsAndObserve(int userId, final CloudManager.CloudCallback<List<Event>> cloudCallback) {
+//    public static void getEventsAndObserve(int userId, final CloudManager.CloudManagerCallback<List<Event>> cloudCallback) {
 ////        FirebaseDatabase database = FirebaseDatabase.getInstance();
 ////        DatabaseReference idsListRef = database.getReference("Users").child(Integer.toString(userId)).child("EventsList");
 ////        final List<Integer>[] ids = new List[]{new LinkedList<Integer>()};
@@ -677,7 +677,7 @@
 ////        return str;
 ////    }
 //
-//    public static void setEventList(User user, CloudManager.CloudCallback<Boolean> callback) {
+//    public static void setEventList(User user, CloudManager.CloudManagerCallback<Boolean> callback) {
 //        try {
 //            FirebaseDatabase database = FirebaseDatabase.getInstance();
 //            DatabaseReference myRef = database.getReference("Users").child(Integer.toString(user.getId())).child("EventsList");
@@ -689,11 +689,11 @@
 //    }
 //
 //
-//    public static void saveRecord(String Path, String eventId, final Model.SaveAudioListener listener, final CloudManager.CloudCallback callback) {
+//    public static void saveRecord(String Path, String eventId, final Model.SaveAudioListener listener, final CloudManager.CloudManagerCallback callback) {
 //        StorageReference storageRef = _storage.getReference("Record").child(eventId);
 //    }
 //
-//    public static void saveRecord(String userId, String Path, String eventId, final Model.SaveAudioListener listener, CloudManager.CloudCallback callback) {
+//    public static void saveRecord(String userId, String Path, String eventId, final Model.SaveAudioListener listener, CloudManager.CloudManagerCallback callback) {
 //        StorageReference storageRef = _storage.getReference("Record").child(eventId).child(userId);
 //        // File or Blob
 //        Uri file;

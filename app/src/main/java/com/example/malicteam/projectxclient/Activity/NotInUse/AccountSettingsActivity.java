@@ -47,7 +47,7 @@
 //        profilePicture = (ImageView) findViewById(R.id.userPic_editAccount);
 //
 //        Repository.instance.getProfilePicture(
-//                new CloudManager.CloudCallback<Bitmap>() {
+//                new CloudManager.CloudManagerCallback<Bitmap>() {
 //                    @Override
 //                    public void onComplete(Bitmap data) {
 //                        if (data != null) {
@@ -114,7 +114,7 @@
 //            ImageView profilePic = (ImageView) findViewById(R.id.userPic_editAccount);
 //            if (user.getPictureUrl() != null) {
 //                Repository.instance.getProfilePicture(
-//                        new CloudManager.CloudCallback<Bitmap>() {
+//                        new CloudManager.CloudManagerCallback<Bitmap>() {
 //                            @Override
 //                            public void onComplete(Bitmap data) {
 //                                if (data != null) {
@@ -210,11 +210,11 @@
 //            @Override
 //            public void onClick(View v) {
 //                if (bitmap != null) {
-//                    Repository.instance.saveProfilePicture(bitmap, viewModel.getUser().getValue().getEmail(), new CloudManager.CloudCallback<String>() {
+//                    Repository.instance.saveProfilePicture(bitmap, viewModel.getUser().getValue().getEmail(), new CloudManager.CloudManagerCallback<String>() {
 //                        @Override
 //                        public void onComplete(String url) {
 //                            if (url != null)
-//                                Repository.instance.setPictureUrl(bitmap, new CloudManager.CloudCallback<Boolean>() {
+//                                Repository.instance.setPictureUrl(bitmap, new CloudManager.CloudManagerCallback<Boolean>() {
 //                                    @Override
 //                                    public void onComplete(Boolean data) {
 //                                        if (data == true) {

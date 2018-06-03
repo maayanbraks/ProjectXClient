@@ -23,7 +23,7 @@ public class RemoveAccountDialogFragment extends DialogFragment{
         builder.setMessage("Are you sure you want be removed???\n")
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-//                        Repository.instance.removeAccount(new CloudManager.CloudCallback<Boolean>() {
+//                        Repository.instance.removeAccount(new CloudManager.CloudManagerCallback<Boolean>() {
 //                            @Override
 //                            public void onComplete(Boolean data) {
 //                                if(data != null) {

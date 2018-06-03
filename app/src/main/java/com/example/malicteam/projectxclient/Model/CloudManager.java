@@ -34,7 +34,7 @@ import static java.lang.Thread.sleep;
  */
 
 public class CloudManager {
-    public interface CloudCallback<T> {
+    public interface CloudManagerCallback<T> {
         void onComplete(T data);
 
         void onCancel();
@@ -45,7 +45,7 @@ public class CloudManager {
     //    private final String SERVER_ADDRESS = "http://192.168.27.1:8080";
     private final String EVENT_CONNECT = "Connect";//Login + Register
     private final String SERVER_ADDRESS = "http://193.106.55.95:8080";
-    private CloudCallback<String> localCallbackCloudManager;
+    private CloudManagerCallback<String> localCallbackCloudManager;
     private RecordingActivityCallback recordingActivityCallback;
     private Observer<Event> mainActivityInvitesCallback;
     private Observer<Integer> mainActivityProtocolCallback;
@@ -243,21 +243,35 @@ public class CloudManager {
 //    }
 //
 
-    public void sendToServer(String serverEvent, Object requestObject, final CloudCallback<String> cloudManagerCallback) {
+    public void sendToServer(String serverEvent, Object requestObject, final CloudManagerCallback<String> cloudManagerCallback) {
         localCallbackCloudManager = cloudManagerCallback;
         String jsonString = ProductTypeConverters.getStringFromObject(requestObject);
         Log.d("TAG", "sendEvent " + jsonString);
         socket.emit(serverEvent, jsonString);
     }
 
-    public void loginRequest(Object obj, final CloudCallback<String> cloudManagerCallback) {
+    public void loginRequest(Object obj, final CloudManagerCallback<String> cloudManagerCallback) {
+        if (!isConnected) {
+            try {
+                isConnected = connectToServer();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
         localCallbackCloudManager = cloudManagerCallback;
         String jsonString = ProductTypeConverters.getStringFromObject(obj);
         Log.d("TAG", "sendLoginEvent " + jsonString);
         socket.emit(EVENT_CONNECT, jsonString);
     }
 
-    public void registerRequest(Object obj, final CloudCallback<String> cloudManagerCallback) {
+    public void registerRequest(Object obj, final CloudManagerCallback<String> cloudManagerCallback) {
+        if (!isConnected) {
+            try {
+                isConnected = connectToServer();
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
         localCallbackCloudManager = cloudManagerCallback;
         String jsonString = ProductTypeConverters.getStringFromObject(obj);
         Log.d("TAG", "Register " + jsonString);
@@ -352,8 +366,10 @@ public class CloudManager {
     }
 
 
-    public void disconnect() {
+    public void disconnect(CloudManagerCallback<Boolean> callback) {
         socket.disconnect();
+        isConnected = false;
+        callback.onComplete(true);
 //        IO.Options opts = new IO.Options();
 //        try {
 //            socket = IO.socket(SERVER_ADDRESS, opts);

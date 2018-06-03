@@ -26,7 +26,7 @@ public class LoginActivity extends Activity {
 
     private EditText inputEmail, inputPassword;
     private ProgressBar progressBar;
-    private Button btnSignup, btnLogin, btnReset;
+    private Button btnSignup, btnLogin;//, btnReset;
 
     private final String DEFAULT_USER = "RoeeMail";
     private final String DEFAULT_PASSWORD = "F";
@@ -56,7 +56,7 @@ public class LoginActivity extends Activity {
     private void initButtons() {
         btnSignup = (Button) findViewById(R.id.btn_signup);
         btnLogin = (Button) findViewById(R.id.btn_login);
-        btnReset = (Button) findViewById(R.id.btn_reset_password);
+//        btnReset = (Button) findViewById(R.id.btn_reset_password);
         btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -64,12 +64,12 @@ public class LoginActivity extends Activity {
                 finish();
             }
         });
-        btnReset.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
-            }
-        });
+//        btnReset.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                startActivity(new Intent(LoginActivity.this, ResetPasswordActivity.class));
+//            }
+//        });
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -132,7 +132,7 @@ public class NewEventFragment extends Fragment {
                 event = new Event(null, title, new LinkedList<User>(), description, myUser.getEmail(), dateFormat, 0);
                 List<User> participats = new LinkedList<>();
                 //participats.add(myUser);
-                usersInvitesEmail.add(myUser.getEmail());
+//                usersInvitesEmail.add(myUser.getEmail());
                 event.setParticipats(participats);
 //                    sendInvites("" + event.getId());
                 //Repository.instance.addEvent(event);
@@ -147,7 +147,7 @@ public class NewEventFragment extends Fragment {
                     //   try {
                     //  currentUser.getUser().getValue().addEventToList(Integer.valueOf(event.getId()));
                     //update the userDatabase
-//                                Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudCallback() {
+//                                Repository.instance.setEventList(currentUser.getUser().getValue(), new CloudManager.CloudManagerCallback() {
 //                                    @Override
 //                                    public void onComplete(Object data) {
 //                                        startActivity(intent);
@@ -304,27 +304,38 @@ public class NewEventFragment extends Fragment {
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
+            final int CHECKED_COLOR = 16777215;//white
+            final int NOT_CHECKED_COLOR = 9300220;//kind of blue
+
             if (view == null) {
                 view = getLayoutInflater().inflate(R.layout.friend_row_simple_new_event, viewGroup, false);
             }
+
             User friend = friendsList.get(i);
             CheckBox checkBox = (CheckBox) view.findViewById(R.id.checkBox_friendRow_newEvent);
+            checkBox.setVisibility(View.INVISIBLE);
             if (usersInvitesEmail.contains(friend.getEmail())) {
                 checkBox.setChecked(true);
+                view.setBackgroundResource(CHECKED_COLOR);
             } else {
                 checkBox.setChecked(false);
+                view.setBackgroundResource(NOT_CHECKED_COLOR);
             }
+
+
             //Friend Details - onClick
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     String fullName = friend.getFirstName() + " " + friend.getLastName();
-                    if (checkBox.isChecked()) {
+                    if (checkBox.isChecked()) {//if check => do unchecked
+                        v.setBackgroundResource(NOT_CHECKED_COLOR);
                         checkBox.setChecked(false);
                         usersInvitesEmail.remove(friend);
                         usersInvitesNames.remove(fullName);
                         _invites.setText("Participats:" + ProductTypeConverters.GenerateStringFromList(usersInvitesNames));
                     } else {
+                        v.setBackgroundResource(CHECKED_COLOR);
                         checkBox.setChecked(true);
                         usersInvitesEmail.add(friend.getEmail());
                         usersInvitesNames.add(fullName);
@@ -369,7 +380,7 @@ public class NewEventFragment extends Fragment {
 //        //String[] items = invites.split(",");
 ////        for (String item : items) {
 ////            Invite invite = new Invite(eventId, item, "" + userId);
-////            Repository.instance.addNewInvite(invite, new CloudManager.CloudCallback<Invite>() {
+////            Repository.instance.addNewInvite(invite, new CloudManager.CloudManagerCallback<Invite>() {
 ////                @Override
 ////                public void onComplete(Invite invite) {
 ////                    Log.d("TAG", "succeed adding new invite.");

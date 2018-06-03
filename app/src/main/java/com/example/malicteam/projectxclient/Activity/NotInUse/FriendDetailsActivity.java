@@ -64,7 +64,7 @@
 //                    builder.setPositiveButton("Yes, Delete!", new DialogInterface.OnClickListener() {
 //                        @Override
 //                        public void onClick(DialogInterface dialog, int which) {
-//                            Repository.instance.deleteFromFriends(user.getId(), new CloudManager.CloudCallback<Boolean>() {
+//                            Repository.instance.deleteFromFriends(user.getId(), new CloudManager.CloudManagerCallback<Boolean>() {
 //                                @Override
 //                                public void onComplete(Boolean data) {
 //                                    if (data) {
@@ -108,7 +108,7 @@
 //
 //        //Profile Picture
 //        Repository.instance.getProfilePicture(user.getPictureUrl(),
-//                new CloudManager.CloudCallback<Bitmap>() {
+//                new CloudManager.CloudManagerCallback<Bitmap>() {
 //                    @Override
 //                    public void onComplete(Bitmap data) {
 //                        if (data != null) {

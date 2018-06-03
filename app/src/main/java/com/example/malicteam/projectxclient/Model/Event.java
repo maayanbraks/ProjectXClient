@@ -125,6 +125,7 @@ public class Event implements Serializable {
         this.date = dateFormat.format(d);
         this.id = Integer.valueOf(id);
         this.EventStartTime = time;
+        this.isConverted = false;
 
     }
 
@@ -141,7 +142,10 @@ public class Event implements Serializable {
         this.id = eventData.getId();
         //set the starttime to eventdata starttime
         this.EventStartTime = " ";
-        this.isConverted = eventData.getIsConverted();
+        if(eventData.getIsConverted() != null)
+            this.isConverted = eventData.getIsConverted();
+        else
+            this.isConverted = false;
         this.isRecording = eventData.getIsRecording();
     }
 

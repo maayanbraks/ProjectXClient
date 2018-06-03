@@ -375,7 +375,7 @@
 //////            public void fail() {
 //////                Toast.makeText(getApplication(), "Upload failed.", Toast.LENGTH_SHORT).show();
 //////            }
-//////        }, new CloudManager.CloudCallback<Boolean>() {
+//////        }, new CloudManager.CloudManagerCallback<Boolean>() {
 //////            @Override
 //////            public void onComplete(Boolean data) {
 //////
@@ -389,7 +389,7 @@
 ////    }
 //
 //    public void SetEventFromInvitation(Event eventtemp) {
-////        Repository.instance.getEventById(Integer.valueOf(eventid), new CloudManager.CloudCallback<List<Event>>() {
+////        Repository.instance.getEventById(Integer.valueOf(eventid), new CloudManager.CloudManagerCallback<List<Event>>() {
 //
 ////            @Override
 ////            public void onComplete(List<Event> EventList) {
@@ -491,7 +491,7 @@
 //
 //
 ////    public void CheckRecordingStatus() {
-////        Repository.instance.getEventRecordingStatus(event.getId(), new CloudManager.CloudCallback<List<Boolean>>() {
+////        Repository.instance.getEventRecordingStatus(event.getId(), new CloudManager.CloudManagerCallback<List<Boolean>>() {
 ////            @Override
 ////            public void onComplete(List<Boolean> data) {
 ////                if ((data.get(0) == false) && (!(CheckMeAdmin()))) {
@@ -509,7 +509,7 @@
 //
 //    public void setRecordingStatus() {
 //        Log.d("TAG", "SetRecordingStatus func in recordingacitivty");
-//        Repository.instance.setRecodrdingStatus(String.valueOf(event.getId()), new CloudManager.CloudCallback() {
+//        Repository.instance.setRecodrdingStatus(String.valueOf(event.getId()), new CloudManager.CloudManagerCallback() {
 //            @Override
 //            public void onComplete(Object data) {
 //

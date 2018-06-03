@@ -359,7 +359,7 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
     public void SetEventFromInvitation(Event eventtemp) {
-//        Repository.instance.getEventById(Integer.valueOf(eventid), new CloudManager.CloudCallback<List<Event>>() {
+//        Repository.instance.getEventById(Integer.valueOf(eventid), new CloudManager.CloudManagerCallback<List<Event>>() {
 
 //            @Override
 //            public void onComplete(List<Event> EventList) {

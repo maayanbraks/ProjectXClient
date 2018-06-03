@@ -56,10 +56,10 @@ public class EventDetailsFragment extends Fragment {
             mListener.getProtocol(event.getId(), new EventDetailCallback() {
                 @Override
                 public void onSuccees(List<ProtocolLine> list) {
-                    progressBar.setVisibility(View.GONE);
                     getActivity().runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            progressBar.setVisibility(View.GONE);
                             protocol.setText(ProductTypeConverters.FromProtocolToString(list));
                         }
                     });
