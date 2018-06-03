@@ -124,9 +124,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             @Override
             public void onChanged(@Nullable User user) {
                 if (user != null) {
-                    if(user.getEmail().equals("MaayanMail"))
+                    if (user.getEmail().equals("MaayanMail"))
                         user.setDataSetTime(15);
-                    else if(user.getEmail().equals("EdenMail"))
+                    else if (user.getEmail().equals("EdenMail"))
                         user.setDataSetTime(10);
                     //update details
                     updateProfilePicture(user.getPictureUrl());
@@ -136,12 +136,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (dataSetProgress.getProgress() < 40) {
                         dataSetProgress.setDrawingCacheBackgroundColor(13504528);//RED
                         dataSetProgress.getProgressDrawable().setColorFilter(Color.RED, android.graphics.PorterDuff.Mode.SRC_IN);
-                    }
-                    else if (dataSetProgress.getProgress() < 90){
+                    } else if (dataSetProgress.getProgress() < 90) {
                         dataSetProgress.setDrawingCacheBackgroundColor(16772886);//YELLOW
                         dataSetProgress.getProgressDrawable().setColorFilter(Color.YELLOW, android.graphics.PorterDuff.Mode.SRC_IN);
-                    }
-                    else {
+                    } else {
                         dataSetProgress.getProgressDrawable().setColorFilter(Color.GREEN, android.graphics.PorterDuff.Mode.SRC_IN);
                         dataSetProgress.setDrawingCacheBackgroundColor(4980523);//GREEN
                     }
@@ -339,15 +337,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
-    private void handleFloatingButton(boolean show){
+    private void handleFloatingButton(boolean show) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(show){
+                if (show) {
                     fab.setVisibility(View.VISIBLE);
                     fab.setClickable(true);
-                }
-                else{
+                } else {
                     fab.setVisibility(View.INVISIBLE);
                     fab.setClickable(false);
                 }
@@ -676,9 +673,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    private CloudManager.CloudManagerCallback<Boolean> addFriendCallback = null;
 
     @Override
-    public void addFriend() {
+    public void addFriend(CloudManager.CloudManagerCallback<Boolean> callback) {
+        addFriendCallback = callback;
         AddFriendFragment addFriendDialog = new AddFriendFragment();
         addFriendDialog.show(getSupportFragmentManager(), "addFriendDialog");
 //        Repository.instance.addFriend("MaayanMail", new AddFriendCallback<User>() {
@@ -720,6 +719,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onSuccees(Boolean data) {
                 if (data)
                     makeToastShort("Added");
+                addFriendCallback.onComplete(data);
 //                Log.d("TAG", "friendlistsizeBeforeAdding=" + currentFriendsList.size());
 //                currentFriendsList.add(data);
 //                Log.d("TAG", "friendlistsizeafteradding=" + currentFriendsList.size());
@@ -791,7 +791,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 String maketoast = "Adding" + user.getFirstName() + " " + user.getLastName();
                 makeToastShort(maketoast);
                 // Toast.makeText(MyApp.getContext(), maketoast, Toast.LENGTH_LONG);
-                callback.onSuccees(user.getFirstName()+" "+user.getLastName());
+                callback.onSuccees(user.getFirstName() + " " + user.getLastName());
             }
 
             @Override

@@ -1,6 +1,7 @@
 package com.example.malicteam.projectxclient.Model;
 
 import android.arch.lifecycle.Observer;
+import android.os.AsyncTask;
 import android.util.Log;
 
 //import com.github.nkzawa.emitter.Emitter;
@@ -37,7 +38,7 @@ import static java.lang.Thread.sleep;
  * Created by Charcon on 02/05/2018.
  */
 
-public class CloudManager {
+public class CloudManager extends AsyncTask<String, Void, java.net.Socket> {
     public interface CloudManagerCallback<T> {
         void onComplete(T data);
 
@@ -298,7 +299,9 @@ public class CloudManager {
 
     public void sendEvent(int eventId, byte[] data, final SendAudioCallback<Boolean> callback) throws IOException {
         int responseFromServer = 0;
-        java.net.Socket sock = new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_EVENT_PORT);
+//        java.net.Socket sock = new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_EVENT_PORT);
+
+        java.net.Socket sock = doInBackground("");
 
         DataOutputStream outToServer = new DataOutputStream(sock.getOutputStream());
         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
@@ -378,6 +381,16 @@ public class CloudManager {
         sock.close();
     }
 
+    @Override
+    protected java.net.Socket doInBackground(String... strings) {
+        java.net.Socket sock = null;
+        try {
+            sock = new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_DATASET_PORT);
+        }catch (Exception e){
+            Log.d("TAG","DFDFDFDFDFDFDFDFDFDFDFDFDFDFDFDFDFDFDFDFDFDFDFDFDFDFDF");
+        }
+        return sock;
+    }
 
     public void disconnect(CloudManagerCallback<Boolean> callback) {
         socket.disconnect();

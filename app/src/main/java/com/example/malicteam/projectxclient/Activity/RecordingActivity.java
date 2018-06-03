@@ -281,7 +281,7 @@ public class RecordingActivity extends AppCompatActivity {
         recorder.stopRecording();
         if (checkMeAdmin()) {
             shareEvent();
-            finish();
+//            finish();
         } else {
            leaveEvent();
         }

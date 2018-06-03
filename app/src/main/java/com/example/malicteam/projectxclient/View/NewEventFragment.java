@@ -2,6 +2,7 @@ package com.example.malicteam.projectxclient.View;
 
 import android.arch.lifecycle.Observer;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
@@ -41,6 +42,7 @@ public class NewEventFragment extends Fragment {
         void startRecording(Event event);
     }
 
+    private SimpleFriendsAdapter adapter;
     private boolean contactsOpen = false;
     private TextView _invites;
     private NestedScrollView nestedScrollView;
@@ -200,6 +202,15 @@ public class NewEventFragment extends Fragment {
                         if (data.equals(myUser.getEmail())) {
                             Log.d("TAG", "You cant add yourself to event");
                         } else {
+                            if (contactsOpen && adapter != null) {
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                });
+
+                            }
                             usersInvitesEmail.add(parti);
                             usersInvitesNames.add(data);
                             InviteTextViewEdit(view);
@@ -269,7 +280,7 @@ public class NewEventFragment extends Fragment {
             contactsOpen = true;
             nestedScrollView.setVisibility(View.VISIBLE);
             friendsList = new LinkedList<>();
-            SimpleFriendsAdapter adapter = new SimpleFriendsAdapter();
+            adapter = new SimpleFriendsAdapter();
             ListView friendsListView = (ListView) view.findViewById(R.id.friendsListView_newEvent);
             friendsListView.setAdapter(adapter);
             mListener.initFriendsList(new Observer<List<User>>() {
@@ -304,8 +315,8 @@ public class NewEventFragment extends Fragment {
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
-            final int CHECKED_COLOR = 16777215;//white
-            final int NOT_CHECKED_COLOR = 9300220;//kind of blue
+            final int CHECKED_COLOR = Color.WHITE;//white
+            final int NOT_CHECKED_COLOR = Color.LTGRAY;//kind of blue
 
             if (view == null) {
                 view = getLayoutInflater().inflate(R.layout.friend_row_simple_new_event, viewGroup, false);
@@ -316,10 +327,10 @@ public class NewEventFragment extends Fragment {
             checkBox.setVisibility(View.INVISIBLE);
             if (usersInvitesEmail.contains(friend.getEmail())) {
                 checkBox.setChecked(true);
-                view.setBackgroundResource(CHECKED_COLOR);
+                view.setBackgroundColor(CHECKED_COLOR);
             } else {
                 checkBox.setChecked(false);
-                view.setBackgroundResource(NOT_CHECKED_COLOR);
+                view.setBackgroundColor(NOT_CHECKED_COLOR);
             }
 
 
@@ -329,13 +340,13 @@ public class NewEventFragment extends Fragment {
                 public void onClick(View v) {
                     String fullName = friend.getFirstName() + " " + friend.getLastName();
                     if (checkBox.isChecked()) {//if check => do unchecked
-                        v.setBackgroundResource(NOT_CHECKED_COLOR);
+                        v.setBackgroundColor(NOT_CHECKED_COLOR);
                         checkBox.setChecked(false);
                         usersInvitesEmail.remove(friend);
                         usersInvitesNames.remove(fullName);
                         _invites.setText("Participats:" + ProductTypeConverters.GenerateStringFromList(usersInvitesNames));
                     } else {
-                        v.setBackgroundResource(CHECKED_COLOR);
+                        v.setBackgroundColor(CHECKED_COLOR);
                         checkBox.setChecked(true);
                         usersInvitesEmail.add(friend.getEmail());
                         usersInvitesNames.add(fullName);
