@@ -297,15 +297,15 @@ public class CloudManager {
     private final int SERVER_AUDIO_EVENT_PORT = 8082;
     private final int SERVER_AUDIO_DATASET_PORT = 8081;
 
-    public void sendEvent(int eventId, byte[] data, final SendAudioCallback<Boolean> callback) throws IOException {
-        SenderObject obj = new SenderObject(eventId, null, data);
+    public void sendEvent(int eventId, byte[] data, final CloudManagerCallback<Boolean> callback) throws IOException {
+        SenderObject obj = new SenderObject(eventId, null, data, callback);
         new FileSender().execute(obj);
 //        boolean res = f.doInBackground(obj);
 //        if(res == true)
 //            callback.onSuccees(res);
 //        else
 //            callback.onError(res);
-        Log.d("TAG","ASDF");
+        Log.d("TAG","Call to async");
 //        int responseFromServer = 0;
 //        java.net.Socket sock = new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_EVENT_PORT);
 
@@ -348,14 +348,14 @@ public class CloudManager {
 
     }
 
-    public void sendDataSet(int userId, String lengthOfRecord, byte[] data, final SendAudioCallback<Boolean> callback) throws IOException {
-        SenderObject obj = new SenderObject(userId, lengthOfRecord, data);
-        FileSender f = new FileSender();
-        boolean res = f.doInBackground(obj);
-        if(res == true)
-            callback.onSuccees(res);
-        else
-            callback.onError(res);
+    public void sendDataSet(int userId, String lengthOfRecord, byte[] data, final CloudManagerCallback<Boolean> callback) throws IOException {
+        SenderObject obj = new SenderObject(userId, lengthOfRecord, data, callback);
+        new FileSender().execute(obj);
+//        boolean res = f.doInBackground(obj);
+////        if(res == true)
+////            callback.onSuccees(res);
+////        else
+////            callback.onError(res);
 //        int responseFromServer = 0;
 //        java.net.Socket sock = new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_DATASET_PORT);
 //

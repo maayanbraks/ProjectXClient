@@ -836,9 +836,9 @@ public class Repository {
         }
 
         try {
-            CloudManager.instance.sendDataSet(userLiveData.getValue().getId(), String.valueOf(seconds) + "\n", audioBytes, new CloudManager.SendAudioCallback<Boolean>() {
+            CloudManager.instance.sendDataSet(userLiveData.getValue().getId(), String.valueOf(seconds) + "\n", audioBytes, new CloudManager.CloudManagerCallback<Boolean>() {
                 @Override
-                public void onSuccees(Boolean data) {
+                public void onComplete(Boolean data) {
                     Log.d("TAG", "Repositoty -> SendDataSet -> On Succees = :)");
                     float newTime = (((float)seconds) / 60) + userLiveData.getValue().getDataSetTime();
                     userLiveData.getValue().setDataSetTime(newTime);
@@ -846,9 +846,10 @@ public class Repository {
                 }
 
                 @Override
-                public void onError(Boolean error) {
+                public void onCancel() {
                     Log.d("TAG", "Repositoty -> SendDataSet -> On Error (Boolean 0)");
                 }
+
             });
         } catch (Exception e) {
             Log.d("TAG", "Repositoty -> SendDataSet -> IO Exception " + e.getMessage());
@@ -898,15 +899,15 @@ public class Repository {
             Log.d("TAG", e.getStackTrace() + e.getMessage());
         }
         try {
-            CloudManager.instance.sendEvent(eventId, audioBytes, new CloudManager.SendAudioCallback<Boolean>() {
+            CloudManager.instance.sendEvent(eventId, audioBytes, new CloudManager.CloudManagerCallback<Boolean>() {
                 @Override
-                public void onSuccees(Boolean data) {
+                public void onComplete(Boolean data) {
                     Log.d("TAG", "Repositoty -> CloseEvent -> On Succees = :)");
                     callback.onSuccees();
                 }
 
                 @Override
-                public void onError(Boolean error) {
+                public void onCancel() {
                     Log.d("TAG", "Repositoty -> CloseEvent -> On Error (Boolean 0)");
                 }
             });

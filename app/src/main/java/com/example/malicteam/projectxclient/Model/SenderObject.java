@@ -8,14 +8,20 @@ public class SenderObject {
     private int id;
     private String lengthOfRecord;
     private byte[] data;
-    public SenderObject(int id, String lengthOfRecord, byte[] data) {
+    private CloudManager.CloudManagerCallback<Boolean> callback;
+    public SenderObject(int id, String lengthOfRecord, byte[] data, CloudManager.CloudManagerCallback<Boolean> callback) {
         this.id = id;
         this.lengthOfRecord = lengthOfRecord;
         this.data = data;
+        this.callback = callback;
     }
 
     public int getId() {
         return id;
+    }
+
+    public CloudManager.CloudManagerCallback<Boolean> getCallback() {
+        return callback;
     }
 
     public String getLengthOfRecord() {
