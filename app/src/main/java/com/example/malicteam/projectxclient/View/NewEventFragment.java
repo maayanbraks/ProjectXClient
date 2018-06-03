@@ -315,8 +315,8 @@ public class NewEventFragment extends Fragment {
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
-            final int CHECKED_COLOR = Color.WHITE;//white
-            final int NOT_CHECKED_COLOR = Color.LTGRAY;//kind of blue
+            final int CHECKED_COLOR = Color.LTGRAY;//white
+            final int NOT_CHECKED_COLOR = Color.WHITE;//kind of blue
 
             if (view == null) {
                 view = getLayoutInflater().inflate(R.layout.friend_row_simple_new_event, viewGroup, false);
