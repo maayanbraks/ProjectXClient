@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.example.malicteam.projectxclient.Common.Callbacks.EditFriendListCallback;
 import com.example.malicteam.projectxclient.Common.MyApp;
 import com.example.malicteam.projectxclient.Common.ProductTypeConverters;
+import com.example.malicteam.projectxclient.Model.CloudManager;
 import com.example.malicteam.projectxclient.Model.Repository;
 import com.example.malicteam.projectxclient.Model.User;
 import com.example.malicteam.projectxclient.R;
@@ -32,7 +33,7 @@ public class FriendsListFragment extends Fragment {
     public interface FriendsFragmentInteraction extends BasicInteractionInterface {
         void showFriendDetails(User user);
         void initFriendsList(Observer<List<User>> observer);
-        void addFriend();
+        void addFriend(CloudManager.CloudManagerCallback<Boolean> callback);
         void deleteFriend(User friend);
     }
 
@@ -153,7 +154,17 @@ public class FriendsListFragment extends Fragment {
             @Override
             public void onClick(View view) {
 
-                mListener.addFriend();
+                mListener.addFriend(new CloudManager.CloudManagerCallback<Boolean>() {
+                    @Override
+                    public void onComplete(Boolean data) {
+                        refreshList();
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+                });
             }
 
         });

@@ -1,6 +1,7 @@
 package com.example.malicteam.projectxclient.Model;
 
 import android.arch.lifecycle.Observer;
+import android.os.AsyncTask;
 import android.util.Log;
 
 //import com.github.nkzawa.emitter.Emitter;
@@ -297,86 +298,104 @@ public class CloudManager {
     private final int SERVER_AUDIO_DATASET_PORT = 8081;
 
     public void sendEvent(int eventId, byte[] data, final SendAudioCallback<Boolean> callback) throws IOException {
-        int responseFromServer = 0;
-        java.net.Socket sock = new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_EVENT_PORT);
+        SenderObject obj = new SenderObject(eventId, null, data);
+        new FileSender().execute(obj);
+//        boolean res = f.doInBackground(obj);
+//        if(res == true)
+//            callback.onSuccees(res);
+//        else
+//            callback.onError(res);
+        Log.d("TAG","ASDF");
+//        int responseFromServer = 0;
+//        java.net.Socket sock = new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_EVENT_PORT);
 
-        DataOutputStream outToServer = new DataOutputStream(sock.getOutputStream());
-        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        java.net.Socket sock = doInBackground("");
 
-        outToServer.writeBytes(eventId + "\n");
-
-        //wait for acknowlage
-        responseFromServer = inFromServer.read();
-//        if (responseFromServer == 0) {
-//            callback.onError(false);
-//            return;
-//        }
-        //SendData
-        outToServer.writeBytes(data.length + "\n");
-        responseFromServer = inFromServer.read();
-        baos.write(data);
-        baos.writeTo(outToServer);
+//        DataOutputStream outToServer = new DataOutputStream(sock.getOutputStream());
+//        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
 //
-//        try {
-//            outToServer.write(data);
-//        } catch (IOException e1) {
-//            e1.printStackTrace();
+//        outToServer.writeBytes(eventId + "\n");
+//
+//        //wait for acknowlage
+//        responseFromServer = inFromServer.read();
+////        if (responseFromServer == 0) {
+////            callback.onError(false);
+////            return;
+////        }
+//        //SendData
+//        outToServer.writeBytes(data.length + "\n");
+//        responseFromServer = inFromServer.read();
+//        baos.write(data);
+//        baos.writeTo(outToServer);
+////
+////        try {
+////            outToServer.write(data);
+////        } catch (IOException e1) {
+////            e1.printStackTrace();
+////        }
+//        if (responseFromServer == 0) {
+//            Log.d("TAG", "responseFromServerError=" + responseFromServer);
+//            callback.onError(false);
+//        } else if (responseFromServer == 1) {
+//            Log.d("TAG", "OK=" + responseFromServer);
+//            callback.onSuccees(true);
 //        }
-        if (responseFromServer == 0) {
-            Log.d("TAG", "responseFromServerError=" + responseFromServer);
-            callback.onError(false);
-        } else if (responseFromServer == 1) {
-            Log.d("TAG", "OK=" + responseFromServer);
-            callback.onSuccees(true);
-        }
-        inFromServer.close();
-        outToServer.close();
-        baos.close();
-        sock.close();
+//        inFromServer.close();
+//        outToServer.close();
+//        baos.close();
+//        sock.close();
 
     }
 
     public void sendDataSet(int userId, String lengthOfRecord, byte[] data, final SendAudioCallback<Boolean> callback) throws IOException {
-        int responseFromServer = 0;
-        java.net.Socket sock = new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_DATASET_PORT);
-
-        DataOutputStream outToServer = new DataOutputStream(sock.getOutputStream());
-        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        outToServer.writeBytes(userId + "\n");
-
-        //wait for acknowlage
-        responseFromServer = inFromServer.read();
-
-        //need to send Length of DataSet before the Record
-        outToServer.writeBytes(lengthOfRecord + "\n");
-        responseFromServer = inFromServer.read();
-        if (responseFromServer == 0) //send the AudioByt
-        {
-            callback.onError(false);
-            return;
-        }
-
-        //Send Data
-        outToServer.writeBytes(data.length + "\n");
-        responseFromServer = inFromServer.read();
-        baos.write(data);
-        baos.writeTo(outToServer);
-        responseFromServer = inFromServer.read();
-        if (responseFromServer == 0) {
-            Log.d("TAG", "responseFromServerError=" + responseFromServer);
-            callback.onError(false);
-        } else if (responseFromServer == 1) {
-            Log.d("TAG", "OK=" + responseFromServer);
-            callback.onSuccees(true);
-        }
-        inFromServer.close();
-        outToServer.close();
-        baos.close();
-        sock.close();
+        SenderObject obj = new SenderObject(userId, lengthOfRecord, data);
+        FileSender f = new FileSender();
+        boolean res = f.doInBackground(obj);
+        if(res == true)
+            callback.onSuccees(res);
+        else
+            callback.onError(res);
+//        int responseFromServer = 0;
+//        java.net.Socket sock = new java.net.Socket(SERVER_ADDRESS_Audio, SERVER_AUDIO_DATASET_PORT);
+//
+//        DataOutputStream outToServer = new DataOutputStream(sock.getOutputStream());
+//        BufferedReader inFromServer = new BufferedReader(new InputStreamReader(sock.getInputStream()));
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//
+//        outToServer.writeBytes(userId + "\n");
+//
+//        //wait for acknowlage
+//        responseFromServer = inFromServer.read();
+//
+//        //need to send Length of DataSet before the Record
+//        outToServer.writeBytes(lengthOfRecord + "\n");
+//        responseFromServer = inFromServer.read();
+//        if (responseFromServer == 0) //send the AudioByt
+//        {
+//            callback.onError(false);
+//            return;
+//        }
+//
+//        //Send Data
+//        outToServer.writeBytes(data.length + "\n");
+//        responseFromServer = inFromServer.read();
+//        baos.write(data);
+//        baos.writeTo(outToServer);
+//        responseFromServer = inFromServer.read();
+//        if (responseFromServer == 0) {
+//            Log.d("TAG", "responseFromServerError=" + responseFromServer);
+//            callback.onError(false);
+//        } else if (responseFromServer == 1) {
+//            Log.d("TAG", "OK=" + responseFromServer);
+//            callback.onSuccees(true);
+//        }
+//        inFromServer.close();
+//        outToServer.close();
+//        baos.close();
+//        sock.close();
     }
+
 
 
     public void disconnect(CloudManagerCallback<Boolean> callback) {

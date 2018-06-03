@@ -31,7 +31,6 @@ import com.example.malicteam.projectxclient.R;
 import java.io.File;
 import java.io.IOException;
 
-import Requests.IsUserExistRequestData;
 import UpdateObjects.CloseEvent;
 
 
@@ -80,52 +79,24 @@ public class RecordingActivity extends AppCompatActivity {
         TextView onAir = findViewById(R.id.onAir_recording);
         //Recording Button + "On Air" image
         if (recorder.isRecording()) {//if recording now
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    onAir.setVisibility(View.VISIBLE);
-                    playingButton.setClickable(false);
-                    playingButton.setVisibility(View.INVISIBLE);
-                    recordingButton.setImageResource(android.R.drawable.ic_menu_save);
-                }
-            });
-
-
+            recordingButton.setImageResource(android.R.drawable.ic_menu_save);
+            onAir.setVisibility(View.VISIBLE);
+            playingButton.setClickable(false);
+            playingButton.setVisibility(View.INVISIBLE);
         } else {
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    recordingButton.setImageResource(android.R.drawable.ic_btn_speak_now);
-                    onAir.setVisibility(View.INVISIBLE);
-                    playingButton.setImageResource(android.R.drawable.ic_media_play);
-                    playingButton.setClickable(true);
-                    playingButton.setVisibility(View.VISIBLE);
-                }
-            });
-
+            recordingButton.setImageResource(android.R.drawable.ic_btn_speak_now);
+            onAir.setVisibility(View.INVISIBLE);
+            playingButton.setImageResource(android.R.drawable.ic_media_play);
+            playingButton.setClickable(true);
+            playingButton.setVisibility(View.VISIBLE);
         }
         //Playing Button
         if (!mStartToPlayMedia) {//if next click should be pause
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    playingButton.setImageResource(android.R.drawable.ic_media_pause);
-                }
-            });
+            playingButton.setImageResource(android.R.drawable.ic_media_pause);
         } else {
-            runOnUiThread(new Runnable() {
-
-                @Override
-                public void run() {
-                    playingButton.setImageResource(android.R.drawable.ic_media_play);
-                }
-            });
+            playingButton.setImageResource(android.R.drawable.ic_media_play);
         }
     }
-
 
     private void listenToParticipents() {
         Repository.instance.InitCallbacksForCloudManeger(new RecordingActivityCallback() {
@@ -141,7 +112,6 @@ public class RecordingActivity extends AppCompatActivity {
 
             @Override
             public void eventClosed(Event event) {
-                if (!(checkMeAdmin()))
                 StopRecordingByAdmin();
             }
 
@@ -282,7 +252,6 @@ public class RecordingActivity extends AppCompatActivity {
         //Toast.makeText(getApplication(), "The admin has stop the record..", Toast.LENGTH_SHORT).show();
         MakeToastShort("The admin has stop the record..");
         startRecordOrSaveIt();
-        finish();
         //stop recording...
     }
 
@@ -312,7 +281,7 @@ public class RecordingActivity extends AppCompatActivity {
         recorder.stopRecording();
         if (checkMeAdmin()) {
             shareEvent();
-           // finish();
+//            finish();
         } else {
            leaveEvent();
         }
